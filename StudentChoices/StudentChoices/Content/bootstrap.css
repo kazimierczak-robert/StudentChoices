@@ -42,6 +42,10 @@ video {
   display: inline-block;
 }
 
+footer{
+      text-align: center;
+}
+
 audio:not([controls]) {
   display: none;
   height: 0;
@@ -289,6 +293,7 @@ table {
     border: 1px solid #000;
   }
   .table {
+            vertical-align: middle;
     border-collapse: collapse !important;
   }
   .table-bordered th,
@@ -560,6 +565,39 @@ h4 small,
   padding-bottom: 9px;
   margin: 40px 0 20px;
   border-bottom: 1px solid #eeeeee;
+}
+
+ul li {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+ul li:hover {
+  background: #161515;
+  color: #fff;
+}
+ul li ul {
+  padding: 1px;
+  position: absolute;
+  left: auto;
+  right:0;
+  width: 140px;
+  text-align:right;
+  box-shadow:none;
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  line-height: 35px;
+}
+ul li ul li { 
+  background: #555; 
+  display: block; 
+}
+ul li ul li:hover { background: #393838; }
+ul li:hover ul {
+  display: block;
+  opacity: 1;
+  visibility: visible;
 }
 
 ul,
@@ -2049,9 +2087,11 @@ fieldset[disabled] .btn {
 }
 
 .btn-default {
-  color: #333333;
-  background-color: #ffffff;
-  border-color: #cccccc;
+  color: #FFFFFF;
+  background-color: #539ad7;
+  border-color: #539ad7;
+  font-weight: 600;
+  line-height: 1.1;
 }
 
 .btn-default:hover,
@@ -2060,7 +2100,7 @@ fieldset[disabled] .btn {
 .btn-default.active,
 .open .dropdown-toggle.btn-default {
   color: #333333;
-  background-color: #ebebeb;
+  background-color: #9ccbf3;
   border-color: #adadad;
 }
 
@@ -2085,7 +2125,7 @@ fieldset[disabled] .btn-default:active,
 .btn-default.disabled.active,
 .btn-default[disabled].active,
 fieldset[disabled] .btn-default.active {
-  background-color: #ffffff;
+  /*background-color: #ffffff;*/
   border-color: #cccccc;
 }
 
@@ -3242,7 +3282,7 @@ input[type="button"].btn-block {
   min-width: 160px;
   padding: 5px 0;
   margin: 2px 0 0;
-  font-size: 14px;
+  font-size: 12px;
   list-style: none;
   background-color: #ffffff;
   border: 1px solid #cccccc;
@@ -3818,13 +3858,14 @@ textarea.input-group-sm > .input-group-btn > .btn {
 .nav > li > a {
   position: relative;
   display: block;
-  padding: 10px 15px;
+  padding: 1px 15px;
 }
 
 .nav > li > a:hover,
 .nav > li > a:focus {
   text-decoration: none;
-  background-color: #eeeeee;
+  background-color: #393838;
+  color:#a9cfef
 }
 
 .nav > li.disabled > a {
@@ -5750,6 +5791,14 @@ body.modal-open,
     -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   }
+}
+
+.tool-tip {
+  display: inline-block;
+}
+
+.tool-tip [disabled] {
+  pointer-events: none;
 }
 
 .tooltip {

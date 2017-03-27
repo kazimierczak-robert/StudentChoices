@@ -1,0 +1,31 @@
+﻿@if (Session["USER_LOGIN"] != null)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                @Html.ActionLink("Zarządzaj", "Index", "Reservation")
+            </li>
+
+            <li>
+                <a>Witaj, @Session["USER_NAME"].ToString()!</a>
+                <ul class="nav">
+                    <li>@Html.ActionLink("Edytuj Profil", "Edit", "Account")</li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="javascript:document.getElementById('logoutForm').submit()">Wyloguj</a>
+            </li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("Zaloguj się", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}
+
