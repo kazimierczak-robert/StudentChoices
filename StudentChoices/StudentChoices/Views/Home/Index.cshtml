@@ -1,31 +1,49 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "StudentChoices";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+@if (Session["USER"] == "Admin")
+{
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+}
+else if (Session["USER"] == "Student")
+{
+
+}
+else
+{
+<table align="center">
+    <tr>
+        <td rowspan="5"><img src="~/Images/index.jpg" style="min-width:100%" alt="" /></td> 
+    </tr>
+    <tr>
+        <td align="center" width="60%" valign="top">
+            <h2 style="color: #210764"><b>Wybór</b></h2>
+            Dokonaj wyboru specjalności.<br />
+            Zdecyduj, które przedmioty obieralne chcesz studiować.
+        </td>
+    </tr>
+    <tr>   
+        <td align="center" width="60%" valign="top">
+            <h2 style="color: #210764"><b>Prostota</b></h2>
+             Korzystaj z przejrzystego interfejsu będąc studentem.<br/>
+             Ułatw administrowanie procesem rekrutacji.
+        </td>
+    </tr>
+    <tr>
+        <td align="center" width="60%" valign="top">
+            <h2 style="color: #210764"><b>Szybkość</b></h2>
+            Wprowadzaj swoje dane w formie elektronicznej.<br />
+            Przyspiesz przydział studentów.
+        </td>
+    </tr>
+    <tr>
+        <td align="center" width="60%" valign="top">
+            <h2 style="color: #210764"><b>Nowoczesność</b></h2>
+            Zakończ pracę z tradycyjnymi, papierowymi formularzami.<br/>
+            Miej dostęp do danych o każdej porze.<br />
+            Podejmuj decyzje, niewychodząc z domu.
+        </td>
+    </tr>
+</table>
+}
