@@ -1,0 +1,1310 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="PPDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Admins">
+          <Key>
+            <PropertyRef Name="AdminID" />
+          </Key>
+          <Property Name="AdminID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Login" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Password" Type="char" MaxLength="64" Nullable="false" />
+          <Property Name="Active" Type="bit" Nullable="false" />
+          <Property Name="SuperAdmin" Type="bit" Nullable="false" />
+          <Property Name="LastLogin" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Categories">
+          <Key>
+            <PropertyRef Name="CategoryID" />
+          </Key>
+          <Property Name="CategoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClassGroupID" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Information" Type="varchar(max)" />
+          <Property Name="MaxNoChoices" Type="int" Nullable="false" />
+          <Property Name="LastEdit" Type="datetime" />
+          <Property Name="LastEditedBy" Type="int" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ClassGroups">
+          <Key>
+            <PropertyRef Name="ClassGroupID" />
+          </Key>
+          <Property Name="ClassGroupID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DegreeCourse" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Graduate" Type="tinyint" Nullable="false" />
+          <Property Name="FullTimeStudies" Type="bit" Nullable="false" />
+          <Property Name="Semester" Type="tinyint" Nullable="false" />
+          <Property Name="Speciality" Type="varchar" MaxLength="50" />
+          <Property Name="LastEdit" Type="datetime" />
+          <Property Name="LastEditedBy" Type="int" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ElectiveSubjectsAndSpecialities">
+          <Key>
+            <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+          </Key>
+          <Property Name="ElectiveSubjectAndSpecialityID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CategoryID" Type="int" Nullable="false" />
+          <Property Name="Information" Type="varchar(max)" />
+          <Property Name="UpperLimit" Type="smallint" />
+          <Property Name="LowerLimit" Type="smallint" />
+          <Property Name="LastEdit" Type="datetime" />
+          <Property Name="LastEditedBy" Type="int" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Files">
+          <Key>
+            <PropertyRef Name="FileID" />
+          </Key>
+          <Property Name="FileID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Filename" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ElectiveSubjectAndSpecialityID" Type="int" Nullable="false" />
+          <Property Name="Path" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="LastEdit" Type="datetime" />
+          <Property Name="LastEditedBy" Type="int" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FinalChoices">
+          <Key>
+            <PropertyRef Name="FinalChoiceID" />
+          </Key>
+          <Property Name="FinalChoiceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StudentNo" Type="int" Nullable="false" />
+          <Property Name="CategoryID" Type="int" Nullable="false" />
+          <Property Name="ChoiceID" Type="int" Nullable="false" />
+          <Property Name="LastEdit" Type="datetime" />
+          <Property Name="LastEditedBy" Type="int" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StudentChoices">
+          <Key>
+            <PropertyRef Name="StudentChoiceID" />
+          </Key>
+          <Property Name="StudentChoiceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StudentNo" Type="int" Nullable="false" />
+          <Property Name="CategoryID" Type="int" Nullable="false" />
+          <Property Name="ChoiceID" Type="int" Nullable="false" />
+          <Property Name="PreferenceNo" Type="tinyint" Nullable="false" />
+          <Property Name="ChoiceDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Students">
+          <Key>
+            <PropertyRef Name="StudentNo" />
+          </Key>
+          <Property Name="StudentNo" Type="int" Nullable="false" />
+          <Property Name="Login" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Password" Type="char" MaxLength="64" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Surname" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="AverageGrade" Type="float" Nullable="false" />
+          <Property Name="TriesNo" Type="tinyint" Nullable="false" />
+          <Property Name="LastEdit" Type="datetime" />
+          <Property Name="LastEditedBy" Type="int" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StudentsAndClassGroups">
+          <Key>
+            <PropertyRef Name="StudentNo" />
+            <PropertyRef Name="ClassGroupID" />
+          </Key>
+          <Property Name="StudentNo" Type="int" Nullable="false" />
+          <Property Name="ClassGroupID" Type="int" Nullable="false" />
+          <Property Name="LastEdit" Type="datetime" />
+          <Property Name="LastEditedBy" Type="int" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Categories_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="Categories" Type="Self.Categories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Categories">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Categories_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="Categories" Type="Self.Categories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Categories">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Category_ClassGroup">
+          <End Role="ClassGroups" Type="Self.ClassGroups" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Categories" Type="Self.Categories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClassGroups">
+              <PropertyRef Name="ClassGroupID" />
+            </Principal>
+            <Dependent Role="Categories">
+              <PropertyRef Name="ClassGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClassGroups_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="ClassGroups" Type="Self.ClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="ClassGroups">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClassGroups_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="ClassGroups" Type="Self.ClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="ClassGroups">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ElectiveSubject&amp;Speciality_Category">
+          <End Role="Categories" Type="Self.Categories" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categories">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ElectiveSubjectsAndSpecialities_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ElectiveSubjectsAndSpecialities_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_File_ElectiveSubject&amp;Speciality">
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Files" Type="Self.Files" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+            </Principal>
+            <Dependent Role="Files">
+              <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Files_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="Files" Type="Self.Files" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Files">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Files_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="Files" Type="Self.Files" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Files">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_Categories">
+          <End Role="Categories" Type="Self.Categories" Multiplicity="1" />
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categories">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_ElectiveSubjectsAndSpecialities">
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="1" />
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="ChoiceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_Students">
+          <End Role="Students" Type="Self.Students" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Students">
+              <PropertyRef Name="StudentNo" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student&amp;ClassGroup_ClassGroup">
+          <End Role="ClassGroups" Type="Self.ClassGroups" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="StudentsAndClassGroups" Type="Self.StudentsAndClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClassGroups">
+              <PropertyRef Name="ClassGroupID" />
+            </Principal>
+            <Dependent Role="StudentsAndClassGroups">
+              <PropertyRef Name="ClassGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student&amp;ClassGroup_Student">
+          <End Role="Students" Type="Self.Students" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="StudentsAndClassGroups" Type="Self.StudentsAndClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Students">
+              <PropertyRef Name="StudentNo" />
+            </Principal>
+            <Dependent Role="StudentsAndClassGroups">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentChoice_Category">
+          <End Role="Categories" Type="Self.Categories" Multiplicity="1" />
+          <End Role="StudentChoices" Type="Self.StudentChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categories">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="StudentChoices">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentChoice_Student">
+          <End Role="Students" Type="Self.Students" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="StudentChoices" Type="Self.StudentChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Students">
+              <PropertyRef Name="StudentNo" />
+            </Principal>
+            <Dependent Role="StudentChoices">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentChoice1_ElectiveSubject&amp;Speciality">
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="1" />
+          <End Role="StudentChoices" Type="Self.StudentChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+            </Principal>
+            <Dependent Role="StudentChoices">
+              <PropertyRef Name="ChoiceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Students_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="Students" Type="Self.Students" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Students">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Students_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="Students" Type="Self.Students" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Students">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentsAndClassGroups_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="StudentsAndClassGroups" Type="Self.StudentsAndClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="StudentsAndClassGroups">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentsAndClassGroups_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="StudentsAndClassGroups" Type="Self.StudentsAndClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="StudentsAndClassGroups">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PPDBModelStoreContainer">
+          <EntitySet Name="Admins" EntityType="Self.Admins" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Categories" EntityType="Self.Categories" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ClassGroups" EntityType="Self.ClassGroups" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ElectiveSubjectsAndSpecialities" EntityType="Self.ElectiveSubjectsAndSpecialities" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Files" EntityType="Self.Files" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FinalChoices" EntityType="Self.FinalChoices" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StudentChoices" EntityType="Self.StudentChoices" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Students" EntityType="Self.Students" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StudentsAndClassGroups" EntityType="Self.StudentsAndClassGroups" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Categories_Admins" Association="Self.FK_Categories_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Categories" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Categories_Admins1" Association="Self.FK_Categories_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Categories" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Category_ClassGroup" Association="Self.FK_Category_ClassGroup">
+            <End Role="ClassGroups" EntitySet="ClassGroups" />
+            <End Role="Categories" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClassGroups_Admins" Association="Self.FK_ClassGroups_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="ClassGroups" EntitySet="ClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClassGroups_Admins1" Association="Self.FK_ClassGroups_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="ClassGroups" EntitySet="ClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ElectiveSubject&amp;Speciality_Category" Association="Self.FK_ElectiveSubject&amp;Speciality_Category">
+            <End Role="Categories" EntitySet="Categories" />
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ElectiveSubjectsAndSpecialities_Admins" Association="Self.FK_ElectiveSubjectsAndSpecialities_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ElectiveSubjectsAndSpecialities_Admins1" Association="Self.FK_ElectiveSubjectsAndSpecialities_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_File_ElectiveSubject&amp;Speciality" Association="Self.FK_File_ElectiveSubject&amp;Speciality">
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+            <End Role="Files" EntitySet="Files" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Files_Admins" Association="Self.FK_Files_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Files" EntitySet="Files" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Files_Admins1" Association="Self.FK_Files_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Files" EntitySet="Files" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_Admins" Association="Self.FK_FinalChoices_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_Admins1" Association="Self.FK_FinalChoices_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_Categories" Association="Self.FK_FinalChoices_Categories">
+            <End Role="Categories" EntitySet="Categories" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_ElectiveSubjectsAndSpecialities" Association="Self.FK_FinalChoices_ElectiveSubjectsAndSpecialities">
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_Students" Association="Self.FK_FinalChoices_Students">
+            <End Role="Students" EntitySet="Students" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student&amp;ClassGroup_ClassGroup" Association="Self.FK_Student&amp;ClassGroup_ClassGroup">
+            <End Role="ClassGroups" EntitySet="ClassGroups" />
+            <End Role="StudentsAndClassGroups" EntitySet="StudentsAndClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student&amp;ClassGroup_Student" Association="Self.FK_Student&amp;ClassGroup_Student">
+            <End Role="Students" EntitySet="Students" />
+            <End Role="StudentsAndClassGroups" EntitySet="StudentsAndClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentChoice_Category" Association="Self.FK_StudentChoice_Category">
+            <End Role="Categories" EntitySet="Categories" />
+            <End Role="StudentChoices" EntitySet="StudentChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentChoice_Student" Association="Self.FK_StudentChoice_Student">
+            <End Role="Students" EntitySet="Students" />
+            <End Role="StudentChoices" EntitySet="StudentChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentChoice1_ElectiveSubject&amp;Speciality" Association="Self.FK_StudentChoice1_ElectiveSubject&amp;Speciality">
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+            <End Role="StudentChoices" EntitySet="StudentChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Students_Admins" Association="Self.FK_Students_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Students" EntitySet="Students" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Students_Admins1" Association="Self.FK_Students_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Students" EntitySet="Students" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentsAndClassGroups_Admins" Association="Self.FK_StudentsAndClassGroups_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="StudentsAndClassGroups" EntitySet="StudentsAndClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentsAndClassGroups_Admins1" Association="Self.FK_StudentsAndClassGroups_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="StudentsAndClassGroups" EntitySet="StudentsAndClassGroups" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="PPDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Admins">
+          <Key>
+            <PropertyRef Name="AdminID" />
+          </Key>
+          <Property Name="AdminID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Login" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="64" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="SuperAdmin" Type="Boolean" Nullable="false" />
+          <Property Name="LastLogin" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Categories" Relationship="Self.FK_Categories_Admins" FromRole="Admins" ToRole="Categories" />
+          <NavigationProperty Name="Categories1" Relationship="Self.FK_Categories_Admins1" FromRole="Admins" ToRole="Categories" />
+          <NavigationProperty Name="ClassGroups" Relationship="Self.FK_ClassGroups_Admins" FromRole="Admins" ToRole="ClassGroups" />
+          <NavigationProperty Name="ClassGroups1" Relationship="Self.FK_ClassGroups_Admins1" FromRole="Admins" ToRole="ClassGroups" />
+          <NavigationProperty Name="ElectiveSubjectsAndSpecialities" Relationship="Self.FK_ElectiveSubjectsAndSpecialities_Admins" FromRole="Admins" ToRole="ElectiveSubjectsAndSpecialities" />
+          <NavigationProperty Name="ElectiveSubjectsAndSpecialities1" Relationship="Self.FK_ElectiveSubjectsAndSpecialities_Admins1" FromRole="Admins" ToRole="ElectiveSubjectsAndSpecialities" />
+          <NavigationProperty Name="Files" Relationship="Self.FK_Files_Admins" FromRole="Admins" ToRole="Files" />
+          <NavigationProperty Name="Files1" Relationship="Self.FK_Files_Admins1" FromRole="Admins" ToRole="Files" />
+          <NavigationProperty Name="FinalChoices" Relationship="Self.FK_FinalChoices_Admins" FromRole="Admins" ToRole="FinalChoices" />
+          <NavigationProperty Name="FinalChoices1" Relationship="Self.FK_FinalChoices_Admins1" FromRole="Admins" ToRole="FinalChoices" />
+          <NavigationProperty Name="Students" Relationship="Self.FK_Students_Admins" FromRole="Admins" ToRole="Students" />
+          <NavigationProperty Name="Students1" Relationship="Self.FK_Students_Admins1" FromRole="Admins" ToRole="Students" />
+          <NavigationProperty Name="StudentsAndClassGroups" Relationship="Self.FK_StudentsAndClassGroups_Admins" FromRole="Admins" ToRole="StudentsAndClassGroups" />
+          <NavigationProperty Name="StudentsAndClassGroups1" Relationship="Self.FK_StudentsAndClassGroups_Admins1" FromRole="Admins" ToRole="StudentsAndClassGroups" />
+        </EntityType>
+        <EntityType Name="Categories">
+          <Key>
+            <PropertyRef Name="CategoryID" />
+          </Key>
+          <Property Name="CategoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClassGroupID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Information" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="MaxNoChoices" Type="Int32" Nullable="false" />
+          <Property Name="LastEdit" Type="DateTime" Precision="3" />
+          <Property Name="LastEditedBy" Type="Int32" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Admins" Relationship="Self.FK_Categories_Admins" FromRole="Categories" ToRole="Admins" />
+          <NavigationProperty Name="Admins1" Relationship="Self.FK_Categories_Admins1" FromRole="Categories" ToRole="Admins" />
+          <NavigationProperty Name="ClassGroups" Relationship="Self.FK_Category_ClassGroup" FromRole="Categories" ToRole="ClassGroups" />
+          <NavigationProperty Name="ElectiveSubjectsAndSpecialities" Relationship="Self.FK_ElectiveSubject_Speciality_Category" FromRole="Categories" ToRole="ElectiveSubjectsAndSpecialities" />
+          <NavigationProperty Name="FinalChoices" Relationship="Self.FK_FinalChoices_Categories" FromRole="Categories" ToRole="FinalChoices" />
+          <NavigationProperty Name="StudentChoices" Relationship="Self.FK_StudentChoice_Category" FromRole="Categories" ToRole="StudentChoices" />
+        </EntityType>
+        <EntityType Name="ClassGroups">
+          <Key>
+            <PropertyRef Name="ClassGroupID" />
+          </Key>
+          <Property Name="ClassGroupID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DegreeCourse" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Graduate" Type="Byte" Nullable="false" />
+          <Property Name="FullTimeStudies" Type="Boolean" Nullable="false" />
+          <Property Name="Semester" Type="Byte" Nullable="false" />
+          <Property Name="Speciality" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LastEdit" Type="DateTime" Precision="3" />
+          <Property Name="LastEditedBy" Type="Int32" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Admins" Relationship="Self.FK_ClassGroups_Admins" FromRole="ClassGroups" ToRole="Admins" />
+          <NavigationProperty Name="Admins1" Relationship="Self.FK_ClassGroups_Admins1" FromRole="ClassGroups" ToRole="Admins" />
+          <NavigationProperty Name="Categories" Relationship="Self.FK_Category_ClassGroup" FromRole="ClassGroups" ToRole="Categories" />
+          <NavigationProperty Name="StudentsAndClassGroups" Relationship="Self.FK_Student_ClassGroup_ClassGroup" FromRole="ClassGroups" ToRole="StudentsAndClassGroups" />
+        </EntityType>
+        <EntityType Name="ElectiveSubjectsAndSpecialities">
+          <Key>
+            <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+          </Key>
+          <Property Name="ElectiveSubjectAndSpecialityID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CategoryID" Type="Int32" Nullable="false" />
+          <Property Name="Information" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="UpperLimit" Type="Int16" />
+          <Property Name="LowerLimit" Type="Int16" />
+          <Property Name="LastEdit" Type="DateTime" Precision="3" />
+          <Property Name="LastEditedBy" Type="Int32" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Admins" Relationship="Self.FK_ElectiveSubjectsAndSpecialities_Admins" FromRole="ElectiveSubjectsAndSpecialities" ToRole="Admins" />
+          <NavigationProperty Name="Admins1" Relationship="Self.FK_ElectiveSubjectsAndSpecialities_Admins1" FromRole="ElectiveSubjectsAndSpecialities" ToRole="Admins" />
+          <NavigationProperty Name="Categories" Relationship="Self.FK_ElectiveSubject_Speciality_Category" FromRole="ElectiveSubjectsAndSpecialities" ToRole="Categories" />
+          <NavigationProperty Name="Files" Relationship="Self.FK_File_ElectiveSubject_Speciality" FromRole="ElectiveSubjectsAndSpecialities" ToRole="Files" />
+          <NavigationProperty Name="FinalChoices" Relationship="Self.FK_FinalChoices_ElectiveSubjectsAndSpecialities" FromRole="ElectiveSubjectsAndSpecialities" ToRole="FinalChoices" />
+          <NavigationProperty Name="StudentChoices" Relationship="Self.FK_StudentChoice1_ElectiveSubject_Speciality" FromRole="ElectiveSubjectsAndSpecialities" ToRole="StudentChoices" />
+        </EntityType>
+        <EntityType Name="Files">
+          <Key>
+            <PropertyRef Name="FileID" />
+          </Key>
+          <Property Name="FileID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Filename" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ElectiveSubjectAndSpecialityID" Type="Int32" Nullable="false" />
+          <Property Name="Path" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LastEdit" Type="DateTime" Precision="3" />
+          <Property Name="LastEditedBy" Type="Int32" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Admins" Relationship="Self.FK_Files_Admins" FromRole="Files" ToRole="Admins" />
+          <NavigationProperty Name="Admins1" Relationship="Self.FK_Files_Admins1" FromRole="Files" ToRole="Admins" />
+          <NavigationProperty Name="ElectiveSubjectsAndSpecialities" Relationship="Self.FK_File_ElectiveSubject_Speciality" FromRole="Files" ToRole="ElectiveSubjectsAndSpecialities" />
+        </EntityType>
+        <EntityType Name="FinalChoices">
+          <Key>
+            <PropertyRef Name="FinalChoiceID" />
+          </Key>
+          <Property Name="FinalChoiceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentNo" Type="Int32" Nullable="false" />
+          <Property Name="CategoryID" Type="Int32" Nullable="false" />
+          <Property Name="ChoiceID" Type="Int32" Nullable="false" />
+          <Property Name="LastEdit" Type="DateTime" Precision="3" />
+          <Property Name="LastEditedBy" Type="Int32" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Admins" Relationship="Self.FK_FinalChoices_Admins" FromRole="FinalChoices" ToRole="Admins" />
+          <NavigationProperty Name="Admins1" Relationship="Self.FK_FinalChoices_Admins1" FromRole="FinalChoices" ToRole="Admins" />
+          <NavigationProperty Name="Categories" Relationship="Self.FK_FinalChoices_Categories" FromRole="FinalChoices" ToRole="Categories" />
+          <NavigationProperty Name="ElectiveSubjectsAndSpecialities" Relationship="Self.FK_FinalChoices_ElectiveSubjectsAndSpecialities" FromRole="FinalChoices" ToRole="ElectiveSubjectsAndSpecialities" />
+          <NavigationProperty Name="Students" Relationship="Self.FK_FinalChoices_Students" FromRole="FinalChoices" ToRole="Students" />
+        </EntityType>
+        <EntityType Name="StudentChoices">
+          <Key>
+            <PropertyRef Name="StudentChoiceID" />
+          </Key>
+          <Property Name="StudentChoiceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentNo" Type="Int32" Nullable="false" />
+          <Property Name="CategoryID" Type="Int32" Nullable="false" />
+          <Property Name="ChoiceID" Type="Int32" Nullable="false" />
+          <Property Name="PreferenceNo" Type="Byte" Nullable="false" />
+          <Property Name="ChoiceDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Categories" Relationship="Self.FK_StudentChoice_Category" FromRole="StudentChoices" ToRole="Categories" />
+          <NavigationProperty Name="ElectiveSubjectsAndSpecialities" Relationship="Self.FK_StudentChoice1_ElectiveSubject_Speciality" FromRole="StudentChoices" ToRole="ElectiveSubjectsAndSpecialities" />
+          <NavigationProperty Name="Students" Relationship="Self.FK_StudentChoice_Student" FromRole="StudentChoices" ToRole="Students" />
+        </EntityType>
+        <EntityType Name="Students">
+          <Key>
+            <PropertyRef Name="StudentNo" />
+          </Key>
+          <Property Name="StudentNo" Type="Int32" Nullable="false" />
+          <Property Name="Login" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="64" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Surname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="AverageGrade" Type="Double" Nullable="false" />
+          <Property Name="TriesNo" Type="Byte" Nullable="false" />
+          <Property Name="LastEdit" Type="DateTime" Precision="3" />
+          <Property Name="LastEditedBy" Type="Int32" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Admins" Relationship="Self.FK_Students_Admins" FromRole="Students" ToRole="Admins" />
+          <NavigationProperty Name="Admins1" Relationship="Self.FK_Students_Admins1" FromRole="Students" ToRole="Admins" />
+          <NavigationProperty Name="FinalChoices" Relationship="Self.FK_FinalChoices_Students" FromRole="Students" ToRole="FinalChoices" />
+          <NavigationProperty Name="StudentChoices" Relationship="Self.FK_StudentChoice_Student" FromRole="Students" ToRole="StudentChoices" />
+          <NavigationProperty Name="StudentsAndClassGroups" Relationship="Self.FK_Student_ClassGroup_Student" FromRole="Students" ToRole="StudentsAndClassGroups" />
+        </EntityType>
+        <EntityType Name="StudentsAndClassGroups">
+          <Key>
+            <PropertyRef Name="StudentNo" />
+            <PropertyRef Name="ClassGroupID" />
+          </Key>
+          <Property Name="StudentNo" Type="Int32" Nullable="false" />
+          <Property Name="ClassGroupID" Type="Int32" Nullable="false" />
+          <Property Name="LastEdit" Type="DateTime" Precision="3" />
+          <Property Name="LastEditedBy" Type="Int32" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Admins" Relationship="Self.FK_StudentsAndClassGroups_Admins" FromRole="StudentsAndClassGroups" ToRole="Admins" />
+          <NavigationProperty Name="Admins1" Relationship="Self.FK_StudentsAndClassGroups_Admins1" FromRole="StudentsAndClassGroups" ToRole="Admins" />
+          <NavigationProperty Name="ClassGroups" Relationship="Self.FK_Student_ClassGroup_ClassGroup" FromRole="StudentsAndClassGroups" ToRole="ClassGroups" />
+          <NavigationProperty Name="Students" Relationship="Self.FK_Student_ClassGroup_Student" FromRole="StudentsAndClassGroups" ToRole="Students" />
+        </EntityType>
+        <Association Name="FK_Categories_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="Categories" Type="Self.Categories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Categories">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Categories_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="Categories" Type="Self.Categories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Categories">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClassGroups_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="ClassGroups" Type="Self.ClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="ClassGroups">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClassGroups_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="ClassGroups" Type="Self.ClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="ClassGroups">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ElectiveSubjectsAndSpecialities_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ElectiveSubjectsAndSpecialities_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Files_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="Files" Type="Self.Files" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Files">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Files_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="Files" Type="Self.Files" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Files">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Students_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="Students" Type="Self.Students" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Students">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Students_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="Students" Type="Self.Students" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="Students">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentsAndClassGroups_Admins">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="0..1" />
+          <End Role="StudentsAndClassGroups" Type="Self.StudentsAndClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="StudentsAndClassGroups">
+              <PropertyRef Name="LastEditedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentsAndClassGroups_Admins1">
+          <End Role="Admins" Type="Self.Admins" Multiplicity="1" />
+          <End Role="StudentsAndClassGroups" Type="Self.StudentsAndClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Admins">
+              <PropertyRef Name="AdminID" />
+            </Principal>
+            <Dependent Role="StudentsAndClassGroups">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Category_ClassGroup">
+          <End Role="ClassGroups" Type="Self.ClassGroups" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Categories" Type="Self.Categories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClassGroups">
+              <PropertyRef Name="ClassGroupID" />
+            </Principal>
+            <Dependent Role="Categories">
+              <PropertyRef Name="ClassGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ElectiveSubject_Speciality_Category">
+          <End Role="Categories" Type="Self.Categories" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categories">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_Categories">
+          <End Role="Categories" Type="Self.Categories" Multiplicity="1" />
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categories">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentChoice_Category">
+          <End Role="Categories" Type="Self.Categories" Multiplicity="1" />
+          <End Role="StudentChoices" Type="Self.StudentChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categories">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="StudentChoices">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student_ClassGroup_ClassGroup">
+          <End Role="ClassGroups" Type="Self.ClassGroups" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="StudentsAndClassGroups" Type="Self.StudentsAndClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClassGroups">
+              <PropertyRef Name="ClassGroupID" />
+            </Principal>
+            <Dependent Role="StudentsAndClassGroups">
+              <PropertyRef Name="ClassGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_File_ElectiveSubject_Speciality">
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Files" Type="Self.Files" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+            </Principal>
+            <Dependent Role="Files">
+              <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_ElectiveSubjectsAndSpecialities">
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="1" />
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="ChoiceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentChoice1_ElectiveSubject_Speciality">
+          <End Role="ElectiveSubjectsAndSpecialities" Type="Self.ElectiveSubjectsAndSpecialities" Multiplicity="1" />
+          <End Role="StudentChoices" Type="Self.StudentChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ElectiveSubjectsAndSpecialities">
+              <PropertyRef Name="ElectiveSubjectAndSpecialityID" />
+            </Principal>
+            <Dependent Role="StudentChoices">
+              <PropertyRef Name="ChoiceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FinalChoices_Students">
+          <End Role="Students" Type="Self.Students" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FinalChoices" Type="Self.FinalChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Students">
+              <PropertyRef Name="StudentNo" />
+            </Principal>
+            <Dependent Role="FinalChoices">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentChoice_Student">
+          <End Role="Students" Type="Self.Students" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="StudentChoices" Type="Self.StudentChoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Students">
+              <PropertyRef Name="StudentNo" />
+            </Principal>
+            <Dependent Role="StudentChoices">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student_ClassGroup_Student">
+          <End Role="Students" Type="Self.Students" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="StudentsAndClassGroups" Type="Self.StudentsAndClassGroups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Students">
+              <PropertyRef Name="StudentNo" />
+            </Principal>
+            <Dependent Role="StudentsAndClassGroups">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PPDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Admins" EntityType="Self.Admins" />
+          <EntitySet Name="Categories" EntityType="Self.Categories" />
+          <EntitySet Name="ClassGroups" EntityType="Self.ClassGroups" />
+          <EntitySet Name="ElectiveSubjectsAndSpecialities" EntityType="Self.ElectiveSubjectsAndSpecialities" />
+          <EntitySet Name="Files" EntityType="Self.Files" />
+          <EntitySet Name="FinalChoices" EntityType="Self.FinalChoices" />
+          <EntitySet Name="StudentChoices" EntityType="Self.StudentChoices" />
+          <EntitySet Name="Students" EntityType="Self.Students" />
+          <EntitySet Name="StudentsAndClassGroups" EntityType="Self.StudentsAndClassGroups" />
+          <AssociationSet Name="FK_Categories_Admins" Association="Self.FK_Categories_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Categories" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Categories_Admins1" Association="Self.FK_Categories_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Categories" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClassGroups_Admins" Association="Self.FK_ClassGroups_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="ClassGroups" EntitySet="ClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClassGroups_Admins1" Association="Self.FK_ClassGroups_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="ClassGroups" EntitySet="ClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ElectiveSubjectsAndSpecialities_Admins" Association="Self.FK_ElectiveSubjectsAndSpecialities_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ElectiveSubjectsAndSpecialities_Admins1" Association="Self.FK_ElectiveSubjectsAndSpecialities_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Files_Admins" Association="Self.FK_Files_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Files" EntitySet="Files" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Files_Admins1" Association="Self.FK_Files_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Files" EntitySet="Files" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_Admins" Association="Self.FK_FinalChoices_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_Admins1" Association="Self.FK_FinalChoices_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Students_Admins" Association="Self.FK_Students_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Students" EntitySet="Students" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Students_Admins1" Association="Self.FK_Students_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="Students" EntitySet="Students" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentsAndClassGroups_Admins" Association="Self.FK_StudentsAndClassGroups_Admins">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="StudentsAndClassGroups" EntitySet="StudentsAndClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentsAndClassGroups_Admins1" Association="Self.FK_StudentsAndClassGroups_Admins1">
+            <End Role="Admins" EntitySet="Admins" />
+            <End Role="StudentsAndClassGroups" EntitySet="StudentsAndClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Category_ClassGroup" Association="Self.FK_Category_ClassGroup">
+            <End Role="ClassGroups" EntitySet="ClassGroups" />
+            <End Role="Categories" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ElectiveSubject_Speciality_Category" Association="Self.FK_ElectiveSubject_Speciality_Category">
+            <End Role="Categories" EntitySet="Categories" />
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_Categories" Association="Self.FK_FinalChoices_Categories">
+            <End Role="Categories" EntitySet="Categories" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentChoice_Category" Association="Self.FK_StudentChoice_Category">
+            <End Role="Categories" EntitySet="Categories" />
+            <End Role="StudentChoices" EntitySet="StudentChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student_ClassGroup_ClassGroup" Association="Self.FK_Student_ClassGroup_ClassGroup">
+            <End Role="ClassGroups" EntitySet="ClassGroups" />
+            <End Role="StudentsAndClassGroups" EntitySet="StudentsAndClassGroups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_File_ElectiveSubject_Speciality" Association="Self.FK_File_ElectiveSubject_Speciality">
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+            <End Role="Files" EntitySet="Files" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_ElectiveSubjectsAndSpecialities" Association="Self.FK_FinalChoices_ElectiveSubjectsAndSpecialities">
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentChoice1_ElectiveSubject_Speciality" Association="Self.FK_StudentChoice1_ElectiveSubject_Speciality">
+            <End Role="ElectiveSubjectsAndSpecialities" EntitySet="ElectiveSubjectsAndSpecialities" />
+            <End Role="StudentChoices" EntitySet="StudentChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FinalChoices_Students" Association="Self.FK_FinalChoices_Students">
+            <End Role="Students" EntitySet="Students" />
+            <End Role="FinalChoices" EntitySet="FinalChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentChoice_Student" Association="Self.FK_StudentChoice_Student">
+            <End Role="Students" EntitySet="Students" />
+            <End Role="StudentChoices" EntitySet="StudentChoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student_ClassGroup_Student" Association="Self.FK_Student_ClassGroup_Student">
+            <End Role="Students" EntitySet="Students" />
+            <End Role="StudentsAndClassGroups" EntitySet="StudentsAndClassGroups" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="PPDBModelStoreContainer" CdmEntityContainer="PPDBEntities">
+          <EntitySetMapping Name="Admins">
+            <EntityTypeMapping TypeName="PPDBModel.Admins">
+              <MappingFragment StoreEntitySet="Admins">
+                <ScalarProperty Name="AdminID" ColumnName="AdminID" />
+                <ScalarProperty Name="Login" ColumnName="Login" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="SuperAdmin" ColumnName="SuperAdmin" />
+                <ScalarProperty Name="LastLogin" ColumnName="LastLogin" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Categories">
+            <EntityTypeMapping TypeName="PPDBModel.Categories">
+              <MappingFragment StoreEntitySet="Categories">
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="ClassGroupID" ColumnName="ClassGroupID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Information" ColumnName="Information" />
+                <ScalarProperty Name="MaxNoChoices" ColumnName="MaxNoChoices" />
+                <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
+                <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ClassGroups">
+            <EntityTypeMapping TypeName="PPDBModel.ClassGroups">
+              <MappingFragment StoreEntitySet="ClassGroups">
+                <ScalarProperty Name="ClassGroupID" ColumnName="ClassGroupID" />
+                <ScalarProperty Name="DegreeCourse" ColumnName="DegreeCourse" />
+                <ScalarProperty Name="Graduate" ColumnName="Graduate" />
+                <ScalarProperty Name="FullTimeStudies" ColumnName="FullTimeStudies" />
+                <ScalarProperty Name="Semester" ColumnName="Semester" />
+                <ScalarProperty Name="Speciality" ColumnName="Speciality" />
+                <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
+                <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ElectiveSubjectsAndSpecialities">
+            <EntityTypeMapping TypeName="PPDBModel.ElectiveSubjectsAndSpecialities">
+              <MappingFragment StoreEntitySet="ElectiveSubjectsAndSpecialities">
+                <ScalarProperty Name="ElectiveSubjectAndSpecialityID" ColumnName="ElectiveSubjectAndSpecialityID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="Information" ColumnName="Information" />
+                <ScalarProperty Name="UpperLimit" ColumnName="UpperLimit" />
+                <ScalarProperty Name="LowerLimit" ColumnName="LowerLimit" />
+                <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
+                <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Files">
+            <EntityTypeMapping TypeName="PPDBModel.Files">
+              <MappingFragment StoreEntitySet="Files">
+                <ScalarProperty Name="FileID" ColumnName="FileID" />
+                <ScalarProperty Name="Filename" ColumnName="Filename" />
+                <ScalarProperty Name="ElectiveSubjectAndSpecialityID" ColumnName="ElectiveSubjectAndSpecialityID" />
+                <ScalarProperty Name="Path" ColumnName="Path" />
+                <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
+                <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FinalChoices">
+            <EntityTypeMapping TypeName="PPDBModel.FinalChoices">
+              <MappingFragment StoreEntitySet="FinalChoices">
+                <ScalarProperty Name="FinalChoiceID" ColumnName="FinalChoiceID" />
+                <ScalarProperty Name="StudentNo" ColumnName="StudentNo" />
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="ChoiceID" ColumnName="ChoiceID" />
+                <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
+                <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StudentChoices">
+            <EntityTypeMapping TypeName="PPDBModel.StudentChoices">
+              <MappingFragment StoreEntitySet="StudentChoices">
+                <ScalarProperty Name="StudentChoiceID" ColumnName="StudentChoiceID" />
+                <ScalarProperty Name="StudentNo" ColumnName="StudentNo" />
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="ChoiceID" ColumnName="ChoiceID" />
+                <ScalarProperty Name="PreferenceNo" ColumnName="PreferenceNo" />
+                <ScalarProperty Name="ChoiceDate" ColumnName="ChoiceDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Students">
+            <EntityTypeMapping TypeName="PPDBModel.Students">
+              <MappingFragment StoreEntitySet="Students">
+                <ScalarProperty Name="StudentNo" ColumnName="StudentNo" />
+                <ScalarProperty Name="Login" ColumnName="Login" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Surname" ColumnName="Surname" />
+                <ScalarProperty Name="AverageGrade" ColumnName="AverageGrade" />
+                <ScalarProperty Name="TriesNo" ColumnName="TriesNo" />
+                <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
+                <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StudentsAndClassGroups">
+            <EntityTypeMapping TypeName="PPDBModel.StudentsAndClassGroups">
+              <MappingFragment StoreEntitySet="StudentsAndClassGroups">
+                <ScalarProperty Name="StudentNo" ColumnName="StudentNo" />
+                <ScalarProperty Name="ClassGroupID" ColumnName="ClassGroupID" />
+                <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
+                <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
