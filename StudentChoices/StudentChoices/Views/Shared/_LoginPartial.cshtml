@@ -1,11 +1,11 @@
-﻿@if (Session["USER"] != null)
+﻿@if (Session["User"] != null)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
         @Html.AntiForgeryToken()
 
         <ul class="nav navbar-nav navbar-right">
-            @if (Session["USER"] != "Student")
+            @if (Session["User"] != "Student")
             {
                 <li style="width:140px; text-align:center">
                   <a>Zarządzaj!</a>
@@ -14,7 +14,7 @@
                       <li>@Html.ActionLink("Dodaj dane", "Edit", "Account")</li>
                       <li>@Html.ActionLink("Edytuj dane", "Edit", "Account")</li>
                       <li>@Html.ActionLink("Zmień hasło", "Edit", "Account")</li>
-                      @if (Session["USER"] == "SuperAdmin")
+                      @if (Session["User"] == "SuperAdmin")
                       {
                         <li>@Html.ActionLink("Administatorzy", "Edit", "Account")</li>
                       }

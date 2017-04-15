@@ -2,11 +2,11 @@
     ViewBag.Title = "StudentChoices";
 }
 
-@if (Session["USER"] == "Admin" || Session["USER"] == "SuperAdmin")
+@if (Session["User"] == "Admin" || Session["User"] == "SuperAdmin")
 {
 
 }
-else if (Session["USER"] == "Student")
+else if (Session["User"] == "Student")
 {
 
 }
