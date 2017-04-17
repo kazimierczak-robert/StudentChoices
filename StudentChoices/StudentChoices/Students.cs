@@ -27,7 +27,6 @@ namespace StudentChoices
         public string Password { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
-        public double AverageGrade { get; set; }
         public byte TriesNo { get; set; }
         public Nullable<System.DateTime> LastEdit { get; set; }
         public Nullable<int> LastEditedBy { get; set; }

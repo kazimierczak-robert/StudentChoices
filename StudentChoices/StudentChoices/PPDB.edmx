@@ -106,7 +106,6 @@
           <Property Name="Password" Type="char" MaxLength="64" Nullable="false" />
           <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Surname" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="AverageGrade" Type="float" Nullable="false" />
           <Property Name="TriesNo" Type="tinyint" Nullable="false" />
           <Property Name="LastEdit" Type="datetime" />
           <Property Name="LastEditedBy" Type="int" />
@@ -120,6 +119,7 @@
           </Key>
           <Property Name="StudentNo" Type="int" Nullable="false" />
           <Property Name="ClassGroupID" Type="int" Nullable="false" />
+          <Property Name="AverageGrade" Type="float" Nullable="false" />
           <Property Name="LastEdit" Type="datetime" />
           <Property Name="LastEditedBy" Type="int" />
           <Property Name="CreationDate" Type="datetime" Nullable="false" />
@@ -697,7 +697,6 @@
           <Property Name="Password" Type="String" MaxLength="64" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Surname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="AverageGrade" Type="Double" Nullable="false" />
           <Property Name="TriesNo" Type="Byte" Nullable="false" />
           <Property Name="LastEdit" Type="DateTime" Precision="3" />
           <Property Name="LastEditedBy" Type="Int32" />
@@ -716,6 +715,7 @@
           </Key>
           <Property Name="StudentNo" Type="Int32" Nullable="false" />
           <Property Name="ClassGroupID" Type="Int32" Nullable="false" />
+          <Property Name="AverageGrade" Type="Double" Nullable="false" />
           <Property Name="LastEdit" Type="DateTime" Precision="3" />
           <Property Name="LastEditedBy" Type="Int32" />
           <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
@@ -1263,7 +1263,6 @@
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Surname" ColumnName="Surname" />
-                <ScalarProperty Name="AverageGrade" ColumnName="AverageGrade" />
                 <ScalarProperty Name="TriesNo" ColumnName="TriesNo" />
                 <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
                 <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
@@ -1277,6 +1276,7 @@
               <MappingFragment StoreEntitySet="StudentsAndClassGroups">
                 <ScalarProperty Name="StudentNo" ColumnName="StudentNo" />
                 <ScalarProperty Name="ClassGroupID" ColumnName="ClassGroupID" />
+                <ScalarProperty Name="AverageGrade" ColumnName="AverageGrade" />
                 <ScalarProperty Name="LastEdit" ColumnName="LastEdit" />
                 <ScalarProperty Name="LastEditedBy" ColumnName="LastEditedBy" />
                 <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />

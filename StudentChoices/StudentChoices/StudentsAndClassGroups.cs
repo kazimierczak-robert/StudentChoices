@@ -16,6 +16,7 @@ namespace StudentChoices
     {
         public int StudentNo { get; set; }
         public int ClassGroupID { get; set; }
+        public double AverageGrade { get; set; }
         public Nullable<System.DateTime> LastEdit { get; set; }
         public Nullable<int> LastEditedBy { get; set; }
         public System.DateTime CreationDate { get; set; }
