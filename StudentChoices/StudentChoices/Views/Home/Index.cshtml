@@ -4,13 +4,112 @@
     ViewBag.Title = "StudentChoices";
 }
 
-@if (Session["User"] == "Admin" || Session["User"] == "SuperAdmin")
+@if (Session["User"] == "Admin" || Session["User"] == "SuperAdmin" || Session["User"] == "Student")
 {
+    <h3>Zalogowano jako: @Session["UserName"]</h3>
 
-}
-else if (Session["User"] == "Student")
-{
+    if (Session["User"] == "Student")
+    {
+        if ((bool)HttpContext.Current.Application["RecActive"] == true)
+        {
+            using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
 
+                <h5>Termin zakończenia rekrutacji: 24 kwiecień 2017</h5>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
+                        <h4 style="color:#ffffff">Dostępne przedmioty obieralne i specjalności</h4>
+                    </div>
+                    <div class="panel-body">
+                        <h3><b>Przedmiot obieralny 1</b></h3>
+                        <h4><b>Programowanie współbieżne</b></h4>
+                        <h5>Informacje</h5>
+                        <h5>Linki</h5>
+                        <h4><b>Protokoły komunikacyjne</b></h4>
+                        <h5>Informacje</h5>
+                        <h5>Linki</h5>
+                        <h4><b>Programowanie robotów</b></h4>
+                        <h5>Informacje</h5>
+                        <h5>Linki</h5>
+
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <h5>1. preferencja:</h5> 
+                            </div>
+                            <div class="col-sm-2">
+                                @Html.DropDownList("Subjects", (SelectList)Session["Subjects"], htmlAttributes: new { @class = "form-control", @style="width:auto" })
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        <h4>Informatyka, 1. stopień, st. stacjonarne, sem. 5., -, średnia ocen: 4.02</h4>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            if ((bool)HttpContext.Current.Application["AfterRec"] == true)
+            {
+                <h5>Termin zakończenia rekrutacji: 24 kwiecień 2017</h5>
+                <h4>Rekrutacja na specjalności oraz przedmioty obieralne jest już zakończona, lecz wyniki nie zostały jeszcze opublikowane.</h4>
+            }
+            else if ((bool)HttpContext.Current.Application["ShareResults"] == true)
+            {
+                <h5>Termin zakończenia rekrutacji: 24 kwiecień 2017</h5>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
+                        <h4 style="color:#ffffff">Wyniki rekrutacji na przedmioty obieralne i specjalności</h4>
+                    </div>
+                    <div class="panel-body">
+                        <h4><b>Przedmiot obieralny 1</b></h4>
+                        <h4>Przydzielono do: <b>Programowanie współbieżne</b></h4>
+                    </div>
+                    <div class="panel-footer">
+                        <h4>Informatyka, 1. stopień, st. stacjonarne, sem. 5., -, średnia ocen: 4.02</h4>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <h5>Rekrutacja na specjalności oraz przedmioty obieralne jeszcze się nie rozpoczęła.</h5>
+            }
+        }
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-sm-5" style="padding-top:20px">
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
+                        <h4 style="color:#ffffff">Zarządzanie rekrutacją</h4>
+                    </div>
+                    <div class="panel-body">
+                       
+                    </div>
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
+                        <h4 style="color:#ffffff">Po zakończeniu okresu rekrutacji</h4>
+                    </div>
+                    <div class="panel-body">
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-5" style="padding-top:20px">
+                <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
+                    <h4 style="color:#ffffff">Statystyki</h4>
+                </div>
+                <div class="panel-body">
+
+                </div>
+            </div>
+        </div>
+    }
 }
 else
 {
@@ -29,8 +128,7 @@ else
                     <div class="panel panel-default">
                         <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px"><h4 style="color:#ffffff"><b>Panel logowania</b></h4></div>
                         <div class="panel-body">
-                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                            @Html.ValidationSummary()
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger", @style = "pointer-events:none;" })
                             <div class="form-group">
                                 @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control", @placeholder = "Login", @style = "display:block" } })
                                 @Html.ValidationMessageFor(model => model.Login, "", new { @class = "text-danger" })

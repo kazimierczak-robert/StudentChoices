@@ -22,14 +22,13 @@ namespace StudentChoices.Controllers
         {
             using (PPDBEntities db = new PPDBEntities())
             {
-                byte[] clientPassword = Encoding.Default.GetBytes(user.Password);
+                byte[] clientPassword = Encoding.ASCII.GetBytes(user.Password);
 
                 //utworzenie skrotu od pobranego hasla (SHA256)
                 using (var sha256 = SHA256.Create())
                 {
                     byte[] clientPasswordSHA256 = sha256.ComputeHash(clientPassword);
-                    string stringClientPasswordSHA256 = Encoding.Default.GetString(clientPasswordSHA256);
-                    user.Password = stringClientPasswordSHA256;
+                    user.Password = BitConverter.ToString(clientPasswordSHA256).Replace("-", string.Empty); ;
                 }
 
                 //Sprawdzenie czy to admin
@@ -41,7 +40,7 @@ namespace StudentChoices.Controllers
                     //Sprawdzenie czy konto jest aktywne
                     if (usrAdmin.Active == true)
                     {
-                        Session["UserID"] = usrAdmin.AdminID.ToString();
+                        Session["UserName"] = usrAdmin.Login;
                         if (usrAdmin.SuperAdmin == true)
                         {
                             Session["User"] = "SuperAdmin";
@@ -69,11 +68,25 @@ namespace StudentChoices.Controllers
                             //Sprawdzenie poprawności hasła
                             if (usrStudent.Password == user.Password)
                             {
-                                Session["UserID"] = usrAdmin.AdminID.ToString();
+                                Session["UserName"] = usrStudent.Login + " (" + usrStudent.Name + " " + usrStudent.Surname + ")";
                                 Session["User"] = "Student";
                                 usrStudent.TriesNo = 0;
                                 db.Entry(usrStudent).State = EntityState.Modified;
                                 db.SaveChanges();
+
+                                if ((bool)HttpContext.Application["RecActive"] == true)
+                                {
+                                    List<string> Subjects = new List<string>();
+                                    var ClassGroupIDs = db.StudentsAndClassGroups.Where(x => x.StudentNo == usrStudent.StudentNo).Select(x => x.ClassGroupID).FirstOrDefault();
+                                    var CategoryIDs = db.Categories.Where(x => x.ClassGroupID == ClassGroupIDs).Select(x => x.CategoryID).FirstOrDefault();
+
+                                    Subjects.Add("Nie wybrano");
+                                    foreach (var elem in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == CategoryIDs).ToList())
+                                    {
+                                        Subjects.Add(elem.Name);
+                                    }
+                                    Session["Subjects"] = new SelectList(Subjects);
+                                }
                                 return RedirectToAction("", "Home");
                             }
                             else
@@ -97,8 +110,9 @@ namespace StudentChoices.Controllers
         {
             if (Session["User"] != null)
             {
-                Session["UserID"] = null;
+                Session["UserName"] = null;
                 Session["User"] = null;
+                Session["Subjects"] = null;
             }
             return RedirectToAction("", "Home");
         }

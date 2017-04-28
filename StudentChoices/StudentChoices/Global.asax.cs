@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StudentChoices.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,6 +17,10 @@ namespace StudentChoices
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            Application["RecActive"] = true;
+            Application["RecStop"] = DateTime.Now;
+            Application["AfterRec"] = false;
+            Application["ShareResults"] = false;
         }
     }
 }
