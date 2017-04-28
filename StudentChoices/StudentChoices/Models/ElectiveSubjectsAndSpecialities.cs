@@ -7,26 +7,27 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace StudentChoices
+namespace StudentChoices.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class ClassGroups
+    public partial class ElectiveSubjectsAndSpecialities
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public ClassGroups()
+        public ElectiveSubjectsAndSpecialities()
         {
-            this.Categories = new HashSet<Categories>();
-            this.StudentsAndClassGroups = new HashSet<StudentsAndClassGroups>();
+            this.Files = new HashSet<Files>();
+            this.FinalChoices = new HashSet<FinalChoices>();
+            this.StudentChoices = new HashSet<StudentChoices>();
         }
     
-        public int ClassGroupID { get; set; }
-        public string DegreeCourse { get; set; }
-        public byte Graduate { get; set; }
-        public bool FullTimeStudies { get; set; }
-        public byte Semester { get; set; }
-        public string Speciality { get; set; }
+        public int ElectiveSubjectAndSpecialityID { get; set; }
+        public string Name { get; set; }
+        public int CategoryID { get; set; }
+        public string Information { get; set; }
+        public Nullable<short> UpperLimit { get; set; }
+        public Nullable<short> LowerLimit { get; set; }
         public Nullable<System.DateTime> LastEdit { get; set; }
         public Nullable<int> LastEditedBy { get; set; }
         public System.DateTime CreationDate { get; set; }
@@ -34,9 +35,12 @@ namespace StudentChoices
     
         public virtual Admins Admins { get; set; }
         public virtual Admins Admins1 { get; set; }
+        public virtual Categories Categories { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Categories> Categories { get; set; }
+        public virtual ICollection<Files> Files { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<StudentsAndClassGroups> StudentsAndClassGroups { get; set; }
+        public virtual ICollection<FinalChoices> FinalChoices { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StudentChoices> StudentChoices { get; set; }
     }
 }

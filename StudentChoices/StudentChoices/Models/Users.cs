@@ -10,6 +10,7 @@
         {
 
         }
+
         [Required(ErrorMessage = "To pole jest wymagane!")]
         public string Login { get; set; }
 

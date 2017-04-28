@@ -989,7 +989,7 @@ pre code {
     width: 25%;
   }
   .col-sm-4 {
-    width: 33.33333333333333%;
+    width: 30%;
   }
   .col-sm-5 {
     width: 41.66666666666667%;
@@ -1791,7 +1791,7 @@ textarea.form-control {
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .radio,
@@ -2005,8 +2005,8 @@ textarea.input-lg {
 }
 
 .form-horizontal .form-group {
-  margin-right: -15px;
-  margin-left: -15px;
+  margin-right: 0px;
+  margin-left: 0px;
 }
 
 .form-horizontal .form-group:before,

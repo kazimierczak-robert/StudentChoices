@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace StudentChoices
+namespace StudentChoices.Models
 {
     using System;
     using System.Data.Entity;

@@ -7,17 +7,17 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace StudentChoices
+namespace StudentChoices.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class FinalChoices
+    public partial class Files
     {
-        public int FinalChoiceID { get; set; }
-        public int StudentNo { get; set; }
-        public int CategoryID { get; set; }
-        public int ChoiceID { get; set; }
+        public int FileID { get; set; }
+        public string Filename { get; set; }
+        public int ElectiveSubjectAndSpecialityID { get; set; }
+        public string Path { get; set; }
         public Nullable<System.DateTime> LastEdit { get; set; }
         public Nullable<int> LastEditedBy { get; set; }
         public System.DateTime CreationDate { get; set; }
@@ -25,8 +25,6 @@ namespace StudentChoices
     
         public virtual Admins Admins { get; set; }
         public virtual Admins Admins1 { get; set; }
-        public virtual Categories Categories { get; set; }
         public virtual ElectiveSubjectsAndSpecialities ElectiveSubjectsAndSpecialities { get; set; }
-        public virtual Students Students { get; set; }
     }
 }

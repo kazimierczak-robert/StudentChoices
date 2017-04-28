@@ -1,4 +1,6 @@
-﻿@{
+﻿@model Users
+
+@{
     ViewBag.Title = "StudentChoices";
 }
 
@@ -12,38 +14,43 @@ else if (Session["User"] == "Student")
 }
 else
 {
-<table align="center">
-    <tr>
-        <td rowspan="5"><img src="~/Images/index.jpg" style="min-width:100%" alt="" /></td> 
-    </tr>
-    <tr>
-        <td align="center" width="60%" valign="top">
-            <h2 style="color: #210764"><b>Wybór</b></h2>
-            Dokonaj wyboru specjalności.<br />
-            Zdecyduj, które przedmioty obieralne chcesz studiować.
-        </td>
-    </tr>
-    <tr>   
-        <td align="center" width="60%" valign="top">
-            <h2 style="color: #210764"><b>Prostota</b></h2>
-             Korzystaj z przejrzystego interfejsu będąc studentem.<br/>
-             Ułatw administrowanie procesem rekrutacji.
-        </td>
-    </tr>
-    <tr>
-        <td align="center" width="60%" valign="top">
-            <h2 style="color: #210764"><b>Szybkość</b></h2>
-            Wprowadzaj swoje dane w formie elektronicznej.<br />
-            Przyspiesz przydział studentów.
-        </td>
-    </tr>
-    <tr>
-        <td align="center" width="60%" valign="top">
-            <h2 style="color: #210764"><b>Nowoczesność</b></h2>
-            Zakończ pracę z tradycyjnymi, papierowymi formularzami.<br/>
-            Miej dostęp do danych o każdej porze.<br />
-            Podejmuj decyzje, niewychodząc z domu.
-        </td>
-    </tr>
-</table>
+    <div style="width:100%; float:left; text-align:center">
+        <img src="~/Images/studentChoicesTrim.png" style="max-width:100%; background-size:cover;" alt="" />
+    </div>
+
+    using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8" style="padding-top:20px; margin-right: 3.333333333333333%"> </div>
+                <!-- Login Panel -->
+                <div class="col-sm-4" style="padding-top:20px">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px"><h4 style="color:#ffffff"><b>Panel logowania</b></h4></div>
+                        <div class="panel-body">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            @Html.ValidationSummary()
+                            <div class="form-group">
+                                @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control", @placeholder = "Login", @style = "display:block" } })
+                                @Html.ValidationMessageFor(model => model.Login, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", @placeholder = "Hasło" } })
+                                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <input type="submit" value="Zaloguj" class="btn btn-default" style="float:right"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
 }
