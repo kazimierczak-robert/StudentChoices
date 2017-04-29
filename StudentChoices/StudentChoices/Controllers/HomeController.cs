@@ -103,6 +103,33 @@ namespace StudentChoices.Controllers
             return View();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SaveConfig(bool isRecruitmentActive, string endDate)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                HttpContext.Application["RecActive"] = isRecruitmentActive;
+                var dateStr = endDate.Split('.');
+                var date= new DateTime(Int32.Parse(dateStr[2]), Int32.Parse(dateStr[1]), Int32.Parse(dateStr[0]));
+                HttpContext.Application["RecStop"] = 
+                HttpContext.Application["RecStopString"] = endDate;
+
+                if(date.AddDays(1)>DateTime.Now)
+                {
+                    HttpContext.Application["RecActive"] = true;
+                    HttpContext.Application["AfterRec"] = false;
+                }
+                else
+                {
+                    HttpContext.Application["RecActive"] = false;
+                    HttpContext.Application["AfterRec"] = true;
+                }
+
+            }
+            return RedirectToAction("", "Home");
+        }
+
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]

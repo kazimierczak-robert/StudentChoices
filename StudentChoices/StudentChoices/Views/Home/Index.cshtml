@@ -89,7 +89,24 @@
                         <h4 style="color:#ffffff">Zarządzanie rekrutacją</h4>
                     </div>
                     <div class="panel-body">
-                       
+                        @using (Html.BeginForm("SaveConfig", "Home"))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="checkbox">
+                                @Html.CheckBox("isRecruitmentActive", (bool)HttpContext.Current.Application["RecActive"])
+                                <h4>Rekrutacja w toku</h4>
+                            </div>
+                            <div class="input-group date datepicker">
+                                <input type="text" name="endDate" class="form-control" style="max-width:100%" value="@HttpContext.Current.Application["RecStopString"]">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="submit" value="Zapisz zmiany!" class="btn btn-default" />
+                            </div>
+
+                        }
+
                     </div>
                     <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         <h4 style="color:#ffffff">Po zakończeniu okresu rekrutacji</h4>
@@ -151,4 +168,19 @@ else
 }
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+<script type="text/javascript">
+    $(function () { // will trigger when the document is ready
+        $('.datepicker').datepicker(
+            {
+               
+                inline: true,
+                sideBySide: true,
+                startDate: "@HttpContext.Current.Application["RecActive"]",
+                maxViewMode: 2,
+                todayBtn: "linked",
+                language: "pl",
+                autoclose: true
+            }); //Initialise any date pickers
+    });
+</script>
 }

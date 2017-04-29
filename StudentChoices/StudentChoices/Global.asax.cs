@@ -1,6 +1,7 @@
 ﻿using StudentChoices.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -17,8 +18,10 @@ namespace StudentChoices
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            DateTime date = DateTime.Now;
             Application["RecActive"] = true;
-            Application["RecStop"] = DateTime.Now;
+            Application["RecStop"] = date;
+            Application["RecStopString"] = date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
             Application["AfterRec"] = false;
             Application["ShareResults"] = false;
         }
