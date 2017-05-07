@@ -12,6 +12,77 @@ namespace StudentChoices.Controllers
 {
     public class HomeController : Controller
     {
+        void setSessionClassGroups(string selectedValue)
+        {
+            using (PPDBEntities db = new PPDBEntities())
+            {
+                List<string> ClassGroups = new List<string>();
+                string oneClassGroup = string.Empty;
+                foreach (var elem in db.ClassGroups)
+                {
+                    oneClassGroup = elem.DegreeCourse.ToString() + "/" + elem.Graduate.ToString() + "/";
+                    if (elem.FullTimeStudies == true) { oneClassGroup += "STACJ"; }
+                    else { oneClassGroup += "NIESTACJ"; }
+                    oneClassGroup += "/" + elem.Semester.ToString() + "/" + elem.Speciality.ToString();
+                    ClassGroups.Add(oneClassGroup);
+                }
+                if (ClassGroups.IndexOf(selectedValue)>=0)
+                {
+                    ClassGroups.Remove(selectedValue);
+                    ClassGroups.Insert(0, selectedValue);
+                }
+                Session["ClassGroups"] = new SelectList(ClassGroups);
+                setSessionCategoriesAndStats("", ClassGroups.ElementAt(0));
+            }
+        }
+
+        void setSessionCategoriesAndStats(string selectedValue, string selectedClassGroup)
+        {
+            using (PPDBEntities db = new PPDBEntities())
+            {
+                var selectedClassGroupDetails= selectedClassGroup.Split('/');
+                
+                string DegreeCourse = selectedClassGroupDetails[0];
+                Byte Graduate = Byte.Parse(selectedClassGroupDetails[1]);
+                bool FullTimeStudies = selectedClassGroupDetails[2] == "STACJ" ? true : false;
+                Byte Semester = Byte.Parse(selectedClassGroupDetails[3]);
+                string Speciality = selectedClassGroupDetails[4];
+
+                var selectedClassGroupID = db.ClassGroups.Where(x=>x.DegreeCourse== DegreeCourse &&
+                    x.Graduate == Graduate && x.FullTimeStudies == FullTimeStudies &&
+                    x.Semester == Semester && x.Speciality == Speciality).FirstOrDefault().ClassGroupID;
+
+                Session["NoOfStudents"] = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == selectedClassGroupID).Count();
+
+                List<string> Categories = new List<string>();
+                foreach (var elem in db.Categories.Where(x => x.ClassGroupID == selectedClassGroupID).Select(x => x.Name))
+                {
+                    Categories.Add(elem);
+                }
+                if (Categories.IndexOf(selectedValue) >= 0)
+                {
+                    Categories.Remove(selectedValue);
+                    Categories.Insert(0, selectedValue);
+                }
+                Session["Categories"] = new SelectList(Categories);
+
+                int NoOfSavedStudents = 0;
+                int NoOfSavedStudentsOnOneSubject = 0;
+                Dictionary<string, int> stats = new Dictionary<string, int>();
+
+                var firstCategoryName = Categories.ElementAt(0);
+                var firstCategoryID = db.Categories.Where(x => x.Name == firstCategoryName).FirstOrDefault().CategoryID;
+                foreach (var item in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == firstCategoryID))
+                {
+                    NoOfSavedStudentsOnOneSubject = db.StudentChoices.Where(x => x.ChoiceID == item.ElectiveSubjectAndSpecialityID && x.PreferenceNo == 1).Count();
+                    stats.Add(item.Name, NoOfSavedStudentsOnOneSubject);
+                    NoOfSavedStudents += NoOfSavedStudentsOnOneSubject;
+                }
+                Session["NoOfSavedStudents"] = NoOfSavedStudents;
+                Session["Stats"] = stats;
+            }
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -53,40 +124,10 @@ namespace StudentChoices.Controllers
                         db.Entry(usrAdmin).State = EntityState.Modified;
                         db.SaveChanges();
 
-                        List<string> ClassGroups = new List<string>();
-                        string oneClassGroup = string.Empty;
-                        foreach (var elem in db.ClassGroups)
+                        if (Session["ClassGroups"] == null)
                         {
-                            oneClassGroup = elem.DegreeCourse.ToString() + "/" + elem.Graduate.ToString() + "/";
-                            if(elem.FullTimeStudies==true) { oneClassGroup += "STACJ"; }
-                            else { oneClassGroup += "NIESTACJ"; }
-                            oneClassGroup += "/" + elem.Semester.ToString() + "/" +elem.Speciality.ToString();
-                            ClassGroups.Add(oneClassGroup);
+                            setSessionClassGroups("");
                         }
-                        Session["ClassGroups"] = new SelectList(ClassGroups);
-
-                        List<string> Categories = new List<string>();
-                        foreach (var elem in db.Categories.Where(x => x.ClassGroupID == db.ClassGroups.FirstOrDefault().ClassGroupID).Select(x => x.Name))
-                        {
-                            Categories.Add(elem);
-                        }
-                        Session["Categories"] = new SelectList(Categories);
-                        Session["NoOfStudents"] = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == db.ClassGroups.FirstOrDefault().ClassGroupID).Count();
-
-                        int NoOfSavedStudents = 0;
-                        int NoOfSavedStudentsOnOneSubject = 0;
-                        Dictionary<string, int> stats = new Dictionary<string, int>();
-                        foreach (var elem in db.Categories.Where(x => x.ClassGroupID == db.ClassGroups.FirstOrDefault().ClassGroupID).Select(x => x.CategoryID))
-                        {
-                            foreach (var item in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID==elem))
-                            {
-                                NoOfSavedStudentsOnOneSubject = db.StudentChoices.Where(x => x.ChoiceID == item.ElectiveSubjectAndSpecialityID && x.PreferenceNo == 1).Count();
-                                stats.Add(item.Name, NoOfSavedStudentsOnOneSubject);
-                                NoOfSavedStudents += NoOfSavedStudentsOnOneSubject;
-                            }                          
-                        }
-                        Session["NoOfSavedStudents"] = NoOfSavedStudents;
-                        Session["Stats"] = stats;
 
                         return RedirectToAction("", "Home");
                     }
@@ -141,6 +182,28 @@ namespace StudentChoices.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public ActionResult ChangeClassGroup(string ClassGroups)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                setSessionClassGroups(ClassGroups);
+            }
+            return RedirectToAction("", "Home");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangeCategory(string Categories, string ClassGroups)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                setSessionCategoriesAndStats(Categories, ClassGroups);
+            }
+            return RedirectToAction("", "Home");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveConfig(bool isRecruitmentActive, string endDate)
         {
             if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
@@ -148,10 +211,11 @@ namespace StudentChoices.Controllers
                 HttpContext.Application["RecActive"] = isRecruitmentActive;
                 var dateStr = endDate.Split('.');
                 var date= new DateTime(Int32.Parse(dateStr[2]), Int32.Parse(dateStr[1]), Int32.Parse(dateStr[0]));
-                HttpContext.Application["RecStop"] = 
+                HttpContext.Application["RecStop"] = date;
                 HttpContext.Application["RecStopString"] = endDate;
+                HttpContext.Application["ShareResults"] = false;
 
-                if(date.AddDays(1)>DateTime.Now)
+                if (date.AddDays(1)>DateTime.Now)
                 {
                     HttpContext.Application["RecActive"] = true;
                     HttpContext.Application["AfterRec"] = false;
@@ -176,6 +240,45 @@ namespace StudentChoices.Controllers
                 Session["UserName"] = null;
                 Session["User"] = null;
                 Session["Subjects"] = null;
+                Session["ClassGroups"] = null;
+                Session["NoOfStudents"] = null;
+                Session["Categories"] = null;
+                Session["NoOfSavedStudents"] = null;
+                Session["Stats"] = null;
+            }
+            return RedirectToAction("", "Home");
+        }
+
+        public ActionResult Run()
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
+                {
+
+                }
+            }
+            return RedirectToAction("", "Home");
+        }
+        public ActionResult ShareResults()
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                if((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
+                {
+                    HttpContext.Application["ShareResults"] = true;
+                }
+            }
+            return RedirectToAction("", "Home");
+        }
+        public ActionResult Export()
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
+                {
+
+                }
             }
             return RedirectToAction("", "Home");
         }
