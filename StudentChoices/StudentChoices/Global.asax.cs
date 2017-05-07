@@ -19,7 +19,7 @@ namespace StudentChoices
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             DateTime date = DateTime.Now;
-            Application["RecActive"] = true;
+            Application["RecActive"] = false;
             Application["RecStop"] = date;
             Application["RecStopString"] = date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
             Application["AfterRec"] = false;

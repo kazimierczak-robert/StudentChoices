@@ -52,6 +52,42 @@ namespace StudentChoices.Controllers
                         usrAdmin.LastLogin = DateTime.Now;
                         db.Entry(usrAdmin).State = EntityState.Modified;
                         db.SaveChanges();
+
+                        List<string> ClassGroups = new List<string>();
+                        string oneClassGroup = string.Empty;
+                        foreach (var elem in db.ClassGroups)
+                        {
+                            oneClassGroup = elem.DegreeCourse.ToString() + "/" + elem.Graduate.ToString() + "/";
+                            if(elem.FullTimeStudies==true) { oneClassGroup += "STACJ"; }
+                            else { oneClassGroup += "NIESTACJ"; }
+                            oneClassGroup += "/" + elem.Semester.ToString() + "/" +elem.Speciality.ToString();
+                            ClassGroups.Add(oneClassGroup);
+                        }
+                        Session["ClassGroups"] = new SelectList(ClassGroups);
+
+                        List<string> Categories = new List<string>();
+                        foreach (var elem in db.Categories.Where(x => x.ClassGroupID == db.ClassGroups.FirstOrDefault().ClassGroupID).Select(x => x.Name))
+                        {
+                            Categories.Add(elem);
+                        }
+                        Session["Categories"] = new SelectList(Categories);
+                        Session["NoOfStudents"] = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == db.ClassGroups.FirstOrDefault().ClassGroupID).Count();
+
+                        int NoOfSavedStudents = 0;
+                        int NoOfSavedStudentsOnOneSubject = 0;
+                        Dictionary<string, int> stats = new Dictionary<string, int>();
+                        foreach (var elem in db.Categories.Where(x => x.ClassGroupID == db.ClassGroups.FirstOrDefault().ClassGroupID).Select(x => x.CategoryID))
+                        {
+                            foreach (var item in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID==elem))
+                            {
+                                NoOfSavedStudentsOnOneSubject = db.StudentChoices.Where(x => x.ChoiceID == item.ElectiveSubjectAndSpecialityID && x.PreferenceNo == 1).Count();
+                                stats.Add(item.Name, NoOfSavedStudentsOnOneSubject);
+                                NoOfSavedStudents += NoOfSavedStudentsOnOneSubject;
+                            }                          
+                        }
+                        Session["NoOfSavedStudents"] = NoOfSavedStudents;
+                        Session["Stats"] = stats;
+
                         return RedirectToAction("", "Home");
                     }
                 }
