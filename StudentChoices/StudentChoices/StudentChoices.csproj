@@ -141,6 +141,8 @@
     <Compile Include="Models\ElectiveSubjectsAndSpecialities.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Export\Category.cs" />
+    <Compile Include="Models\Export\ElectiveSubjectAndSpeciality.cs" />
     <Compile Include="Models\Files.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>

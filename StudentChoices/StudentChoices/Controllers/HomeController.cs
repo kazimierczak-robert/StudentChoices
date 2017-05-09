@@ -271,16 +271,55 @@ namespace StudentChoices.Controllers
             }
             return RedirectToAction("", "Home");
         }
-        public ActionResult Export()
+        public void ExportResults()
         {
             if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
             {
-                if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
-                {
+                //if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
+                //{
+                    using (PPDBEntities db = new PPDBEntities())
+                    {
+                        List<Models.Export.Category> exportData = new List<Models.Export.Category>();
 
-                }
+                        var categories = db.ClassGroups.Join(db.Categories, c=>c.ClassGroupID,
+                        cm=>cm.ClassGroupID, (c, cm)=>new
+                        {
+                            CategoryID = cm.CategoryID,
+                            Name =cm.Name,
+                            DegreeCourse = c.DegreeCourse,
+                            Graduate = c.Graduate,
+                            FullTimeStudies = c.FullTimeStudies,
+                            Semester = c.Semester,
+                            Speciality = c.Speciality,
+                        }).ToList();
+
+                        List<Models.Export.ElectiveSubjectAndSpeciality> subjectslist;
+                        List<string> studentsnolist;
+
+                        foreach (var categoryitem in categories)
+                        {
+                            subjectslist = new List<Models.Export.ElectiveSubjectAndSpeciality>();
+                            foreach (var subjectitem in db.ElectiveSubjectsAndSpecialities.Where(x=>x.CategoryID== categoryitem.CategoryID))
+                            {
+                                studentsnolist = new List<string>();
+                                foreach (var choiceitem in db.FinalChoices.Where(x => x.ChoiceID == subjectitem.ElectiveSubjectAndSpecialityID))
+                                {
+                                    studentsnolist.Add(choiceitem.StudentNo.ToString());
+                                }
+                                subjectslist.Add(new Models.Export.ElectiveSubjectAndSpeciality(subjectitem.Name, studentsnolist));
+                            }
+                            exportData.Add(new Models.Export.Category(categoryitem.Name, categoryitem.DegreeCourse, categoryitem.Graduate, categoryitem.FullTimeStudies, categoryitem.Semester, categoryitem.Speciality, subjectslist));
+                        }
+
+                        Response.ClearContent();
+                        Response.Buffer = true;
+                        Response.AddHeader("content-disposition", "attachment; filename = Results.xml");
+                        Response.ContentType = "text/xml";
+                        var serializer = new System.Xml.Serialization.XmlSerializer(exportData.GetType());
+                        serializer.Serialize(Response.OutputStream, exportData);
+                    }
+                //}
             }
-            return RedirectToAction("", "Home");
         }
 
         public ActionResult About()
