@@ -16,11 +16,14 @@
             {
                 @Html.AntiForgeryToken()
 
-                <h5>Termin zakończenia rekrutacji: 24 kwiecień 2017</h5>
+                <h5>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</h5>
 
                 <div class="panel panel-default">
                     <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         <h4 style="color:#ffffff">Dostępne przedmioty obieralne i specjalności</h4>
+                    </div>
+                    <div class="panel-footer">
+                        <h4>Informatyka, 1. stopień, st. stacjonarne, sem. 5., -, średnia ocen: 4.02</h4>
                     </div>
                     <div class="panel-body">
                         <h3><b>Przedmiot obieralny 1</b></h3>
@@ -44,9 +47,6 @@
                         </div>
 
                     </div>
-                    <div class="panel-footer">
-                        <h4>Informatyka, 1. stopień, st. stacjonarne, sem. 5., -, średnia ocen: 4.02</h4>
-                    </div>
                 </div>
             }
         }
@@ -54,24 +54,30 @@
         {
             if ((bool)HttpContext.Current.Application["AfterRec"] == true)
             {
-                <h5>Termin zakończenia rekrutacji: 24 kwiecień 2017</h5>
+                <h5>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</h5>
                 <h4>Rekrutacja na specjalności oraz przedmioty obieralne jest już zakończona, lecz wyniki nie zostały jeszcze opublikowane.</h4>
             }
             else if ((bool)HttpContext.Current.Application["ShareResults"] == true)
             {
-                <h5>Termin zakończenia rekrutacji: 24 kwiecień 2017</h5>
+                <h5>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</h5>
 
                 <div class="panel panel-default">
                     <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         <h4 style="color:#ffffff">Wyniki rekrutacji na przedmioty obieralne i specjalności</h4>
                     </div>
-                    <div class="panel-body">
-                        <h4><b>Przedmiot obieralny 1</b></h4>
-                        <h4>Przydzielono do: <b>Programowanie współbieżne</b></h4>
-                    </div>
-                    <div class="panel-footer">
-                        <h4>Informatyka, 1. stopień, st. stacjonarne, sem. 5., -, średnia ocen: 4.02</h4>
-                    </div>
+                    @foreach (var item in (Dictionary<string, Dictionary<string, string>>)Session["Results"])
+                    {
+                        <div class="panel-footer">
+                            <h4>@item.Key</h4>
+                        </div>
+                        <div class="panel-body">
+                            @foreach (var subitem in item.Value)
+                            {
+                                <h4><b>@subitem.Key</b></h4>
+                                <h4>Przydzielono do: <b>@subitem.Value</b></h4>
+                            }
+                        </div>
+                    }
                 </div>
             }
             else

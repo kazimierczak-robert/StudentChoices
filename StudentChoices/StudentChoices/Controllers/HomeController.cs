@@ -154,6 +154,7 @@ namespace StudentChoices.Controllers
                                 if ((bool)HttpContext.Application["RecActive"] == true)
                                 {
                                     List<string> Subjects = new List<string>();
+                                    //TODO
                                     var ClassGroupIDs = db.StudentsAndClassGroups.Where(x => x.StudentNo == usrStudent.StudentNo).Select(x => x.ClassGroupID).FirstOrDefault();
                                     var CategoryIDs = db.Categories.Where(x => x.ClassGroupID == ClassGroupIDs).Select(x => x.CategoryID).FirstOrDefault();
 
@@ -163,6 +164,39 @@ namespace StudentChoices.Controllers
                                         Subjects.Add(elem.Name);
                                     }
                                     Session["Subjects"] = new SelectList(Subjects);
+                                }
+                                else if((bool)HttpContext.Application["ShareResults"] == true)
+                                {
+                                    Dictionary<string, Dictionary<string, string>> resultsAll = new Dictionary<string, Dictionary<string, string>>();
+
+                                    Dictionary<string, string> resultsOnGroup;
+                                    string oneClassGroupStr = string.Empty;
+
+                                    var ClassGroups = db.StudentsAndClassGroups.Where(x => x.StudentNo == usrStudent.StudentNo);
+                                    foreach (var oneClassGroup in ClassGroups)
+                                    {
+                                        resultsOnGroup = new Dictionary<string, string>();
+                                        var Categories = db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID);
+                                        foreach (var Cat in Categories)
+                                        {
+
+                                            var FinalChoiceID = db.FinalChoices.Where(x => x.StudentNo == usrStudent.StudentNo && x.CategoryID == Cat.CategoryID).Select(x => x.ChoiceID).FirstOrDefault();
+                                            var FinalChoiceName = db.ElectiveSubjectsAndSpecialities.Where(x=>x.ElectiveSubjectAndSpecialityID==FinalChoiceID).Select(x => x.Name).FirstOrDefault();
+                                            resultsOnGroup[Cat.Name]= FinalChoiceName;
+                                        }
+                                        var ClassGroup=db.ClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID).FirstOrDefault();
+
+                                        oneClassGroupStr = ClassGroup.DegreeCourse.ToString() + ", " + ClassGroup.Graduate.ToString() + ". stopień, ";
+                                        if (ClassGroup.FullTimeStudies == true) { oneClassGroupStr += "st. stacjonarne"; }
+                                        else { oneClassGroupStr += "st. niestacjonarne"; }
+                                        oneClassGroupStr += ", sem. " + ClassGroup.Semester.ToString() + "., " + ClassGroup.Speciality.ToString()
+                                            + ", średnia ocen: "+ oneClassGroup.AverageGrade.ToString();
+                                        
+                                        resultsAll[oneClassGroupStr] = resultsOnGroup;
+                                    }
+
+
+                                    Session["Results"] = resultsAll;
                                 }
                                 return RedirectToAction("", "Home");
                             }
@@ -245,6 +279,7 @@ namespace StudentChoices.Controllers
                 Session["Categories"] = null;
                 Session["NoOfSavedStudents"] = null;
                 Session["Stats"] = null;
+                Session["Results"] = null;
             }
             return RedirectToAction("", "Home");
         }
@@ -266,6 +301,7 @@ namespace StudentChoices.Controllers
             {
                 if((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
                 {
+                    HttpContext.Application["AfterRec"] = false;
                     HttpContext.Application["ShareResults"] = true;
                 }
             }
@@ -275,8 +311,8 @@ namespace StudentChoices.Controllers
         {
             if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
             {
-                //if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
-                //{
+                if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
+                {
                     using (PPDBEntities db = new PPDBEntities())
                     {
                         List<Models.Export.Category> exportData = new List<Models.Export.Category>();
@@ -318,7 +354,7 @@ namespace StudentChoices.Controllers
                         var serializer = new System.Xml.Serialization.XmlSerializer(exportData.GetType());
                         serializer.Serialize(Response.OutputStream, exportData);
                     }
-                //}
+                }
             }
         }
 
