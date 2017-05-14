@@ -240,7 +240,29 @@ else
     var dict = @Html.Raw(Json.Encode(Session["ChosenOptions"]));
     for (key in dict)
     {
-        document.getElementById(key).selectedIndex = 1;
+        if (dict[key] == "")
+        {
+            var option = document.createElement('option');
+            option.text = option.value = "Nie wybrano";
+            document.getElementById(key).add(option, 0);
+            document.getElementById(key).selectedIndex = 0;
+            var res = key.split(" ");
+            if (res[res.length - 1] != '1')
+            {
+                document.getElementById(key).disabled = true;
+                //albo też remove options from previous comboboxes i wtedy bez "Nie wybrano" i blokowania
+            }
+        }
+        else
+        {
+            var res = key.split(" ");
+            if (res[res.length - 1] != '1')
+            {
+                //remove options from previous comboboxes
+            }
+            document.getElementById(key).value = dict[key];
+        }
+        
     }
 </script>
 }
