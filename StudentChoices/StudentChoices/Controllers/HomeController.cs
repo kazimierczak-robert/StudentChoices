@@ -1,5 +1,6 @@
 ﻿using StudentChoices.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -153,36 +154,93 @@ namespace StudentChoices.Controllers
 
                                 if ((bool)HttpContext.Application["RecActive"] == true)
                                 {
-                                    List<string> Subjects = new List<string>();
-                                    //TODO
-                                    var ClassGroupIDs = db.StudentsAndClassGroups.Where(x => x.StudentNo == usrStudent.StudentNo).Select(x => x.ClassGroupID).FirstOrDefault();
-                                    var CategoryIDs = db.Categories.Where(x => x.ClassGroupID == ClassGroupIDs).Select(x => x.CategoryID).FirstOrDefault();
+                                    var ChosenOptions = new Dictionary<string, string>();
 
-                                    Subjects.Add("Nie wybrano");
-                                    foreach (var elem in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == CategoryIDs).ToList())
-                                    {
-                                        Subjects.Add(elem.Name);
-                                    }
-                                    Session["Subjects"] = new SelectList(Subjects);
-                                }
-                                else if((bool)HttpContext.Application["ShareResults"] == true)
-                                {
-                                    Dictionary<string, Dictionary<string, string>> resultsAll = new Dictionary<string, Dictionary<string, string>>();
+                                    Dictionary<string, Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>> optionsAll = new Dictionary<string, Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>>();
+                                    Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>> optionsOneGroup;
 
-                                    Dictionary<string, string> resultsOnGroup;
+                                    Dictionary<List<List<string>>, SelectList> optionsOneCategory;
+                                    List<List<string>> optionsOneCategoryList;
                                     string oneClassGroupStr = string.Empty;
 
                                     var ClassGroups = db.StudentsAndClassGroups.Where(x => x.StudentNo == usrStudent.StudentNo);
                                     foreach (var oneClassGroup in ClassGroups)
                                     {
-                                        resultsOnGroup = new Dictionary<string, string>();
+                                        optionsOneGroup = new Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>();
+                                        var Categories = db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID);
+                                        foreach (var Cat in Categories)
+                                        {
+                                            optionsOneCategory = new Dictionary<List<List<string>>, SelectList>();
+                                            optionsOneCategoryList = new List<List<string>>();
+                                            var optionsOneCategorySubjects = db.ElectiveSubjectsAndSpecialities.Where(x=>x.CategoryID == Cat.CategoryID);
+                                            foreach (var Sub in optionsOneCategorySubjects)
+                                            {
+                                                var SubInfo = new List<string>();
+                                                SubInfo.Add(Sub.Name);
+                                                SubInfo.Add(Sub.Information);
+                                                var files = String.Empty;
+                                                foreach (var file in db.Files.Where(x=>x.ElectiveSubjectAndSpecialityID==Sub.ElectiveSubjectAndSpecialityID))
+                                                {
+                                                    files += file.Path + "\n";
+                                                }
+                                                SubInfo.Add(files);
+                                                optionsOneCategoryList.Add(SubInfo);
+                                            }
+
+                                            optionsOneCategory[optionsOneCategoryList]=new SelectList(optionsOneCategorySubjects.Select(x=>x.Name).ToList());
+
+                                            var optionsOneGroupParams = new ArrayList();
+                                            optionsOneGroupParams.Add(Cat.Name);
+                                            optionsOneGroupParams.Add(Cat.MaxNoChoices);
+
+                                            for (int i = 1; i <= Cat.MaxNoChoices; i++)
+                                            {
+                                                ChosenOptions[Cat.Name + " " + i] = "";
+                                            }
+
+                                            optionsOneGroup[optionsOneGroupParams] = optionsOneCategory;
+                                        }
+                                        var ClassGroup = db.ClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID).FirstOrDefault();
+
+                                        oneClassGroupStr = ClassGroup.DegreeCourse.ToString() + ", " + ClassGroup.Graduate.ToString() + ". stopień, ";
+                                        if (ClassGroup.FullTimeStudies == true) { oneClassGroupStr += "st. stacjonarne"; }
+                                        else { oneClassGroupStr += "st. niestacjonarne"; }
+                                        oneClassGroupStr += ", sem. " + ClassGroup.Semester.ToString() + "., " + ClassGroup.Speciality.ToString()
+                                            + ", średnia ocen: " + oneClassGroup.AverageGrade.ToString();
+
+                                        optionsAll[oneClassGroupStr] = optionsOneGroup;
+                                    }
+                                    Session["Options"] = optionsAll;
+                                    //Session["HasChosenEarlier"] = db.StudentChoices.Where(x => x.StudentNo == usrStudent.StudentNo).Count();
+                                    //if((int)Session["HasChosenEarlier"]!=0)
+                                    //{
+
+                                        var ChosenOptionsFromDB = db.StudentChoices.Where(x => x.StudentNo == usrStudent.StudentNo);
+                                        foreach (var item in ChosenOptionsFromDB)
+                                        {
+                                            ChosenOptions[db.Categories.Where(x=>x.CategoryID== item.CategoryID).FirstOrDefault().Name + " " + item.PreferenceNo] = db.ElectiveSubjectsAndSpecialities.Where(x => x.ElectiveSubjectAndSpecialityID == item.ChoiceID).FirstOrDefault().Name;
+                                        }
+                                        Session["ChosenOptions"] = ChosenOptions;
+                                    //}
+                                }
+                                else if((bool)HttpContext.Application["ShareResults"] == true)
+                                {
+                                    Dictionary<string, Dictionary<string, string>> resultsAll = new Dictionary<string, Dictionary<string, string>>();
+
+                                    Dictionary<string, string> resultsOneGroup;
+                                    string oneClassGroupStr = string.Empty;
+
+                                    var ClassGroups = db.StudentsAndClassGroups.Where(x => x.StudentNo == usrStudent.StudentNo);
+                                    foreach (var oneClassGroup in ClassGroups)
+                                    {
+                                        resultsOneGroup = new Dictionary<string, string>();
                                         var Categories = db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID);
                                         foreach (var Cat in Categories)
                                         {
 
                                             var FinalChoiceID = db.FinalChoices.Where(x => x.StudentNo == usrStudent.StudentNo && x.CategoryID == Cat.CategoryID).Select(x => x.ChoiceID).FirstOrDefault();
                                             var FinalChoiceName = db.ElectiveSubjectsAndSpecialities.Where(x=>x.ElectiveSubjectAndSpecialityID==FinalChoiceID).Select(x => x.Name).FirstOrDefault();
-                                            resultsOnGroup[Cat.Name]= FinalChoiceName;
+                                            resultsOneGroup[Cat.Name]= FinalChoiceName;
                                         }
                                         var ClassGroup=db.ClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID).FirstOrDefault();
 
@@ -192,7 +250,7 @@ namespace StudentChoices.Controllers
                                         oneClassGroupStr += ", sem. " + ClassGroup.Semester.ToString() + "., " + ClassGroup.Speciality.ToString()
                                             + ", średnia ocen: "+ oneClassGroup.AverageGrade.ToString();
                                         
-                                        resultsAll[oneClassGroupStr] = resultsOnGroup;
+                                        resultsAll[oneClassGroupStr] = resultsOneGroup;
                                     }
 
 
@@ -264,7 +322,6 @@ namespace StudentChoices.Controllers
             return RedirectToAction("", "Home");
         }
 
-        // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
@@ -280,6 +337,8 @@ namespace StudentChoices.Controllers
                 Session["NoOfSavedStudents"] = null;
                 Session["Stats"] = null;
                 Session["Results"] = null;
+                //Session["HasChosenEarlier"] = null;
+                Session["ChosenOptions"] = null;
             }
             return RedirectToAction("", "Home");
         }

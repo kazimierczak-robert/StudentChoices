@@ -22,31 +22,39 @@
                     <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         <h4 style="color:#ffffff">Dostępne przedmioty obieralne i specjalności</h4>
                     </div>
-                    <div class="panel-footer">
-                        <h4>Informatyka, 1. stopień, st. stacjonarne, sem. 5., -, średnia ocen: 4.02</h4>
-                    </div>
-                    <div class="panel-body">
-                        <h3><b>Przedmiot obieralny 1</b></h3>
-                        <h4><b>Programowanie współbieżne</b></h4>
-                        <h5>Informacje</h5>
-                        <h5>Linki</h5>
-                        <h4><b>Protokoły komunikacyjne</b></h4>
-                        <h5>Informacje</h5>
-                        <h5>Linki</h5>
-                        <h4><b>Programowanie robotów</b></h4>
-                        <h5>Informacje</h5>
-                        <h5>Linki</h5>
-
-                        <div class="row">
-                            <div class="col-sm-2">
-                                <h5>1. preferencja:</h5> 
-                            </div>
-                            <div class="col-sm-2">
-                                @Html.DropDownList("Subjects", (SelectList)Session["Subjects"], htmlAttributes: new { @class = "form-control", @style="width:auto" })
-                            </div>
+                    @foreach (var item in (Dictionary<string, Dictionary<System.Collections.ArrayList, Dictionary<List<List<string>>, SelectList>>>)Session["Options"])
+                    {
+                        <div class="panel-footer">
+                            <h4>@item.Key</h4>
                         </div>
-
-                    </div>
+                        <div class="panel-body">
+                            @foreach (var subitem in item.Value)
+                            {
+                                <h3><b>@subitem.Key[0]</b></h3>
+                                foreach (var subsubitem in subitem.Value)
+                                {
+                                    foreach (var subsubsubitem in subsubitem.Key)
+                                    {
+                                        <h4><b>@subsubsubitem[0]</b></h4>
+                                        <h5>@subsubsubitem[1]</h5>
+                                        <h5>@subsubsubitem[2]</h5>
+                                    }
+                                    <br />
+                                    for (int i = 1; i <= (int)subitem.Key[1]; i++)
+                                    {
+                                        <div class="row">
+                                            <div class="col-sm-2">
+                                                <h5>@i. preferencja:</h5> 
+                                            </div>
+                                            <div class="col-sm-2">
+                                                @Html.DropDownList("Subjects", (SelectList)subsubitem.Value, htmlAttributes: new { @class = "form-control", @id=@subitem.Key[0]+" "+@i.ToString(), @style = "width:auto" })
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                     }
                 </div>
             }
         }
@@ -218,7 +226,7 @@ else
     $(function () { // will trigger when the document is ready
         $('.datepicker').datepicker(
             {
-               
+
                 inline: true,
                 sideBySide: true,
                 startDate: "@HttpContext.Current.Application["RecActive"]",
@@ -228,5 +236,11 @@ else
                 autoclose: true
             }); //Initialise any date pickers
     });
+
+    var dict = @Html.Raw(Json.Encode(Session["ChosenOptions"]));
+    for (key in dict)
+    {
+        document.getElementById(key).selectedIndex = 1;
+    }
 </script>
 }
