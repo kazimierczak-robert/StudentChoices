@@ -47,7 +47,7 @@
                                                 <h5>@i. preferencja:</h5> 
                                             </div>
                                             <div class="col-sm-2">
-                                                @Html.DropDownList("Subjects", (SelectList)subsubitem.Value, htmlAttributes: new { @class = "form-control", @id=@subitem.Key[0]+" "+@i.ToString(), @style = "width:auto" })
+                                                @Html.DropDownList("Subjects", (SelectList)subsubitem.Value, htmlAttributes: new { @class = "form-control", @id=@subitem.Key[0]+" "+@i.ToString(), @style = "width:auto", @onchange = "ComboboxChange(this)" })
                                             </div>
                                         </div>
                                     }
@@ -110,7 +110,10 @@
                                 @Html.CheckBox("isRecruitmentActive", (bool)HttpContext.Current.Application["RecActive"])
                                 <h4>Rekrutacja w toku</h4>
                             </div>
+
+                            <h5 style="padding-top:10px">Data zakończenia rekrutacji</h5>
                             <div class="input-group date datepicker">
+
                                 <input type="text" name="endDate" class="form-control" style="max-width:100%" value="@HttpContext.Current.Application["RecStopString"]">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                             </div>
@@ -237,32 +240,114 @@ else
             }); //Initialise any date pickers
     });
 
+    var maxwidth = 0;
+
     var dict = @Html.Raw(Json.Encode(Session["ChosenOptions"]));
     for (key in dict)
     {
-        if (dict[key] == "")
+        var res = key.split(" ");
+        if (res[res.length - 1] != '1')
+        {
+            var comboboxNumber = Number(res[res.length - 1]);
+            for (i = 1; i < comboboxNumber; i++)
+            {
+                var previousCombobox = "";
+                for (var j = 0; j < res.length - 1; j++)
+                {
+                    previousCombobox += res[j];
+                    previousCombobox += " ";
+                }
+                previousCombobox += i;
+                for (j = 0; j < document.getElementById(key).length; j++)
+                {
+                    if (document.getElementById(key).options[j].value == document.getElementById(previousCombobox).value)
+                    {
+                        document.getElementById(key).remove(j);
+                        break;
+                    }
+                }
+            } 
+        }
+        if (dict[key] != "")
+        {
+            document.getElementById(key).value = dict[key];
+        } 
+
+        var width = document.getElementById(key).clientWidth;
+        if (width > maxwidth) {
+            maxwidth = width;
+        }
+    }
+
+    maxwidth = maxwidth + 2;
+    for (key in dict)
+    {
+        var option = document.createElement('option');
+        option.text = option.value = document.getElementById(key).value;
+        option.style.display = "none";
+        document.getElementById(key).add(option, 0);
+        document.getElementById(key).style.width = maxwidth + "px";
+    }
+
+
+    function ComboboxChange(control)
+    {
+        var prevValue = control[0].value;
+        var newValue = control.value
+
+        control[0].text = newValue;
+        control[0].value = newValue;
+        
+        var prevValueIndex = -1;
+
+        for (var i = 1; i < control.length; i++)
+        {
+            if (control[i].value == prevValue)
+            {
+                prevValueIndex = control[i].index;
+                break;
+            }
+        }
+
+        var res = control.id.split(" ");
+        var comboboxNumber = Number(res[res.length - 1]);
+
+        var nextComboboxTemplate = "";
+        for (var j = 0; j < res.length - 1; j++) {
+            nextComboboxTemplate += res[j];
+            nextComboboxTemplate += " ";
+        }
+
+        var k = comboboxNumber+1;
+        var nextCombobox = nextComboboxTemplate + k;
+        while (document.getElementById(nextCombobox) != null)
         {
             var option = document.createElement('option');
-            option.text = option.value = "Nie wybrano";
-            document.getElementById(key).add(option, 0);
-            document.getElementById(key).selectedIndex = 0;
-            var res = key.split(" ");
-            if (res[res.length - 1] != '1')
+            option.text = option.value = prevValue;
+            document.getElementById(nextCombobox).add(option, prevValueIndex);
+
+            for (var j = 1; j < document.getElementById(nextCombobox).length; j++)
             {
-                document.getElementById(key).disabled = true;
-                //albo też remove options from previous comboboxes i wtedy bez "Nie wybrano" i blokowania
+                if (document.getElementById(nextCombobox).options[j].value == newValue)
+                {
+                    if (document.getElementById(nextCombobox).value == newValue)
+                    {
+                        document.getElementById(nextCombobox).remove(j);
+                        document.getElementById(nextCombobox)[1].selected = true;
+                        document.getElementById(nextCombobox)[0].id = document.getElementById(nextCombobox)[1].id;
+                        document.getElementById(nextCombobox)[0].value = document.getElementById(nextCombobox)[1].value;
+                        newValue = document.getElementById(nextCombobox).value;
+                    }
+                    else
+                    {
+                        document.getElementById(nextCombobox).remove(j);
+                    }
+                    break;
+                }
             }
+            k += 1;
+            nextCombobox = nextComboboxTemplate + k;
         }
-        else
-        {
-            var res = key.split(" ");
-            if (res[res.length - 1] != '1')
-            {
-                //remove options from previous comboboxes
-            }
-            document.getElementById(key).value = dict[key];
-        }
-        
     }
 </script>
 }
