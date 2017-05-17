@@ -12,7 +12,7 @@
     {
         if ((bool)HttpContext.Current.Application["RecActive"] == true)
         {
-            using (Html.BeginForm())
+            using (Html.BeginForm("SaveStudentChoices","Home"))
             {
                 @Html.AntiForgeryToken()
 
@@ -55,7 +55,13 @@
                             }
                         </div>
                      }
-                </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <input type="submit" value="Zapisz" class="btn btn-default" style="float:right" />
+                        </div>
+                    </div>
+
+                    </div>
             }
         }
         else

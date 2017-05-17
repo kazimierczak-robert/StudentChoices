@@ -148,6 +148,7 @@ namespace StudentChoices.Controllers
                             {
                                 Session["UserName"] = usrStudent.Login + " (" + usrStudent.Name + " " + usrStudent.Surname + ")";
                                 Session["User"] = "Student";
+                                Session["StudentNo"] = usrStudent.StudentNo;
                                 usrStudent.TriesNo = 0;
                                 db.Entry(usrStudent).State = EntityState.Modified;
                                 db.SaveChanges();
@@ -155,73 +156,72 @@ namespace StudentChoices.Controllers
                                 if ((bool)HttpContext.Application["RecActive"] == true)
                                 {
                                     var ChosenOptions = new Dictionary<string, string>();
-
-                                    Dictionary<string, Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>> optionsAll = new Dictionary<string, Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>>();
-                                    Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>> optionsOneGroup;
-
-                                    Dictionary<List<List<string>>, SelectList> optionsOneCategory;
-                                    List<List<string>> optionsOneCategoryList;
-                                    string oneClassGroupStr = string.Empty;
-
-                                    var ClassGroups = db.StudentsAndClassGroups.Where(x => x.StudentNo == usrStudent.StudentNo);
-                                    foreach (var oneClassGroup in ClassGroups)
+                                    if (Session["Options"] ==null)
                                     {
-                                        optionsOneGroup = new Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>();
-                                        var Categories = db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID);
-                                        foreach (var Cat in Categories)
+                                        Dictionary<string, Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>> optionsAll = new Dictionary<string, Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>>();
+                                        Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>> optionsOneGroup;
+
+                                        Dictionary<List<List<string>>, SelectList> optionsOneCategory;
+                                        List<List<string>> optionsOneCategoryList;
+                                        string oneClassGroupStr = string.Empty;
+
+                                        var ClassGroups = db.StudentsAndClassGroups.Where(x => x.StudentNo == usrStudent.StudentNo);
+                                        foreach (var oneClassGroup in ClassGroups)
                                         {
-                                            optionsOneCategory = new Dictionary<List<List<string>>, SelectList>();
-                                            optionsOneCategoryList = new List<List<string>>();
-                                            var optionsOneCategorySubjects = db.ElectiveSubjectsAndSpecialities.Where(x=>x.CategoryID == Cat.CategoryID);
-                                            foreach (var Sub in optionsOneCategorySubjects)
+                                            optionsOneGroup = new Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>();
+                                            var Categories = db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID);
+                                            foreach (var Cat in Categories)
                                             {
-                                                var SubInfo = new List<string>();
-                                                SubInfo.Add(Sub.Name);
-                                                SubInfo.Add(Sub.Information);
-                                                var files = String.Empty;
-                                                foreach (var file in db.Files.Where(x=>x.ElectiveSubjectAndSpecialityID==Sub.ElectiveSubjectAndSpecialityID))
+                                                optionsOneCategory = new Dictionary<List<List<string>>, SelectList>();
+                                                optionsOneCategoryList = new List<List<string>>();
+                                                var optionsOneCategorySubjects = db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == Cat.CategoryID);
+                                                foreach (var Sub in optionsOneCategorySubjects)
                                                 {
-                                                    files += file.Path + "\n";
+                                                    var SubInfo = new List<string>();
+                                                    SubInfo.Add(Sub.Name);
+                                                    SubInfo.Add(Sub.Information);
+                                                    var files = String.Empty;
+                                                    foreach (var file in db.Files.Where(x => x.ElectiveSubjectAndSpecialityID == Sub.ElectiveSubjectAndSpecialityID))
+                                                    {
+                                                        files += file.Path + "\n";
+                                                    }
+                                                    SubInfo.Add(files);
+                                                    optionsOneCategoryList.Add(SubInfo);
                                                 }
-                                                SubInfo.Add(files);
-                                                optionsOneCategoryList.Add(SubInfo);
+
+                                                optionsOneCategory[optionsOneCategoryList] = new SelectList(optionsOneCategorySubjects.Select(x => x.Name).ToList());
+
+                                                var optionsOneGroupParams = new ArrayList();
+                                                optionsOneGroupParams.Add(Cat.Name);
+                                                optionsOneGroupParams.Add(Cat.MaxNoChoices);
+
+                                                for (int i = 1; i <= Cat.MaxNoChoices; i++)
+                                                {
+                                                    ChosenOptions[Cat.Name + " " + i] = "";
+                                                }
+
+                                                optionsOneGroup[optionsOneGroupParams] = optionsOneCategory;
                                             }
+                                            var ClassGroup = db.ClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID).FirstOrDefault();
 
-                                            optionsOneCategory[optionsOneCategoryList]=new SelectList(optionsOneCategorySubjects.Select(x=>x.Name).ToList());
+                                            oneClassGroupStr = ClassGroup.DegreeCourse.ToString() + ", " + ClassGroup.Graduate.ToString() + ". stopień, ";
+                                            if (ClassGroup.FullTimeStudies == true) { oneClassGroupStr += "st. stacjonarne"; }
+                                            else { oneClassGroupStr += "st. niestacjonarne"; }
+                                            oneClassGroupStr += ", sem. " + ClassGroup.Semester.ToString() + "., " + ClassGroup.Speciality.ToString()
+                                                + ", średnia ocen: " + oneClassGroup.AverageGrade.ToString();
 
-                                            var optionsOneGroupParams = new ArrayList();
-                                            optionsOneGroupParams.Add(Cat.Name);
-                                            optionsOneGroupParams.Add(Cat.MaxNoChoices);
-
-                                            for (int i = 1; i <= Cat.MaxNoChoices; i++)
-                                            {
-                                                ChosenOptions[Cat.Name + " " + i] = "";
-                                            }
-
-                                            optionsOneGroup[optionsOneGroupParams] = optionsOneCategory;
+                                            optionsAll[oneClassGroupStr] = optionsOneGroup;
                                         }
-                                        var ClassGroup = db.ClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID).FirstOrDefault();
-
-                                        oneClassGroupStr = ClassGroup.DegreeCourse.ToString() + ", " + ClassGroup.Graduate.ToString() + ". stopień, ";
-                                        if (ClassGroup.FullTimeStudies == true) { oneClassGroupStr += "st. stacjonarne"; }
-                                        else { oneClassGroupStr += "st. niestacjonarne"; }
-                                        oneClassGroupStr += ", sem. " + ClassGroup.Semester.ToString() + "., " + ClassGroup.Speciality.ToString()
-                                            + ", średnia ocen: " + oneClassGroup.AverageGrade.ToString();
-
-                                        optionsAll[oneClassGroupStr] = optionsOneGroup;
+                                        Session["Options"] = optionsAll;
                                     }
-                                    Session["Options"] = optionsAll;
-                                    //Session["HasChosenEarlier"] = db.StudentChoices.Where(x => x.StudentNo == usrStudent.StudentNo).Count();
-                                    //if((int)Session["HasChosenEarlier"]!=0)
-                                    //{
 
-                                        var ChosenOptionsFromDB = db.StudentChoices.Where(x => x.StudentNo == usrStudent.StudentNo);
-                                        foreach (var item in ChosenOptionsFromDB)
-                                        {
-                                            ChosenOptions[db.Categories.Where(x=>x.CategoryID== item.CategoryID).FirstOrDefault().Name + " " + item.PreferenceNo] = db.ElectiveSubjectsAndSpecialities.Where(x => x.ElectiveSubjectAndSpecialityID == item.ChoiceID).FirstOrDefault().Name;
-                                        }
-                                        Session["ChosenOptions"] = ChosenOptions;
-                                    //}
+                                    var ChosenOptionsFromDB = db.StudentChoices.Where(x => x.StudentNo == usrStudent.StudentNo);
+                                    foreach (var item in ChosenOptionsFromDB)
+                                    {
+                                        ChosenOptions[db.Categories.Where(x => x.CategoryID == item.CategoryID).FirstOrDefault().Name + " " + item.PreferenceNo] = db.ElectiveSubjectsAndSpecialities.Where(x => x.ElectiveSubjectAndSpecialityID == item.ChoiceID).FirstOrDefault().Name;
+                                    }
+                                    Session["ChosenOptions"] = ChosenOptions;
+
                                 }
                                 else if((bool)HttpContext.Application["ShareResults"] == true)
                                 {
@@ -270,6 +270,60 @@ namespace StudentChoices.Controllers
             }
             ModelState.AddModelError("", "Dane logowania są niepoprawne!");
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SaveStudentChoices(string[] Subjects)
+        {
+            if (Session["User"].ToString() == "Student")
+            {
+                DateTime saveTime = DateTime.Now;
+                int activeChoice = 0;
+                int StdNo = Int32.Parse(Session["StudentNo"].ToString());
+                using (PPDBEntities db = new PPDBEntities())
+                {
+                    var ClassGroups = db.StudentsAndClassGroups.Where(x => x.StudentNo == StdNo);
+                    foreach (var oneClassGroup in ClassGroups)
+                    {
+                        var Categories = db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID);
+                        foreach (var Cat in Categories)
+                        {
+                            var findUserChoices = db.StudentChoices.Where(u => u.StudentNo == StdNo && u.CategoryID==Cat.CategoryID);
+
+                            //if istnieje to nadpisz else dodaj do bazy
+                            for (int i = 1; i <= Cat.MaxNoChoices; i++)
+                            {
+                                if(findUserChoices.Where(x=>x.PreferenceNo==i).Count()==1)
+                                {
+                                    var findChoice = findUserChoices.Where(x => x.PreferenceNo == i).FirstOrDefault();
+                                    var newChoiceName = Subjects[activeChoice];
+                                    int newChoiceID = db.ElectiveSubjectsAndSpecialities.Where(x => x.Name == newChoiceName && x.CategoryID==Cat.CategoryID).Select(x=>x.ElectiveSubjectAndSpecialityID).FirstOrDefault();
+                                    findChoice.ChoiceID = newChoiceID;
+                                    findChoice.ChoiceDate = saveTime;
+                                    db.Entry(findChoice).State = EntityState.Modified;
+                                }
+                                else
+                                {
+                                    var newChoice = new StudentChoices.Models.StudentChoices();
+                                    newChoice.StudentNo = StdNo;
+                                    newChoice.CategoryID = Cat.CategoryID;
+                                    var newChoiceName = Subjects[activeChoice];
+                                    int newChoiceID = db.ElectiveSubjectsAndSpecialities.Where(x => x.Name == newChoiceName && x.CategoryID==Cat.CategoryID).Select(x=>x.ElectiveSubjectAndSpecialityID).FirstOrDefault();
+                                    newChoice.ChoiceID = newChoiceID;
+                                    newChoice.PreferenceNo = Byte.Parse(i.ToString());
+                                    newChoice.ChoiceDate = saveTime;
+                                    db.StudentChoices.Add(newChoice);
+
+                                }
+                                activeChoice++;
+                            }            
+                        }
+                    }
+                    db.SaveChanges();
+                }
+            }
+            return RedirectToAction("", "Home");
         }
 
         [HttpPost]
@@ -337,7 +391,8 @@ namespace StudentChoices.Controllers
                 Session["NoOfSavedStudents"] = null;
                 Session["Stats"] = null;
                 Session["Results"] = null;
-                //Session["HasChosenEarlier"] = null;
+                Session["StudentNo"] = null;
+                Session["Options"] = null;
                 Session["ChosenOptions"] = null;
             }
             return RedirectToAction("", "Home");
