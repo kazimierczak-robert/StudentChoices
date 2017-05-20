@@ -10,13 +10,13 @@
                 <li style="width:140px; text-align:center">
                   <a>Zarządzaj!</a>
                   <ul class="nav">
-                      <li>@Html.ActionLink("Importuj dane", "Edit", "Account")</li>
-                      <li>@Html.ActionLink("Dodaj dane", "Edit", "Account")</li>
-                      <li>@Html.ActionLink("Edytuj dane", "Edit", "Account")</li>
-                      <li>@Html.ActionLink("Zmień hasło", "Edit", "Account")</li>
+                      <li>@Html.ActionLink("Importuj dane", "Edit", "Admin")</li>
+                      <li>@Html.ActionLink("Dodaj dane", "Edit", "Admin")</li>
+                      <li>@Html.ActionLink("Edytuj dane", "Edit", "Admin")</li>
+                      <li>@Html.ActionLink("Zmień hasło", "ChangePass", "Admin")</li>
                       @if (Session["User"] == "SuperAdmin")
                       {
-                        <li>@Html.ActionLink("Administatorzy", "Edit", "Account")</li>
+                        <li>@Html.ActionLink("Administatorzy", "Edit", "Admin")</li>
                       }
                   </ul>
                 </li>

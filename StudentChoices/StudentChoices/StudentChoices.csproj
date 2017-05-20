@@ -125,6 +125,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Models\Admins.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
@@ -134,6 +135,7 @@
     <Compile Include="Models\Categories.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ChangePass.cs" />
     <Compile Include="Models\ClassGroups.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
@@ -240,6 +242,7 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Admin\ChangePass.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
