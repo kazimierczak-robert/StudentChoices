@@ -37,7 +37,11 @@
                                     {
                                         <h4><b>@subsubsubitem[0]</b></h4>
                                         <h5>@subsubsubitem[1]</h5>
-                                        <h5>@subsubsubitem[2]</h5>
+                                        var files = subsubsubitem[2].Split(' ');
+                                        for (int i = 0; i < files.Count()-1; i += 2)
+                                        {
+                                            <a href="@files[i+1]"><h5>@files[i]</h5></a>
+                                        }
                                     }
                                     <br />
                                     for (int i = 1; i <= (int)subitem.Key[1]; i++)
