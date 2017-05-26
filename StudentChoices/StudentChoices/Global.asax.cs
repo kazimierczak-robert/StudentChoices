@@ -22,7 +22,7 @@ namespace StudentChoices
             Application["RecActive"] = false;
             Application["RecStop"] = date;
             Application["RecStopString"] = date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
-            Application["AfterRec"] = false;
+            Application["AfterRec"] = true;
             Application["ShareResults"] = false;
         }
     }

@@ -27,7 +27,7 @@ namespace StudentChoices.Controllers
                     oneClassGroup += "/" + elem.Semester.ToString() + "/" + elem.Speciality.ToString();
                     ClassGroups.Add(oneClassGroup);
                 }
-                if (ClassGroups.IndexOf(selectedValue)>=0)
+                if (ClassGroups.IndexOf(selectedValue) >= 0)
                 {
                     ClassGroups.Remove(selectedValue);
                     ClassGroups.Insert(0, selectedValue);
@@ -41,15 +41,15 @@ namespace StudentChoices.Controllers
         {
             using (PPDBEntities db = new PPDBEntities())
             {
-                var selectedClassGroupDetails= selectedClassGroup.Split('/');
-                
+                var selectedClassGroupDetails = selectedClassGroup.Split('/');
+
                 string DegreeCourse = selectedClassGroupDetails[0];
                 Byte Graduate = Byte.Parse(selectedClassGroupDetails[1]);
                 bool FullTimeStudies = selectedClassGroupDetails[2] == "STACJ" ? true : false;
                 Byte Semester = Byte.Parse(selectedClassGroupDetails[3]);
                 string Speciality = selectedClassGroupDetails[4];
 
-                var selectedClassGroupID = db.ClassGroups.Where(x=>x.DegreeCourse== DegreeCourse &&
+                var selectedClassGroupID = db.ClassGroups.Where(x => x.DegreeCourse == DegreeCourse &&
                     x.Graduate == Graduate && x.FullTimeStudies == FullTimeStudies &&
                     x.Semester == Semester && x.Speciality == Speciality).FirstOrDefault().ClassGroupID;
 
@@ -113,6 +113,7 @@ namespace StudentChoices.Controllers
                     if (usrAdmin.Active == true)
                     {
                         Session["UserName"] = usrAdmin.Login;
+                        Session["AdminID"] = usrAdmin.AdminID;
                         if (usrAdmin.SuperAdmin == true)
                         {
                             Session["User"] = "SuperAdmin";
@@ -156,7 +157,7 @@ namespace StudentChoices.Controllers
                                 if ((bool)HttpContext.Application["RecActive"] == true)
                                 {
                                     var ChosenOptions = new Dictionary<string, string>();
-                                    if (Session["Options"] ==null)
+                                    if (Session["Options"] == null)
                                     {
                                         Dictionary<string, Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>> optionsAll = new Dictionary<string, Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>>>();
                                         Dictionary<ArrayList, Dictionary<List<List<string>>, SelectList>> optionsOneGroup;
@@ -223,7 +224,7 @@ namespace StudentChoices.Controllers
                                     Session["ChosenOptions"] = ChosenOptions;
 
                                 }
-                                else if((bool)HttpContext.Application["ShareResults"] == true)
+                                else if ((bool)HttpContext.Application["ShareResults"] == true)
                                 {
                                     Dictionary<string, Dictionary<string, string>> resultsAll = new Dictionary<string, Dictionary<string, string>>();
 
@@ -239,17 +240,17 @@ namespace StudentChoices.Controllers
                                         {
 
                                             var FinalChoiceID = db.FinalChoices.Where(x => x.StudentNo == usrStudent.StudentNo && x.CategoryID == Cat.CategoryID).Select(x => x.ChoiceID).FirstOrDefault();
-                                            var FinalChoiceName = db.ElectiveSubjectsAndSpecialities.Where(x=>x.ElectiveSubjectAndSpecialityID==FinalChoiceID).Select(x => x.Name).FirstOrDefault();
-                                            resultsOneGroup[Cat.Name]= FinalChoiceName;
+                                            var FinalChoiceName = db.ElectiveSubjectsAndSpecialities.Where(x => x.ElectiveSubjectAndSpecialityID == FinalChoiceID).Select(x => x.Name).FirstOrDefault();
+                                            resultsOneGroup[Cat.Name] = FinalChoiceName;
                                         }
-                                        var ClassGroup=db.ClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID).FirstOrDefault();
+                                        var ClassGroup = db.ClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID).FirstOrDefault();
 
                                         oneClassGroupStr = ClassGroup.DegreeCourse.ToString() + ", " + ClassGroup.Graduate.ToString() + ". stopień, ";
                                         if (ClassGroup.FullTimeStudies == true) { oneClassGroupStr += "st. stacjonarne"; }
                                         else { oneClassGroupStr += "st. niestacjonarne"; }
                                         oneClassGroupStr += ", sem. " + ClassGroup.Semester.ToString() + "., " + ClassGroup.Speciality.ToString()
-                                            + ", średnia ocen: "+ oneClassGroup.AverageGrade.ToString();
-                                        
+                                            + ", średnia ocen: " + oneClassGroup.AverageGrade.ToString();
+
                                         resultsAll[oneClassGroupStr] = resultsOneGroup;
                                     }
 
@@ -264,6 +265,11 @@ namespace StudentChoices.Controllers
                                 db.Entry(usrStudent).State = EntityState.Modified;
                                 db.SaveChanges();
                             }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "Konto jest zablokowane - przekroczono liczbę błędnych logowań z rzędu.\nSkontaktuj się z administratorem systemu!");
+                            return View();
                         }
                     }
                 }
@@ -289,19 +295,23 @@ namespace StudentChoices.Controllers
                         var Categories = db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID);
                         foreach (var Cat in Categories)
                         {
-                            var findUserChoices = db.StudentChoices.Where(u => u.StudentNo == StdNo && u.CategoryID==Cat.CategoryID);
+                            var findUserChoices = db.StudentChoices.Where(u => u.StudentNo == StdNo && u.CategoryID == Cat.CategoryID);
 
                             //if istnieje to nadpisz else dodaj do bazy
                             for (int i = 1; i <= Cat.MaxNoChoices; i++)
                             {
-                                if(findUserChoices.Where(x=>x.PreferenceNo==i).Count()==1)
+                                if (findUserChoices.Where(x => x.PreferenceNo == i).Count() == 1)
                                 {
                                     var findChoice = findUserChoices.Where(x => x.PreferenceNo == i).FirstOrDefault();
+
                                     var newChoiceName = Subjects[activeChoice];
-                                    int newChoiceID = db.ElectiveSubjectsAndSpecialities.Where(x => x.Name == newChoiceName && x.CategoryID==Cat.CategoryID).Select(x=>x.ElectiveSubjectAndSpecialityID).FirstOrDefault();
-                                    findChoice.ChoiceID = newChoiceID;
-                                    findChoice.ChoiceDate = saveTime;
-                                    db.Entry(findChoice).State = EntityState.Modified;
+                                    int newChoiceID = db.ElectiveSubjectsAndSpecialities.Where(x => x.Name == newChoiceName && x.CategoryID == Cat.CategoryID).Select(x => x.ElectiveSubjectAndSpecialityID).FirstOrDefault();
+                                    if (findChoice.ChoiceID != newChoiceID)
+                                    {
+                                        findChoice.ChoiceID = newChoiceID;
+                                        findChoice.ChoiceDate = saveTime;
+                                        db.Entry(findChoice).State = EntityState.Modified;
+                                    }
                                 }
                                 else
                                 {
@@ -309,7 +319,7 @@ namespace StudentChoices.Controllers
                                     newChoice.StudentNo = StdNo;
                                     newChoice.CategoryID = Cat.CategoryID;
                                     var newChoiceName = Subjects[activeChoice];
-                                    int newChoiceID = db.ElectiveSubjectsAndSpecialities.Where(x => x.Name == newChoiceName && x.CategoryID==Cat.CategoryID).Select(x=>x.ElectiveSubjectAndSpecialityID).FirstOrDefault();
+                                    int newChoiceID = db.ElectiveSubjectsAndSpecialities.Where(x => x.Name == newChoiceName && x.CategoryID == Cat.CategoryID).Select(x => x.ElectiveSubjectAndSpecialityID).FirstOrDefault();
                                     newChoice.ChoiceID = newChoiceID;
                                     newChoice.PreferenceNo = Byte.Parse(i.ToString());
                                     newChoice.ChoiceDate = saveTime;
@@ -317,7 +327,7 @@ namespace StudentChoices.Controllers
 
                                 }
                                 activeChoice++;
-                            }            
+                            }
                         }
                     }
                     db.SaveChanges();
@@ -356,12 +366,12 @@ namespace StudentChoices.Controllers
             {
                 HttpContext.Application["RecActive"] = isRecruitmentActive;
                 var dateStr = endDate.Split('.');
-                var date= new DateTime(Int32.Parse(dateStr[2]), Int32.Parse(dateStr[1]), Int32.Parse(dateStr[0]));
+                var date = new DateTime(Int32.Parse(dateStr[2]), Int32.Parse(dateStr[1]), Int32.Parse(dateStr[0]));
                 HttpContext.Application["RecStop"] = date;
                 HttpContext.Application["RecStopString"] = endDate;
                 HttpContext.Application["ShareResults"] = false;
 
-                if (date.AddDays(1)>DateTime.Now)
+                if (date.AddDays(1) > DateTime.Now)
                 {
                     HttpContext.Application["RecActive"] = true;
                     HttpContext.Application["AfterRec"] = false;
@@ -394,6 +404,7 @@ namespace StudentChoices.Controllers
                 Session["StudentNo"] = null;
                 Session["Options"] = null;
                 Session["ChosenOptions"] = null;
+                Session["AdminID"] = null;
             }
             return RedirectToAction("", "Home");
         }
@@ -404,16 +415,175 @@ namespace StudentChoices.Controllers
             {
                 if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
                 {
+                    using (PPDBEntities db = new PPDBEntities())
+                    {
+                        DateTime saveTime = DateTime.Now;
+                        foreach (var oneClassGroupID in db.ClassGroups.Select(x => x.ClassGroupID))
+                        {
+                            foreach (var oneCategory in db.Categories.Where(x => x.ClassGroupID == oneClassGroupID))
+                            {
+                                Dictionary<int, List<int>> algorithmChoices = new Dictionary<int, List<int>>();
+                                List<int> chosenStudents = new List<int>();
 
+                                var studentChoicesOneClassGroup = db.StudentChoices.Where(x => x.CategoryID == oneCategory.CategoryID).OrderBy(x => x.ChoiceDate);
+
+                                for (int ChoicePref = 1; ChoicePref <= oneCategory.MaxNoChoices; ChoicePref++)
+                                {
+                                    foreach (var oneSubject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID))
+                                    {
+                                        if (ChoicePref == 1)
+                                        {
+                                            chosenStudents = new List<int>();
+                                        }
+                                        else
+                                        {
+                                            chosenStudents = algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID];
+                                        }
+
+                                        if (oneSubject.UpperLimit != null)
+                                        {
+                                            int freePlaces = oneSubject.UpperLimit.Value - chosenStudents.Count;
+                                            if (freePlaces > 0)
+                                            {
+                                                var selectedStudentsNo = studentChoicesOneClassGroup.Where(x => x.ChoiceID == oneSubject.ElectiveSubjectAndSpecialityID && x.PreferenceNo == ChoicePref).Select(x => x.StudentNo);
+                                                var selectedsortedStudentsNo = db.StudentsAndClassGroups.Where(x => selectedStudentsNo.Any(y => y == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x => x.StudentNo).Take(freePlaces);
+                                                foreach (var item in selectedsortedStudentsNo)
+                                                {
+                                                    studentChoicesOneClassGroup = studentChoicesOneClassGroup.Where(x => x.StudentNo != item).OrderBy(x=>x.ChoiceDate);
+                                                    chosenStudents.Add(item);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var selectedStudentsNo = studentChoicesOneClassGroup.Where(x => x.ChoiceID == oneSubject.ElectiveSubjectAndSpecialityID && x.PreferenceNo == ChoicePref).Select(x => x.StudentNo);
+                                            var selectedsortedStudentsNo = db.StudentsAndClassGroups.Where(x => selectedStudentsNo.Any(y => y == x.StudentNo)).Select(x => x.StudentNo);
+                                            foreach (var item in selectedsortedStudentsNo)
+                                            {
+                                                studentChoicesOneClassGroup = studentChoicesOneClassGroup.Where(x => x.StudentNo != item).OrderBy(x => x.ChoiceDate);
+                                                chosenStudents.Add(item);
+                                            }
+                                        }
+                                        algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID] = chosenStudents;
+                                    }
+                                }
+
+                                //weź studentów którzy nigdzie się nie dostali
+                                if (studentChoicesOneClassGroup.Count()>0)
+                                {
+                                    var restOfStudentsNo = db.StudentsAndClassGroups.Where(x => studentChoicesOneClassGroup.Any(y => y.StudentNo == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x => x.StudentNo);
+                                    foreach (var oneSubject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit != null))
+                                    {
+                                        int freePlaces = oneSubject.UpperLimit.Value - algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Count;
+                                        if (freePlaces > 0)
+                                        {
+                                            var selectedsortedStudentsNo = restOfStudentsNo.Take(freePlaces);
+                                            foreach (var item in selectedsortedStudentsNo)
+                                            {
+                                                studentChoicesOneClassGroup.Where(x=>x.StudentNo!=item);
+                                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
+                                            }
+                                        }
+                                        if (restOfStudentsNo.Count() == 0) break;
+                                    }
+
+                                    //tylko jeden weź
+                                    if (restOfStudentsNo.Count() > 0)
+                                    {
+                                        var oneSubject = db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit == null).FirstOrDefault();
+                                        if (oneSubject != null)
+                                        {
+                                            foreach (var item in restOfStudentsNo)
+                                            {
+                                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
+                                            }
+                                        }
+                                        else
+                                        { 
+                                            //ERROR
+                                        }
+                                    }
+                                }
+
+                                //weź studentów którzy nie wybrali
+                                var studentsWithoutChoicesNo = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == oneClassGroupID && !db.StudentChoices.Any(y => y.StudentNo == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x=>x.StudentNo).ToList();
+                                if (studentsWithoutChoicesNo.Count()>0)
+                                {
+                                    foreach (var oneSubject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit != null))
+                                    {
+                                        int freePlaces = oneSubject.UpperLimit.Value - algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Count;
+                                        if (freePlaces > 0)
+                                        {
+                                            var selectedsortedStudentsNo = studentsWithoutChoicesNo.Take(freePlaces);
+                                            foreach (var item in selectedsortedStudentsNo)
+                                            {
+                                                studentsWithoutChoicesNo.Remove(item);
+                                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
+                                            }
+                                        }
+                                        if (studentsWithoutChoicesNo.Count() == 0) break;
+                                    }
+
+                                    //tylko jeden weź
+                                    if (studentsWithoutChoicesNo.Count() > 0)
+                                    {
+                                        var oneSubject = db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit == null).FirstOrDefault();
+                                        if (oneSubject != null)
+                                        {
+                                            foreach (var item in studentsWithoutChoicesNo)
+                                            {
+                                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //ERROR
+                                        }
+                                    }
+                                }
+
+                                //Zapisz wyniki do bazy
+                                foreach (var resultSubject in algorithmChoices)
+                                {
+                                    foreach (var resultStudent in resultSubject.Value)
+                                    {
+                                        var checkIfFinalChoiceExists = db.FinalChoices.Where(x => x.StudentNo == resultStudent && x.CategoryID == oneCategory.CategoryID).FirstOrDefault();
+                                        if (checkIfFinalChoiceExists != null)
+                                        {
+                                            if (checkIfFinalChoiceExists.ChoiceID != resultSubject.Key)
+                                            {
+                                                checkIfFinalChoiceExists.ChoiceID = resultSubject.Key;
+                                                checkIfFinalChoiceExists.LastEdit = saveTime;
+                                                checkIfFinalChoiceExists.LastEditedBy = Int32.Parse(Session["AdminID"].ToString());
+                                                db.Entry(checkIfFinalChoiceExists).State = EntityState.Modified;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var newResult = new FinalChoices();
+                                            newResult.StudentNo = resultStudent;
+                                            newResult.CategoryID = oneCategory.CategoryID;
+                                            newResult.ChoiceID = resultSubject.Key;
+                                            newResult.CreationDate = saveTime;
+                                            newResult.CreatedBy = Int32.Parse(Session["AdminID"].ToString());
+                                            db.FinalChoices.Add(newResult);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        db.SaveChanges();
+                    }
                 }
             }
             return RedirectToAction("", "Home");
         }
+
         public ActionResult ShareResults()
         {
             if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
             {
-                if((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
+                if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
                 {
                     HttpContext.Application["AfterRec"] = false;
                     HttpContext.Application["ShareResults"] = true;
@@ -431,11 +601,11 @@ namespace StudentChoices.Controllers
                     {
                         List<Models.Export.Category> exportData = new List<Models.Export.Category>();
 
-                        var categories = db.ClassGroups.Join(db.Categories, c=>c.ClassGroupID,
-                        cm=>cm.ClassGroupID, (c, cm)=>new
+                        var categories = db.ClassGroups.Join(db.Categories, c => c.ClassGroupID,
+                        cm => cm.ClassGroupID, (c, cm) => new
                         {
                             CategoryID = cm.CategoryID,
-                            Name =cm.Name,
+                            Name = cm.Name,
                             DegreeCourse = c.DegreeCourse,
                             Graduate = c.Graduate,
                             FullTimeStudies = c.FullTimeStudies,
@@ -449,7 +619,7 @@ namespace StudentChoices.Controllers
                         foreach (var categoryitem in categories)
                         {
                             subjectslist = new List<Models.Export.ElectiveSubjectAndSpeciality>();
-                            foreach (var subjectitem in db.ElectiveSubjectsAndSpecialities.Where(x=>x.CategoryID== categoryitem.CategoryID))
+                            foreach (var subjectitem in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == categoryitem.CategoryID))
                             {
                                 studentsnolist = new List<string>();
                                 foreach (var choiceitem in db.FinalChoices.Where(x => x.ChoiceID == subjectitem.ElectiveSubjectAndSpecialityID))
