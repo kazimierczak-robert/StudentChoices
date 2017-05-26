@@ -158,9 +158,9 @@
                         <h4 style="color:#ffffff">Po zakończeniu okresu rekrutacji</h4>
                     </div>
                     <div class="panel-body" style="text-align:center">
-                        <div> @Html.ActionLink("Uruchom algorytm", "Run", null, htmlAttributes: new { @class = "btn btn-default" })</div>
-                        <div style="padding-top:10px;padding-bottom:10px"> @Html.ActionLink("Udostępnij wyniki studentom", "ShareResults", null, htmlAttributes: new { @class = "btn btn-default" })</div>
-                        <div> @Html.ActionLink("Wyeksportuj", "ExportResults", null, htmlAttributes: new { @class = "btn btn-default" })</div>
+                        <div> @Html.ActionLink("Uruchom algorytm", "Run", null, htmlAttributes: new { @class = "btn btn-default", @id="RunButton" })</div>
+                        <div style="padding-top:10px;padding-bottom:10px"> @Html.ActionLink("Udostępnij wyniki studentom", "ShareResults", null, htmlAttributes: new { @class = "btn btn-default", @id = "ShareButton" })</div>
+                        <div> @Html.ActionLink("Wyeksportuj", "ExportResults", null, htmlAttributes: new { @class = "btn btn-default", @id = "ExportButton" })</div>
                     </div>
                 </div>
 
@@ -273,6 +273,17 @@ else
                 autoclose: true
             }); //Initialise any date pickers
     });
+
+
+    if (true != @HttpContext.Current.Application["AfterRec"].ToString().ToLower())
+    {
+        document.getElementById("RunButton").setAttribute('disabled', true);
+        document.getElementById("RunButton").style.backgroundColor = "#808080";
+        document.getElementById("ShareButton").setAttribute('disabled', true);
+        document.getElementById("ShareButton").style.backgroundColor = "#808080";
+        document.getElementById("ExportButton").setAttribute('disabled', true);
+        document.getElementById("ExportButton").style.backgroundColor = "#808080";
+    }
 
     var maxwidth = 0;
 
