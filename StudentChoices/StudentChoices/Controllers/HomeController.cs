@@ -371,9 +371,8 @@ namespace StudentChoices.Controllers
                 HttpContext.Application["RecStopString"] = endDate;
                 HttpContext.Application["ShareResults"] = false;
 
-                if (date.AddDays(1) > DateTime.Now)
+                if (date.Date >= DateTime.Now.Date && (bool)HttpContext.Application["RecActive"] == true)
                 {
-                    HttpContext.Application["RecActive"] = true;
                     HttpContext.Application["AfterRec"] = false;
                 }
                 else

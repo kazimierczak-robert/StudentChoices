@@ -110,7 +110,25 @@
             <div class="col-sm-6" style="padding-top:20px">
                 <div class="panel panel-default">
                     <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
-                        <h4 style="color:#ffffff">Zarządzanie rekrutacją</h4>
+                        @if ((bool)HttpContext.Current.Application["RecActive"] == true)
+                        {
+                            <h4 style="color:#ffffff">Zarządzanie rekrutacją (w toku)</h4>
+                        }
+                        else
+                        {
+                            if ((bool)HttpContext.Current.Application["AfterRec"] == true)
+                            {
+                                <h4 style="color:#ffffff">Zarządzanie rekrutacją (zakończona, nieopublikowano)</h4>
+                            }
+                            else if ((bool)HttpContext.Current.Application["ShareResults"] == true)
+                            {
+                                <h4 style="color:#ffffff">Zarządzanie rekrutacją (zakończona, opublikowano)</h4>
+                            }
+                            else
+                            {
+                                <h4 style="color:#ffffff">Zarządzanie rekrutacją (nierozpoczęta)</h4>
+                            }
+                        }
                     </div>
                     <div class="panel-body">
                         @using (Html.BeginForm("SaveConfig", "Home"))
@@ -248,7 +266,7 @@ else
 
                 inline: true,
                 sideBySide: true,
-                startDate: "@HttpContext.Current.Application["RecActive"]",
+                startDate: "@(((DateTime)(HttpContext.Current.Application["RecStop"])).AddDays(-1).ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture));",
                 maxViewMode: 2,
                 todayBtn: "linked",
                 language: "pl",
@@ -282,12 +300,12 @@ else
                         break;
                     }
                 }
-            } 
+            }
         }
         if (dict[key] != "")
         {
             document.getElementById(key).value = dict[key];
-        } 
+        }
 
         var width = document.getElementById(key).clientWidth;
         if (width > maxwidth) {
@@ -313,7 +331,7 @@ else
 
         control[0].text = newValue;
         control[0].value = newValue;
-        
+
         var prevValueIndex = -1;
 
         for (var i = 1; i < control.length; i++)
