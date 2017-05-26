@@ -51,17 +51,17 @@ namespace StudentChoices.Controllers
                                 findUser.Password = newPasswordStr;
                                 db.Entry(findUser).State = EntityState.Modified;
                                 db.SaveChanges();
-                                ModelState.AddModelError("", "Hasło zmieniono pomyślnie!");
+                                ViewBag.Success = "Hasło zmieniono pomyślnie!";
                             }
                             else
                             {
-                                ModelState.AddModelError("", "Podane hasła nie zgadzają się!");
+                                ViewBag.Alert = "Podane hasła nie zgadzają się!";
                             }
 
                         }
                         else
                         {
-                            ModelState.AddModelError("", "Podane stare hasło jest nieprawidłowe!");
+                            ViewBag.Alert = "Podane stare hasło jest nieprawidłowe!";
                         }
                     }
                     return View();

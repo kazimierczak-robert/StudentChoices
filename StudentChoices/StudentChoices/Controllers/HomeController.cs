@@ -133,6 +133,11 @@ namespace StudentChoices.Controllers
 
                         return RedirectToAction("", "Home");
                     }
+                    else
+                    {
+                        ViewBag.Alert="Konto jest nieaktywne!";
+                        return View();
+                    }
                 }
                 else
                 {
@@ -268,13 +273,13 @@ namespace StudentChoices.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError("", "Konto jest zablokowane - przekroczono liczbę błędnych logowań z rzędu.\nSkontaktuj się z administratorem systemu!");
+                            ViewBag.Alert = "Konto jest zablokowane - przekroczono liczbę błędnych logowań. Skontaktuj się z administratorem systemu!";
                             return View();
                         }
                     }
                 }
             }
-            ModelState.AddModelError("", "Dane logowania są niepoprawne!");
+            ViewBag.Alert = "Dane logowania są niepoprawne!";
             return View();
         }
 
@@ -331,6 +336,7 @@ namespace StudentChoices.Controllers
                         }
                     }
                     db.SaveChanges();
+                    TempData["Success"] = "Zapisano wybory pomyślnie!";
                 }
             }
             return RedirectToAction("", "Home");
@@ -380,7 +386,7 @@ namespace StudentChoices.Controllers
                     HttpContext.Application["RecActive"] = false;
                     HttpContext.Application["AfterRec"] = true;
                 }
-
+                TempData["Success"] = "Zmiany w konfiguracji rekrutacji zapisano pomyślnie!";
             }
             return RedirectToAction("", "Home");
         }
@@ -417,9 +423,9 @@ namespace StudentChoices.Controllers
                     using (PPDBEntities db = new PPDBEntities())
                     {
                         DateTime saveTime = DateTime.Now;
-                        foreach (var oneClassGroupID in db.ClassGroups.Select(x => x.ClassGroupID))
+                        foreach (var oneClassGroup in db.ClassGroups)
                         {
-                            foreach (var oneCategory in db.Categories.Where(x => x.ClassGroupID == oneClassGroupID))
+                            foreach (var oneCategory in db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID))
                             {
                                 Dictionary<int, List<int>> algorithmChoices = new Dictionary<int, List<int>>();
                                 List<int> chosenStudents = new List<int>();
@@ -498,14 +504,31 @@ namespace StudentChoices.Controllers
                                             }
                                         }
                                         else
-                                        { 
-                                            //ERROR
+                                        {
+                                            string alertStudents = string.Empty;
+                                            foreach (var item in restOfStudentsNo)
+                                            {
+                                                alertStudents += " " + item;
+                                            }
+                                            if(restOfStudentsNo.Count()==1)
+                                            {
+                                                TempData["Alert"] = "Nie można przydzielić studenta o indeksie" + alertStudents;
+                                            }
+                                            else
+                                            {
+                                                TempData["Alert"] = "Nie można przydzielić studentów o indeksach:" + alertStudents;
+                                            }
+                                            TempData["Alert"] += " - brak wolnych miejsc w kategorii " + oneCategory.Name + " w grupie " + oneClassGroup.DegreeCourse.ToString() + "/" + oneClassGroup.Graduate.ToString() + "/";
+                                            if (oneClassGroup.FullTimeStudies == true) { TempData["Alert"] += "STACJ"; }
+                                            else { TempData["Alert"] += "NIESTACJ"; }
+                                            TempData["Alert"] += "/" + oneClassGroup.Semester.ToString() + "/" + oneClassGroup.Speciality.ToString() + "!";
+                                            return RedirectToAction("", "Home");
                                         }
                                     }
                                 }
 
                                 //weź studentów którzy nie wybrali
-                                var studentsWithoutChoicesNo = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == oneClassGroupID && !db.StudentChoices.Any(y => y.StudentNo == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x=>x.StudentNo).ToList();
+                                var studentsWithoutChoicesNo = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID && !db.StudentChoices.Any(y => y.StudentNo == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x=>x.StudentNo).ToList();
                                 if (studentsWithoutChoicesNo.Count()>0)
                                 {
                                     foreach (var oneSubject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit != null))
@@ -536,7 +559,24 @@ namespace StudentChoices.Controllers
                                         }
                                         else
                                         {
-                                            //ERROR
+                                            string alertStudents = string.Empty;
+                                            foreach (var item in studentsWithoutChoicesNo)
+                                            {
+                                                alertStudents += " " + item;
+                                            }
+                                            if (studentsWithoutChoicesNo.Count() == 1)
+                                            {
+                                                TempData["Alert"] = "Nie można przydzielić studenta o indeksie" + alertStudents;
+                                            }
+                                            else
+                                            {
+                                                TempData["Alert"] = "Nie można przydzielić studentów o indeksach:" + alertStudents;
+                                            }
+                                            TempData["Alert"] += " - brak wolnych miejsc w kategorii " + oneCategory.Name + " w grupie " + oneClassGroup.DegreeCourse.ToString() + "/" + oneClassGroup.Graduate.ToString() + "/";
+                                            if (oneClassGroup.FullTimeStudies == true) { TempData["Alert"] += "STACJ"; }
+                                            else { TempData["Alert"] += "NIESTACJ"; }
+                                            TempData["Alert"] += "/" + oneClassGroup.Semester.ToString() + "/" + oneClassGroup.Speciality.ToString() + "!";
+                                            return RedirectToAction("", "Home");
                                         }
                                     }
                                 }
@@ -572,6 +612,7 @@ namespace StudentChoices.Controllers
                             }
                         }
                         db.SaveChanges();
+                        TempData["Success"] = "Algorytm przydziału studentów zakończył się pomyślnie!";
                     }
                 }
             }
@@ -584,8 +625,8 @@ namespace StudentChoices.Controllers
             {
                 if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
                 {
-                    HttpContext.Application["AfterRec"] = false;
                     HttpContext.Application["ShareResults"] = true;
+                    TempData["Success"] = "Udostępniono wyniki rekrutacji pomyślnie!";
                 }
             }
             return RedirectToAction("", "Home");

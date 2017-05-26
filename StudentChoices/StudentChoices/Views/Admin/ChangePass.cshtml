@@ -11,7 +11,18 @@
 
     <div class="form-horizontal">
         <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @if (ViewBag.Success != null)
+        {
+            <div class="alert alert-success" style="text-align:center">
+                @ViewBag.Success
+            </div>
+        }
+        @if (ViewBag.Alert != null)
+        {
+            <div class="alert alert-danger" style="text-align:center">
+                @ViewBag.Alert
+            </div>
+        }
 
         <div class="form-group">
             @Html.LabelFor(model => model.oldPassword, "Podaj aktualne hasło", htmlAttributes: new { @class = "control-label col-md-2" })
