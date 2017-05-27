@@ -193,7 +193,7 @@ namespace StudentChoices.Controllers
                                                     var files = String.Empty;
                                                     foreach (var file in db.Files.Where(x => x.ElectiveSubjectAndSpecialityID == Sub.ElectiveSubjectAndSpecialityID))
                                                     {
-                                                        files += file.Filename + " " + file.Path + " ";
+                                                        files += file.Filename + "\n" + file.Path + " ";
                                                     }
                                                     SubInfo.Add(files);
                                                     optionsOneCategoryList.Add(SubInfo);
