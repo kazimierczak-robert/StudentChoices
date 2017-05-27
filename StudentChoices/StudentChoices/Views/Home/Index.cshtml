@@ -1,7 +1,7 @@
 ﻿@model Users
 
 @{
-    ViewBag.Title = "StudentChoices";
+    ViewBag.Title = "Strona główna";
 }
 
 @if (Session["User"] == "Admin" || Session["User"] == "SuperAdmin" || Session["User"] == "Student")
@@ -227,8 +227,10 @@
 }
 else
 {
-    <div style="width:100%; float:left; text-align:center">
-        <img src="~/Images/studentChoicesTrim.png" style="max-width:100%; background-size:cover;" alt="" />
+    <div class="row">
+        <div style="width:100%; float:left; text-align:center; padding-bottom:20px">
+            <img src="~/Images/studentChoicesTrim.png" style="max-width:100%; background-size:cover" alt="" />
+        </div>
     </div>
 
     using (Html.BeginForm())
@@ -236,17 +238,22 @@ else
         @Html.AntiForgeryToken()
         <div class="container">
             <div class="row">
-                <div class="col-sm-8" style="padding-top:20px; margin-right: 3.333333333333333%; text-align:center">
-                    Serwis <b>eZapisy</b> pozwala przeprowadzić proces rekrutacji w sposób on-line:<br />
-                    - zapis na przedmioty obieralne i specjalności z uwzględnieniem preferencji,<br />
-                    - dostęp do preferencji z możliwością ich edycji w trakcie rekrutacji,<br />
-                    - zautomatyzowany system przydziału studentów,<br />
-                    - podgląd wyników rekrutacji,
+                <div class="col-sm-8" style="margin-right: 3.333333333333333%">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="background-color:#1f1e1e; padding-bottom:4px; padding-top:4px"><h4 style="color:#ffffff; height:21px"><b>eZapisy</b></h4></div>
+                        <div class="panel-body" style="margin-left:10px;margin-right:10px; min-height:147.4px; line-height: 160%">
+                            Serwis <b>eZapisy</b> pozwala przeprowadzić proces rekrutacji w sposób on-line:<br />
+                            <span class="glyphicon glyphicon-pencil"></span> zapis na przedmioty obieralne i specjalności z uwzględnieniem preferencji,<br />
+                            <span class="glyphicon glyphicon-pencil"></span> dostęp do preferencji z możliwością ich edycji w trakcie rekrutacji,<br />
+                            <span class="glyphicon glyphicon-pencil"></span> zautomatyzowany system przydziału studentów,<br />
+                            <span class="glyphicon glyphicon-pencil"></span> podgląd wyników rekrutacji.
+                        </div>
+                    </div>
                 </div>
                 <!-- Login Panel -->
-                <div class="col-sm-4" style="padding-top:20px">
+                <div class="col-sm-4">
                     <div class="panel panel-default">
-                        <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px"><h4 style="color:#ffffff"><b>Panel logowania</b></h4></div>
+                        <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px"><h4 style="color:#ffffff"><b>Panel logowania</b></h4></div>
                         <div class="panel-body">
                             @if(ViewBag.Alert!=null)
                             {
