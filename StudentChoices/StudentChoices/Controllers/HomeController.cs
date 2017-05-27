@@ -86,6 +86,10 @@ namespace StudentChoices.Controllers
 
         public ActionResult Index()
         {
+            if (Session["User"] == null)
+            {
+                Session["User"] = "";
+            }
             return View();
         }
 
@@ -395,22 +399,20 @@ namespace StudentChoices.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            if (Session["User"] != null)
-            {
-                Session["UserName"] = null;
-                Session["User"] = null;
-                Session["Subjects"] = null;
-                Session["ClassGroups"] = null;
-                Session["NoOfStudents"] = null;
-                Session["Categories"] = null;
-                Session["NoOfSavedStudents"] = null;
-                Session["Stats"] = null;
-                Session["Results"] = null;
-                Session["StudentNo"] = null;
-                Session["Options"] = null;
-                Session["ChosenOptions"] = null;
-                Session["AdminID"] = null;
-            }
+            Session["UserName"] = null;
+            Session["User"] = "";
+            Session["Subjects"] = null;
+            Session["ClassGroups"] = null;
+            Session["NoOfStudents"] = null;
+            Session["Categories"] = null;
+            Session["NoOfSavedStudents"] = null;
+            Session["Stats"] = null;
+            Session["Results"] = null;
+            Session["StudentNo"] = null;
+            Session["Options"] = null;
+            Session["ChosenOptions"] = null;
+            Session["AdminID"] = null;
+
             return RedirectToAction("", "Home");
         }
 

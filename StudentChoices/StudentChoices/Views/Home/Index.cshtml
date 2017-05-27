@@ -9,13 +9,13 @@
     <h3>Zalogowano jako: @Session["UserName"]</h3>
     if (TempData["Alert"] != null)
     {
-        <div class="alert alert-danger" style="text-align:center">
+        <div class="alert alert-margin0px alert-danger" style="text-align:center">
             @TempData["Alert"]
         </div>
     }
     if (TempData["Success"] != null)
     {
-        <div class="alert alert-success" style="text-align:center">
+        <div class="alert alert-margin0px alert-success" style="text-align:center">
             @TempData["Success"]
         </div>
     }
@@ -72,8 +72,8 @@
                         </div>
                      }
                     <div class="panel-body">
-                        <div class="form-group">
-                            <input type="submit" value="Zapisz" class="btn btn-default" style="float:right" />
+                        <div class="form-group-10px">
+                            <input type="submit" value="Zapisz" class="btn btn-default btn-default-main" style="float:right" />
                         </div>
                     </div>
 
@@ -158,8 +158,8 @@
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                             </div>
 
-                            <div class="form-group" style="padding-top:10px; text-align:center">
-                                <input type="submit" value="Zapisz zmiany" class="btn btn-default" />
+                            <div class="form-group-10px" style="padding-top:10px; text-align:center">
+                                <input type="submit" value="Zapisz zmiany" class="btn btn-default btn-default-main" />
                             </div>
 
                         }
@@ -170,9 +170,9 @@
                         <h4 style="color:#ffffff">Po zakończeniu okresu rekrutacji</h4>
                     </div>
                     <div class="panel-body" style="text-align:center">
-                        <div> @Html.ActionLink("Uruchom algorytm", "Run", null, htmlAttributes: new { @class = "btn btn-default", @id="RunButton" })</div>
-                        <div style="padding-top:10px;padding-bottom:10px"> @Html.ActionLink("Udostępnij wyniki studentom", "ShareResults", null, htmlAttributes: new { @class = "btn btn-default", @id = "ShareButton" })</div>
-                        <div> @Html.ActionLink("Wyeksportuj", "ExportResults", null, htmlAttributes: new { @class = "btn btn-default", @id = "ExportButton" })</div>
+                        <div> @Html.ActionLink("Uruchom algorytm", "Run", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id="RunButton" })</div>
+                        <div style="padding-top:10px;padding-bottom:10px"> @Html.ActionLink("Udostępnij wyniki studentom", "ShareResults", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "ShareButton" })</div>
+                        <div> @Html.ActionLink("Wyeksportuj", "ExportResults", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "ExportButton" })</div>
                     </div>
                 </div>
 
@@ -194,7 +194,7 @@
                                     @Html.DropDownList("ClassGroups", (SelectList)Session["ClassGroups"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table" })
                                 </div>
                                 <div class="col-sm-2" style="text-align:center">
-                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeClassGroup", "Home")' class="btn btn-default" />
+                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeClassGroup", "Home")' class="btn btn-default btn-default-main" />
                                 </div>
                             </div>
 
@@ -206,7 +206,7 @@
                                     @Html.DropDownList("Categories", (SelectList)Session["Categories"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table" })
                                 </div>
                                 <div class="col-sm-2" style="text-align:center">
-                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Home")' class="btn btn-default" />
+                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Home")' class="btn btn-default btn-default-main" />
                                 </div>
                             </div>
                         }
@@ -238,10 +238,10 @@ else
         @Html.AntiForgeryToken()
         <div class="container">
             <div class="row">
-                <div class="col-sm-8" style="margin-right: 3.333333333333333%">
+                <div class="col-sm-8">
                     <div class="panel panel-default">
                         <div class="panel-heading" style="background-color:#1f1e1e; padding-bottom:4px; padding-top:4px"><h4 style="color:#ffffff; height:21px"><b>eZapisy</b></h4></div>
-                        <div class="panel-body" style="margin-left:10px;margin-right:10px; min-height:147.4px; line-height: 160%">
+                        <div class="panel-body" style="margin-left:10px;margin-right:10px; min-height:147px; line-height: 160%">
                             Serwis <b>eZapisy</b> pozwala przeprowadzić proces rekrutacji w sposób on-line:<br />
                             <span class="glyphicon glyphicon-pencil"></span> zapis na przedmioty obieralne i specjalności z uwzględnieniem preferencji,<br />
                             <span class="glyphicon glyphicon-pencil"></span> dostęp do preferencji z możliwością ich edycji w trakcie rekrutacji,<br />
@@ -251,28 +251,28 @@ else
                     </div>
                 </div>
                 <!-- Login Panel -->
-                <div class="col-sm-4">
+                <div class="col-sm-4" >
                     <div class="panel panel-default">
                         <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px"><h4 style="color:#ffffff"><b>Panel logowania</b></h4></div>
                         <div class="panel-body">
                             @if(ViewBag.Alert!=null)
                             {
-                                <div class="alert alert-danger" style="text-align:center">
+                                <div class="alert alert-margin0px alert-danger" style="text-align:center">
                                     @ViewBag.Alert
                                 </div>
                             }
-                            <div class="form-group">
-                                @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control", @placeholder = "Login", @style = "display:block" } })
+                            <div class="form-group-10px">
+                                @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control", @placeholder = "Login", @style = "display:block; max-width:none" } })
                                 @Html.ValidationMessageFor(model => model.Login, "", new { @class = "text-danger" })
                             </div>
 
-                            <div class="form-group">
-                                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", @placeholder = "Hasło" } })
+                            <div class="form-group-10px">
+                                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", @placeholder = "Hasło", @style = "display:block; max-width:none" } })
                                 @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
                             </div>
 
-                            <div class="form-group">
-                                <input type="submit" value="Zaloguj" class="btn btn-default" style="float:right"/>
+                            <div class="form-group-10px">
+                                <input type="submit" value="Zaloguj" class="btn btn-default btn-default-main" style="float:right"/>
                             </div>
                         </div>
                     </div>
@@ -298,22 +298,23 @@ else
             }); //Initialise any date pickers
     });
 
-
-    if (true != @HttpContext.Current.Application["AfterRec"].ToString().ToLower())
-    {
-        document.getElementById("RunButton").setAttribute('disabled', true);
-        document.getElementById("RunButton").style.backgroundColor = "#808080";
-        document.getElementById("ShareButton").setAttribute('disabled', true);
-        document.getElementById("ShareButton").style.backgroundColor = "#808080";
-        document.getElementById("ExportButton").setAttribute('disabled', true);
-        document.getElementById("ExportButton").style.backgroundColor = "#808080";
-    }
+        var loggedUser = "@Html.Raw(HttpUtility.JavaScriptStringEncode(Session["User"].ToString()))";
+        if (loggedUser == "Admin" || loggedUser == "SuperAdmin") {
+            if (true != @HttpContext.Current.Application["AfterRec"].ToString().ToLower())
+            {
+                document.getElementById("RunButton").setAttribute('disabled', true);
+                document.getElementById("ShareButton").setAttribute('disabled', true);
+                document.getElementById("ExportButton").setAttribute('disabled', true);
+            }
+        }
+    
 
     var maxwidth = 0;
 
     var dict = @Html.Raw(Json.Encode(Session["ChosenOptions"]));
     for (key in dict)
     {
+        console.log(key);
         var res = key.split(" ");
         if (res[res.length - 1] != '1')
         {
