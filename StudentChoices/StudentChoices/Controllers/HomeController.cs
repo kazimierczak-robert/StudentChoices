@@ -487,7 +487,7 @@ namespace StudentChoices.Controllers
                                             var selectedsortedStudentsNo = restOfStudentsNo.Take(freePlaces);
                                             foreach (var item in selectedsortedStudentsNo)
                                             {
-                                                studentChoicesOneClassGroup.Where(x=>x.StudentNo!=item);
+                                                studentChoicesOneClassGroup=studentChoicesOneClassGroup.Where(x=>x.StudentNo!=item).OrderBy(x => x.ChoiceDate); ;
                                                 algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
                                             }
                                         }
@@ -541,7 +541,7 @@ namespace StudentChoices.Controllers
                                             var selectedsortedStudentsNo = studentsWithoutChoicesNo.Take(freePlaces);
                                             foreach (var item in selectedsortedStudentsNo)
                                             {
-                                                studentsWithoutChoicesNo.Remove(item);
+                                                studentsWithoutChoicesNo = studentsWithoutChoicesNo.Where(x => x != item).ToList();
                                                 algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
                                             }
                                         }
