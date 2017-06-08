@@ -126,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Models\AddStudents.cs" />
     <Compile Include="Models\Admins.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
@@ -216,6 +217,8 @@
     </Content>
     <Content Include="Content\bootstrap-datepicker3.standalone.css.map" />
     <Content Include="Content\bootstrap-datepicker3.standalone.min.css.map" />
+    <Content Include="Doc\Pomoc_a.pdf" />
+    <Content Include="Doc\Pomoc_s.pdf" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -244,6 +247,10 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Admin\ChangePass.cshtml" />
+    <Content Include="Views\Admin\AddStudents.cshtml" />
+    <Content Include="Views\Admin\EditStudents.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\AddData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

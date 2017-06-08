@@ -1,0 +1,31 @@
+﻿@model IEnumerable<StudentChoices.Models.AddStudents>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Lista studentów</h2>
+
+<br />
+<br />
+<table class="table">
+    <tr>
+        <th>Indeks</th>
+        <th>Imię i nazwisko</th>
+        <th>Grupa</th>
+        <th>Operacje</th>
+    </tr>
+
+    @foreach (var student in Model)
+    {
+        <tr>
+            <td>@student.StudentNo</td>
+            <td>@student.Name @student.Surname</td>
+            <td>@student.ClassGroupID</td>
+            <td>
+                @Html.ActionLink("Edytuj", "EditStudents", "Admin", new { id = @student.StudentNo }, new { @class = "btn btn-primary" })
+            </td>
+        </tr>
+    }
+
+</table>
+       
