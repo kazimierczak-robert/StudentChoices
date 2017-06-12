@@ -3,5 +3,22 @@
     ViewBag.Title = "AddData";
 }
 
-<h3>Dodaj dane</h3>
-
+<h2>Dodaj dane</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <h3>Dodawanie studenta</h3>
+        <p>Dodaj studentów do listy i nadaj im wymagane dane logowania.</p>
+        <p>@Html.ActionLink("Dodaj studenta »", "AddStudents", "Admin", null, new { @class = "btn btn-default" })</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Dodawanie kategorii</h3>
+        <p>Dodaj kategorie i należące do nich specjalności lub przedmioty obieralne dla poszczególnych grup.</p>
+        <p>@Html.ActionLink("Dodaj kategorię »", "AddCategories", "Admin", null, new { @class = "btn btn-default" })</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Dodawanie grupy studentów</h3>
+        <p>Dodaj grupy studentów zawierającą potrzebne informacje o kierunku, semestrze i trybie.</p>
+        <p>@Html.ActionLink("Dodaj grupę »", "AddGroups", "Admin", null, new { @class = "btn btn-default" })</p>
+    </div>
+</div>

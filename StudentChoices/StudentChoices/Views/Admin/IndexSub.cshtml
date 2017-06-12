@@ -1,0 +1,37 @@
+﻿@model IEnumerable<StudentChoices.Models.AddCategories>
+@{
+    ViewBag.Title = "IndexSub";
+}
+
+<h2>Lista przedmiotów/specjalności w kategorii</h2>
+
+<br />
+<br />
+<table class="table">
+    <tr>
+        
+        <th>Nazwa kategorii</th>
+        <th>Grupa studencka</th>
+        <th>ID przedmiotu/specjalności</th>
+        <th>Nazwa przedmiotu/specjalności</th>
+        <th>Limit górny</th>
+        <th>Limit dolny</th>
+        <th>Operacje</th>
+    </tr>
+
+    @foreach (var category in Model)
+    {
+        <tr>
+            <td>@category.Name</td>
+            <td>@category.ClassGroupID</td>
+            <td>@category.ElectiveSunjectAndSpecialityID</td>
+            <td>@category.SubjectName</td>
+            <td>@category.UpperLimit</td>
+            <td>@category.LowerLimit</td>
+            <td>
+                @Html.ActionLink("Edytuj", "EditCategories", "Admin", new { id = @category.CategoryID }, new { @class = "btn btn-primary" })
+            </td>
+        </tr>
+    }
+
+</table>

@@ -194,6 +194,27 @@ namespace StudentChoices.Controllers
             return View();
         }
 
+       
+
+
+        public ActionResult AddData()
+        {
+            return View();
+        }
+
+        public ActionResult EditData()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult AddCategories()
+        {
+            PopulateClassGroupsList();
+            return View();
+        }
+
+        
         private string HashPassword(string plainPassword)
         {
             byte[] pass = Encoding.Default.GetBytes(plainPassword);
@@ -211,11 +232,10 @@ namespace StudentChoices.Controllers
                               select new
                               {
                                   ClassGroupID = j.ClassGroupID,
-                                  ClassGroup = j.DegreeCourse + "/" + j.Graduate + "/" + j.FullTimeStudies + "/" + j.Semester + "/" +j.Speciality
+                                  ClassGroup = j.DegreeCourse + "/" + j.Graduate + "/" + j.FullTimeStudies + "/" + j.Semester + "/" + j.Speciality
                               };
             ViewBag.ClassGroupID = new SelectList(classgroups, "ClassGroupID", "ClassGroup", selectedClassGroup);
         }
-        
 
     }
 }

@@ -56,6 +56,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
@@ -126,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Models\AddCategories.cs" />
     <Compile Include="Models\AddStudents.cs" />
     <Compile Include="Models\Admins.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
@@ -251,6 +253,11 @@
     <Content Include="Views\Admin\EditStudents.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Admin\AddData.cshtml" />
+    <Content Include="Views\Admin\AddCategories.cshtml" />
+    <Content Include="Views\Admin\EditData.cshtml" />
+    <Content Include="Views\Admin\IndexCat.cshtml" />
+    <Content Include="Views\Admin\EditCategories.cshtml" />
+    <Content Include="Views\Admin\IndexSub.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
