@@ -6,16 +6,16 @@
 
 @if (Session["User"] == "Admin" || Session["User"] == "SuperAdmin" || Session["User"] == "Student")
 {
-    <h3><b>Zalogowano jako:</b> @Session["UserName"]</h3>
+    <h3>Zalogowano jako: @Session["UserName"]</h3>
     if (TempData["Alert"] != null)
     {
-        <div class="alert alert-margin0px alert-danger" style="text-align:center;margin-bottom:10px">
+        <div class="alert alert-margin0px alert-danger" style="text-align:center">
             @TempData["Alert"]
         </div>
     }
     if (TempData["Success"] != null)
     {
-        <div class="alert alert-margin0px alert-success" style="text-align:center;margin-bottom:10px">
+        <div class="alert alert-margin0px alert-success" style="text-align:center">
             @TempData["Success"]
         </div>
     }
@@ -28,12 +28,10 @@
             {
                 @Html.AntiForgeryToken()
 
-                <div class="alert alert-danger">
-                    <b>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</b>
-                </div>
+                <h5>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</h5>
 
                 <div class="panel panel-default">
-                    <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px">
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         <h4 style="color:#ffffff">Dostępne przedmioty obieralne i specjalności</h4>
                     </div>
                     @foreach (var item in (Dictionary<string, Dictionary<System.Collections.ArrayList, Dictionary<List<List<string>>, SelectList>>>)Session["Options"])
@@ -52,7 +50,7 @@
                                         <h4><b>@subsubsubitem[0]</b></h4>
                                         <h5>@subsubsubitem[1]</h5>
                                         var files = subsubsubitem[2].Split('\n');
-                                        for (int i = 0; i < files.Count() - 1; i += 2)
+                                        for (int i = 0; i < files.Count()-1; i += 2)
                                         {
                                             <a href="@files[i+1]"><h5>@files[i]</h5></a>
                                         }
@@ -62,38 +60,34 @@
                                     {
                                         <div class="row">
                                             <div class="col-sm-2">
-                                                <h5>@i. preferencja:</h5>
+                                                <h5>@i. preferencja:</h5> 
                                             </div>
                                             <div class="col-sm-2">
-                                                @Html.DropDownList("Subjects", (SelectList)subsubitem.Value, htmlAttributes: new { @class = "form-control", @id = @subitem.Key[0] + " " + @i.ToString(), @style = "width:auto", @onchange = "ComboboxChange(this)" })
+                                                @Html.DropDownList("Subjects", (SelectList)subsubitem.Value, htmlAttributes: new { @class = "form-control", @id=@subitem.Key[0]+" "+@i.ToString(), @style = "width:auto", @onchange = "ComboboxChange(this)" })
                                             </div>
                                         </div>
                                     }
                                 }
-                                <hr />
                             }
-                            
                         </div>
-                    }
+                     }
                     <div class="panel-body">
                         <div class="form-group-10px">
                             <input type="submit" value="Zapisz" class="btn btn-default btn-default-main" style="float:right" />
                         </div>
                     </div>
 
-                </div>
+                    </div>
             }
         }
         else
         {
             if ((bool)HttpContext.Current.Application["ShareResults"] == true)
             {
-                <div class="alert alert-danger">
-                    <b>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</b>
-                </div>
+                <h5>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</h5>
 
                 <div class="panel panel-default">
-                    <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px">
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         <h4 style="color:#ffffff">Wyniki rekrutacji na przedmioty obieralne i specjalności</h4>
                     </div>
                     @foreach (var item in (Dictionary<string, Dictionary<string, string>>)Session["Results"])
@@ -118,19 +112,16 @@
             }
             else
             {
-                <div class="alert alert-danger">
-                    Rekrutacja na specjalności oraz przedmioty obieralne jeszcze się nie rozpoczęła.
-                </div>
-
+                <h5>Rekrutacja na specjalności oraz przedmioty obieralne jeszcze się nie rozpoczęła.</h5>
             }
         }
     }
     else
     {
         <div class="row">
-            <div class="col-sm-6" style="padding-top:10px">
+            <div class="col-sm-6" style="padding-top:20px">
                 <div class="panel panel-default">
-                    <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px">
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         @if ((bool)HttpContext.Current.Application["RecActive"] == true)
                         {
                             <h4 style="color:#ffffff">Zarządzanie rekrutacją (w toku)</h4>
@@ -160,7 +151,7 @@
                                 <h4>Rekrutacja w toku</h4>
                             </div>
 
-                            <h5 style="padding-top:5px"><b>Data zakończenia rekrutacji</b></h5>
+                            <h5 style="padding-top:10px">Data zakończenia rekrutacji</h5>
                             <div class="input-group date datepicker">
 
                                 <input type="text" name="endDate" class="form-control" style="max-width:100%" value="@HttpContext.Current.Application["RecStopString"]">
@@ -175,11 +166,11 @@
                     </div>
                 </div>
                 <div class="panel panel-default">
-                    <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px">
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         <h4 style="color:#ffffff">Po zakończeniu okresu rekrutacji</h4>
                     </div>
                     <div class="panel-body" style="text-align:center">
-                        <div> @Html.ActionLink("Uruchom algorytm", "Run", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "RunButton" })</div>
+                        <div> @Html.ActionLink("Uruchom algorytm", "Run", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id="RunButton" })</div>
                         <div style="padding-top:10px;padding-bottom:10px"> @Html.ActionLink("Udostępnij wyniki studentom", "ShareResults", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "ShareButton" })</div>
                         <div> @Html.ActionLink("Wyeksportuj", "ExportResults", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "ExportButton" })</div>
                     </div>
@@ -188,7 +179,7 @@
             </div>
             <div class="col-sm-6" style="padding-top:20px">
                 <div class="panel panel-default">
-                    <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px">
+                    <div class="panel-heading" style="background-color:#539ad7; padding-bottom:4px; padding-top:4px">
                         <h4 style="color:#ffffff">Statystyki</h4>
                     </div>
                     <div class="panel-body">
@@ -196,39 +187,34 @@
                     {
                             @Html.AntiForgeryToken()
                             <div class="row">
-                                <div class="col-sm-12">
-                                    <h5><b>Grupa studencka:</b></h5>
+                                <div class="col-sm-4">
+                                    <h5>Grupa studencka:</h5>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-8" style="padding-bottom:10px">
-                                    @Html.DropDownList("ClassGroups", (SelectList)Session["ClassGroups"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table;max-width: none" })
+                                <div class="col-sm-6" style="padding-bottom:10px">
+                                    @Html.DropDownList("ClassGroups", (SelectList)Session["ClassGroups"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table" })
                                 </div>
                                 <div class="col-sm-2" style="text-align:center">
                                     <input type="submit" value="Zmień" formaction='@Url.Action("ChangeClassGroup", "Home")' class="btn btn-default btn-default-main" />
                                 </div>
-                                <div class="col-sm-2"></div>
                             </div>
+
                             <div class="row">
-                                <div class="col-sm-12">
-                                    <h5><b>Kategoria:</b></h5>
+                                <div class="col-sm-4">
+                                    <h5>Kategoria:</h5>
+                                </div>
+                                <div class="col-sm-6" style="padding-bottom:10px">
+                                    @Html.DropDownList("Categories", (SelectList)Session["Categories"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table" })
+                                </div>
+                                <div class="col-sm-2" style="text-align:center">
+                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Home")' class="btn btn-default btn-default-main" />
                                 </div>
                             </div>
-                                <div class="row">
-                                    <div class="col-sm-8" style="padding-bottom:10px">
-                                        @Html.DropDownList("Categories", (SelectList)Session["Categories"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table; max-width: none" })
-                                    </div>
-                                    <div class="col-sm-2" style="text-align:center">
-                                        <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Home")' class="btn btn-default btn-default-main" />
-                                    </div>
-                                    <div class="col-sm-2"></div>
-                                </div>
-                                <hr />
                         }
+                        <br />
                         <h5>Liczba wszystkich studentów: <b>@Session["NoOfStudents"]</b></h5>
                         <h5>Liczba zapisanych studentów: <b>@Session["NoOfSavedStudents"]</b></h5>
-                        <hr />
-                        <h5><b>Zapisy na poszczególne pozycje (pierwsza preferencja):</b></h5>
+                        <br />
+                        <h5>Zapisy na poszczególne pozycje (pierwsza preferencja):</h5>
                         @foreach (var item in (Dictionary<string, int>)Session["Stats"])
                         {
                             <h5>@item.Key: <b>@item.Value</b></h5>
@@ -265,13 +251,13 @@ else
                     </div>
                 </div>
                 <!-- Login Panel -->
-                <div class="col-sm-4">
+                <div class="col-sm-4" >
                     <div class="panel panel-default">
                         <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px"><h4 style="color:#ffffff"><b>Panel logowania</b></h4></div>
                         <div class="panel-body">
-                            @if (ViewBag.Alert != null)
+                            @if(ViewBag.Alert!=null)
                             {
-                                <div class="alert alert-margin0px alert-danger" style="text-align:center; margin-bottom:15px">
+                                <div class="alert alert-margin0px alert-danger" style="text-align:center">
                                     @ViewBag.Alert
                                 </div>
                             }
@@ -286,7 +272,7 @@ else
                             </div>
 
                             <div class="form-group-10px">
-                                <input type="submit" value="Zaloguj" class="btn btn-default btn-default-main" style="float:right" />
+                                <input type="submit" value="Zaloguj" class="btn btn-default btn-default-main" style="float:right"/>
                             </div>
                         </div>
                     </div>
@@ -297,7 +283,7 @@ else
 }
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-    <script type="text/javascript">
+<script type="text/javascript">
     $(function () { // will trigger when the document is ready
         $('.datepicker').datepicker(
             {
@@ -321,7 +307,7 @@ else
                 document.getElementById("ExportButton").setAttribute('disabled', true);
             }
         }
-
+    
 
     var maxwidth = 0;
 
@@ -433,5 +419,5 @@ else
             nextCombobox = nextComboboxTemplate + k;
         }
     }
-    </script>
+</script>
 }

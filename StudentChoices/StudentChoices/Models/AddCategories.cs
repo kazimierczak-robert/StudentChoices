@@ -40,10 +40,5 @@ namespace StudentChoices.Models
         [Required(ErrorMessage = "To pole jest wymagane!")]
         public int ClassGroupID { get; set; }
 
-        [Required(ErrorMessage = "To pole jest wymagane!")]
-        public string SubjectName { get; set; }
-
-        //[DataType(DataType.Password)]
-        public string SubjectInformation { get; set; }
     }
 }

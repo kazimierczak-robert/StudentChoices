@@ -207,6 +207,8 @@ namespace StudentChoices.Controllers
             return View();
         }
 
+        ////////////    DODAWANIE I EDYCJA KATEGORII   ////////////////////
+
         [HttpGet]
         public ActionResult AddCategories()
         {
@@ -214,7 +216,134 @@ namespace StudentChoices.Controllers
             return View();
         }
 
-        
+        [HttpPost]
+        public ActionResult AddCategories([Bind(Include = "Name,ClassGroupID,Information,MaxNoChoices")] AddCategories category)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {
+                var categoryToAdd = new Categories();
+                categoryToAdd.Name = category.Name;
+                categoryToAdd.ClassGroupID = category.ClassGroupID;
+                categoryToAdd.Information = category.Information;
+                categoryToAdd.MaxNoChoices = category.MaxNoChoices;
+                categoryToAdd.CreatedBy = (int)Session["AdminID"];
+                categoryToAdd.CreationDate = DateTime.Now;
+                if (db.Categories.Where(ct => ct.Name == category.Name).Count() == 0)
+                {
+                    db.Categories.Add(categoryToAdd);
+                    db.SaveChanges();
+                    return RedirectToAction("", "Home");
+                }
+                else
+                {
+                    ModelState.AddModelError("Name", "Kategoria o takiej nazwie już istnieje.");
+                }
+            }
+            PopulateClassGroupsList();
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult AddSubSpec(int id)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {  
+                var sub = db.Categories.Find(id); 
+                if (db.Categories.Where(ct => ct.CategoryID == sub.CategoryID).Count() == 1)
+                {
+                    ViewBag.CatID = id;
+                    return View();
+                }
+                if (sub == null)
+                {
+                    ModelState.AddModelError("CategoryID", "Nie ma kategorii");
+                }
+            }
+            return RedirectToAction("", "EditData");
+        }
+
+        [HttpPost]
+        public ActionResult AddSubSpec([Bind(Include = "CategoryID,Name,Information,UpperLimit,LowerLimit")] ElectiveSubjectsAndSpecialities subject)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {
+                var subjectToAdd = new ElectiveSubjectsAndSpecialities();
+                subjectToAdd.CategoryID = subject.CategoryID;
+                subjectToAdd.Name = subject.Name;
+                subjectToAdd.Information = subject.Information;
+                subjectToAdd.UpperLimit = subject.UpperLimit;
+                subjectToAdd.LowerLimit = subject.LowerLimit;
+                subjectToAdd.CreatedBy = (int)Session["AdminID"];
+                subjectToAdd.CreationDate = DateTime.Now;
+
+                var ctg = db.ElectiveSubjectsAndSpecialities.Find(subject.CategoryID);
+                if (db.ElectiveSubjectsAndSpecialities.Where(ct => ct.Name == subject.Name).Count() == 0)
+                {
+                    db.ElectiveSubjectsAndSpecialities.Add(subjectToAdd);
+                    db.SaveChanges();
+                    return RedirectToAction("", "Home");
+                }
+                else
+                {
+                    ModelState.AddModelError("Name", "Przedmiot/specjalność o takiej nazwie już istnieje.");
+                }
+                return View();
+            }
+            return View();
+        }
+
+        public ActionResult IndexCat()
+        {
+            var data = (from c in db.Categories
+                        select new AddCategories
+                        {
+                            CategoryID = c.CategoryID,
+                            ClassGroupID = c.ClassGroupID,
+                            Name = c.Name,
+                            Information = c.Information,
+                            MaxNoChoices = c.MaxNoChoices
+                        }).ToList();
+            return View(data);
+        }
+
+        [HttpGet]
+        public ActionResult EditCategories(int id)
+        {
+            var category = (from ct in db.Categories
+                            join ctg in db.ElectiveSubjectsAndSpecialities on ct.CategoryID equals ctg.CategoryID
+                            where ct.CategoryID == id
+                            select new AddCategories()
+                            {
+                                CategoryID = ct.CategoryID,
+                                Name = ct.Name,
+                                ClassGroupID = ct.ClassGroupID,
+                                Information = ct.Information,
+                                MaxNoChoices = ct.MaxNoChoices
+                            }).FirstOrDefault();
+            PopulateClassGroupsList(category.ClassGroupID.ToString());
+            return View(category);
+        }
+
+        [HttpPost]
+        public ActionResult EditCategories([Bind(Include = "CategoryID,Name,ClassGroupID,Information,MaxNoChoices")] AddCategories category)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {
+                var categoryToEdit = (from c in db.Categories
+                                      where c.CategoryID == category.CategoryID
+                                      select c).FirstOrDefault();
+                categoryToEdit.Name = category.Name;
+                categoryToEdit.ClassGroupID = category.ClassGroupID;
+                categoryToEdit.Information = category.Information;
+                categoryToEdit.MaxNoChoices = category.MaxNoChoices;
+                db.Entry(categoryToEdit).State = EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("", "Home");
+            }
+            PopulateClassGroupsList();
+            return View();
+        }
+
         private string HashPassword(string plainPassword)
         {
             byte[] pass = Encoding.Default.GetBytes(plainPassword);

@@ -9,27 +9,20 @@
 <br />
 <table class="table">
     <tr>
-        <th>ID kategorii</th>
         <th>Nazwa kategorii</th>
         <th>Grupa studencka</th>
-        <th>ID przedmiotu/specjalności</th>
-        <th>Nazwa przedmiotu/specjalności</th>
-        <th>Limit górny</th>
-        <th>Limit dolny</th>
+        <th>Max liczba wyborów</th>
         <th>Operacje</th>
     </tr>
 
     @foreach (var category in Model)
     {
         <tr>
-            <td>@category.CategoryID</td>
             <td>@category.Name</td>
             <td>@category.ClassGroupID</td>
-            <td>@category.ElectiveSubjectAndSpecialityID</td>
-            <td>@category.SubjectName</td>
-            <td>@category.UpperLimit</td>
-            <td>@category.LowerLimit</td>
+            <td>@category.MaxNoChoices</td>
             <td>
+                @Html.ActionLink("Dodaj przedmiot", "AddSubSpec", "Admin", new { id = @category.CategoryID }, new { @class = "btn btn-primary" })
                 @Html.ActionLink("Edytuj", "EditCategories", "Admin", new { id = @category.CategoryID }, new { @class = "btn btn-primary" })
             </td>
         </tr>

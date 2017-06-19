@@ -1,0 +1,69 @@
+﻿@model StudentChoices.Models.ElectiveSubjectsAndSpecialities
+@{
+    ViewBag.Title = "AddSubSpec";
+}
+
+<h2>Dodawanie przedmiotów i specjalności do kategorii</></h2>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.CategoryID, new { Value = ViewBag.CatID })
+    <div class="form-horizontal">
+        <hr />
+        @if (ViewBag.Success != null)
+        {
+            <div class="alert alert-margin0px alert-success" style="text-align:center">
+                @ViewBag.Success
+            </div>
+        }
+        @if (ViewBag.Alert != null)
+        {
+            <div class="alert alert-margin0px alert-danger" style="text-align:center">
+                @ViewBag.Alert
+            </div>
+        }
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.Name, "Nazwa przedmiotu/specjalności", htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-7">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.Information, "Informacje (przedmiot/specjalność)", htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-7">
+                @Html.EditorFor(model => model.Information, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Information, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.UpperLimit, "Limit górny", htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-7">
+                @Html.EditorFor(model => model.UpperLimit, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UpperLimit, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.LowerLimit, "Limit dolny", htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-7">
+                @Html.EditorFor(model => model.LowerLimit, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LowerLimit, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        
+        <br />
+        <div class="form-group-10px">
+            <div class="col-md-offset-3 col-md-7">
+                <input type="submit" value="Dodaj przedmiot/specjalność" class="btn btn-default btn-default-main" />
+                @Html.ActionLink("Anuluj", "Index", "Home", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+
