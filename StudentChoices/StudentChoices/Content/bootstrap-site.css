@@ -14,8 +14,8 @@
 
 .btn-default-main {
     color: #FFFFFF;
-    background-color: #539ad7;
-    border-color: #539ad7;
+    background-color: #0f46ca;
+    border-color: #0f46ca;
     font-weight: 600;
     line-height: 1.1;
 }
@@ -25,7 +25,9 @@
 .btn-default-main:active,
 .btn-default-main.active,
 .open .dropdown-toggle.btn-default {
-    background-color: #9ccbf3;
+    background-color: #1e5df8;
+    border-color: #0f46ca;
+    color: #FFFFFF;
 }
 
 .btn-default-main.disabled,

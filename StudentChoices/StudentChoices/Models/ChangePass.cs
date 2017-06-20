@@ -13,17 +13,17 @@ namespace StudentChoices.Models
 
         }
 
-        [Required(ErrorMessage = "To pole jest wymagane!")]
+        //[Required(ErrorMessage = "To pole jest wymagane!")]
         [DataType(DataType.Password)]
         public string oldPassword { get; set; }
 
 
-        [Required(ErrorMessage = "To pole jest wymagane!")]
+        //[Required(ErrorMessage = "To pole jest wymagane!")]
         [DataType(DataType.Password)]
         public string newPassword { get; set; }
 
 
-        [Required(ErrorMessage = "To pole jest wymagane!")]
+        //[Required(ErrorMessage = "To pole jest wymagane!")]
         [DataType(DataType.Password)]
         public string newPassword2 { get; set; }
     }

@@ -139,7 +139,7 @@ namespace StudentChoices.Controllers
                     }
                     else
                     {
-                        ViewBag.Alert="Konto jest nieaktywne!";
+                        ViewBag.Alert = "Konto jest nieaktywne!";
                         return View();
                     }
                 }
@@ -429,158 +429,12 @@ namespace StudentChoices.Controllers
                         {
                             foreach (var oneCategory in db.Categories.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID))
                             {
-                                Dictionary<int, List<int>> algorithmChoices = new Dictionary<int, List<int>>();
-                                List<int> chosenStudents = new List<int>();
+                                var subjects = db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID);
 
-                                var studentChoicesOneClassGroup = db.StudentChoices.Where(x => x.CategoryID == oneCategory.CategoryID).OrderBy(x => x.ChoiceDate);
-
-                                for (int ChoicePref = 1; ChoicePref <= oneCategory.MaxNoChoices; ChoicePref++)
+                                Dictionary<int, List<int>> algorithmChoices = AssignStudentToSubjectInOneCategory(subjects, oneCategory, oneClassGroup);
+                                if (algorithmChoices == null)
                                 {
-                                    foreach (var oneSubject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID))
-                                    {
-                                        if (ChoicePref == 1)
-                                        {
-                                            chosenStudents = new List<int>();
-                                        }
-                                        else
-                                        {
-                                            chosenStudents = algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID];
-                                        }
-
-                                        if (oneSubject.UpperLimit != null)
-                                        {
-                                            int freePlaces = oneSubject.UpperLimit.Value - chosenStudents.Count;
-                                            if (freePlaces > 0)
-                                            {
-                                                var selectedStudentsNo = studentChoicesOneClassGroup.Where(x => x.ChoiceID == oneSubject.ElectiveSubjectAndSpecialityID && x.PreferenceNo == ChoicePref).Select(x => x.StudentNo);
-                                                var selectedsortedStudentsNo = db.StudentsAndClassGroups.Where(x => selectedStudentsNo.Any(y => y == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x => x.StudentNo).Take(freePlaces);
-                                                foreach (var item in selectedsortedStudentsNo)
-                                                {
-                                                    studentChoicesOneClassGroup = studentChoicesOneClassGroup.Where(x => x.StudentNo != item).OrderBy(x=>x.ChoiceDate);
-                                                    chosenStudents.Add(item);
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            var selectedStudentsNo = studentChoicesOneClassGroup.Where(x => x.ChoiceID == oneSubject.ElectiveSubjectAndSpecialityID && x.PreferenceNo == ChoicePref).Select(x => x.StudentNo);
-                                            var selectedsortedStudentsNo = db.StudentsAndClassGroups.Where(x => selectedStudentsNo.Any(y => y == x.StudentNo)).Select(x => x.StudentNo);
-                                            foreach (var item in selectedsortedStudentsNo)
-                                            {
-                                                studentChoicesOneClassGroup = studentChoicesOneClassGroup.Where(x => x.StudentNo != item).OrderBy(x => x.ChoiceDate);
-                                                chosenStudents.Add(item);
-                                            }
-                                        }
-                                        algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID] = chosenStudents;
-                                    }
-                                }
-
-                                //weź studentów którzy nigdzie się nie dostali
-                                if (studentChoicesOneClassGroup.Count()>0)
-                                {
-                                    var restOfStudentsNo = db.StudentsAndClassGroups.Where(x => studentChoicesOneClassGroup.Any(y => y.StudentNo == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x => x.StudentNo);
-                                    foreach (var oneSubject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit != null))
-                                    {
-                                        int freePlaces = oneSubject.UpperLimit.Value - algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Count;
-                                        if (freePlaces > 0)
-                                        {
-                                            var selectedsortedStudentsNo = restOfStudentsNo.Take(freePlaces);
-                                            foreach (var item in selectedsortedStudentsNo)
-                                            {
-                                                studentChoicesOneClassGroup=studentChoicesOneClassGroup.Where(x=>x.StudentNo!=item).OrderBy(x => x.ChoiceDate); ;
-                                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
-                                            }
-                                        }
-                                        if (restOfStudentsNo.Count() == 0) break;
-                                    }
-
-                                    //tylko jeden weź
-                                    if (restOfStudentsNo.Count() > 0)
-                                    {
-                                        var oneSubject = db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit == null).FirstOrDefault();
-                                        if (oneSubject != null)
-                                        {
-                                            foreach (var item in restOfStudentsNo)
-                                            {
-                                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            string alertStudents = string.Empty;
-                                            foreach (var item in restOfStudentsNo)
-                                            {
-                                                alertStudents += " " + item;
-                                            }
-                                            if(restOfStudentsNo.Count()==1)
-                                            {
-                                                TempData["Alert"] = "Nie można przydzielić studenta o indeksie" + alertStudents;
-                                            }
-                                            else
-                                            {
-                                                TempData["Alert"] = "Nie można przydzielić studentów o indeksach:" + alertStudents;
-                                            }
-                                            TempData["Alert"] += " - brak wolnych miejsc w kategorii " + oneCategory.Name + " w grupie " + oneClassGroup.DegreeCourse.ToString() + "/" + oneClassGroup.Graduate.ToString() + "/";
-                                            if (oneClassGroup.FullTimeStudies == true) { TempData["Alert"] += "STACJ"; }
-                                            else { TempData["Alert"] += "NIESTACJ"; }
-                                            TempData["Alert"] += "/" + oneClassGroup.Semester.ToString() + "/" + oneClassGroup.Speciality.ToString() + "!";
-                                            return RedirectToAction("", "Home");
-                                        }
-                                    }
-                                }
-
-                                //weź studentów którzy nie wybrali
-                                var studentsWithoutChoicesNo = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID && !db.StudentChoices.Any(y => y.StudentNo == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x=>x.StudentNo).ToList();
-                                if (studentsWithoutChoicesNo.Count()>0)
-                                {
-                                    foreach (var oneSubject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit != null))
-                                    {
-                                        int freePlaces = oneSubject.UpperLimit.Value - algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Count;
-                                        if (freePlaces > 0)
-                                        {
-                                            var selectedsortedStudentsNo = studentsWithoutChoicesNo.Take(freePlaces);
-                                            foreach (var item in selectedsortedStudentsNo)
-                                            {
-                                                studentsWithoutChoicesNo = studentsWithoutChoicesNo.Where(x => x != item).ToList();
-                                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
-                                            }
-                                        }
-                                        if (studentsWithoutChoicesNo.Count() == 0) break;
-                                    }
-
-                                    //tylko jeden weź
-                                    if (studentsWithoutChoicesNo.Count() > 0)
-                                    {
-                                        var oneSubject = db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == oneCategory.CategoryID && x.UpperLimit == null).FirstOrDefault();
-                                        if (oneSubject != null)
-                                        {
-                                            foreach (var item in studentsWithoutChoicesNo)
-                                            {
-                                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            string alertStudents = string.Empty;
-                                            foreach (var item in studentsWithoutChoicesNo)
-                                            {
-                                                alertStudents += " " + item;
-                                            }
-                                            if (studentsWithoutChoicesNo.Count() == 1)
-                                            {
-                                                TempData["Alert"] = "Nie można przydzielić studenta o indeksie" + alertStudents;
-                                            }
-                                            else
-                                            {
-                                                TempData["Alert"] = "Nie można przydzielić studentów o indeksach:" + alertStudents;
-                                            }
-                                            TempData["Alert"] += " - brak wolnych miejsc w kategorii " + oneCategory.Name + " w grupie " + oneClassGroup.DegreeCourse.ToString() + "/" + oneClassGroup.Graduate.ToString() + "/";
-                                            if (oneClassGroup.FullTimeStudies == true) { TempData["Alert"] += "STACJ"; }
-                                            else { TempData["Alert"] += "NIESTACJ"; }
-                                            TempData["Alert"] += "/" + oneClassGroup.Semester.ToString() + "/" + oneClassGroup.Speciality.ToString() + "!";
-                                            return RedirectToAction("", "Home");
-                                        }
-                                    }
+                                    return RedirectToAction("", "Home");
                                 }
 
                                 //Zapisz wyniki do bazy
@@ -619,6 +473,185 @@ namespace StudentChoices.Controllers
                 }
             }
             return RedirectToAction("", "Home");
+        }
+
+        Dictionary<int, List<int>> AssignStudentToSubjectInOneCategory(IQueryable<ElectiveSubjectsAndSpecialities> subjects, Categories oneCategory, ClassGroups oneClassGroup)
+        {
+            Dictionary<int, List<int>> algorithmChoices = new Dictionary<int, List<int>>();
+            List<int> chosenStudents = new List<int>();
+
+            using (PPDBEntities db = new PPDBEntities())
+            {
+                var studentChoicesOneClassGroup = db.StudentChoices.Where(x => x.CategoryID == oneCategory.CategoryID).OrderBy(x => x.ChoiceDate);
+
+                for (int ChoicePref = 1; ChoicePref <= oneCategory.MaxNoChoices; ChoicePref++)
+                {
+                    foreach (var oneSubject in subjects)
+                    {
+                        if (ChoicePref == 1)
+                        {
+                            chosenStudents = new List<int>();
+                        }
+                        else
+                        {
+                            chosenStudents = algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID];
+                        }
+
+                        if (oneSubject.UpperLimit != null)
+                        {
+                            int freePlaces = oneSubject.UpperLimit.Value - chosenStudents.Count;
+                            if (freePlaces > 0)
+                            {
+                                var selectedStudentsNo = studentChoicesOneClassGroup.Where(x => x.ChoiceID == oneSubject.ElectiveSubjectAndSpecialityID && x.PreferenceNo == ChoicePref).Select(x => x.StudentNo);
+                                var selectedsortedStudentsNo = db.StudentsAndClassGroups.Where(x => selectedStudentsNo.Any(y => y == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x => x.StudentNo).Take(freePlaces);
+                                foreach (var item in selectedsortedStudentsNo)
+                                {
+                                    studentChoicesOneClassGroup = studentChoicesOneClassGroup.Where(x => x.StudentNo != item).OrderBy(x => x.ChoiceDate);
+                                    chosenStudents.Add(item);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var selectedStudentsNo = studentChoicesOneClassGroup.Where(x => x.ChoiceID == oneSubject.ElectiveSubjectAndSpecialityID && x.PreferenceNo == ChoicePref).Select(x => x.StudentNo);
+                            var selectedsortedStudentsNo = db.StudentsAndClassGroups.Where(x => selectedStudentsNo.Any(y => y == x.StudentNo)).Select(x => x.StudentNo);
+                            foreach (var item in selectedsortedStudentsNo)
+                            {
+                                studentChoicesOneClassGroup = studentChoicesOneClassGroup.Where(x => x.StudentNo != item).OrderBy(x => x.ChoiceDate);
+                                chosenStudents.Add(item);
+                            }
+                        }
+                        algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID] = chosenStudents;
+                    }
+                }
+
+                //weź studentów którzy nigdzie się nie dostali
+                if (studentChoicesOneClassGroup.Count() > 0)
+                {
+                    var restOfStudentsNo = db.StudentsAndClassGroups.Where(x => studentChoicesOneClassGroup.Any(y => y.StudentNo == x.StudentNo)).OrderByDescending(x => x.AverageGrade).Select(x => x.StudentNo);
+                    foreach (var oneSubject in subjects.Where(x => x.UpperLimit != null))
+                    {
+                        int freePlaces = oneSubject.UpperLimit.Value - algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Count;
+                        if (freePlaces > 0)
+                        {
+                            var selectedsortedStudentsNo = restOfStudentsNo.Take(freePlaces);
+                            foreach (var item in selectedsortedStudentsNo)
+                            {
+                                studentChoicesOneClassGroup = studentChoicesOneClassGroup.Where(x => x.StudentNo != item).OrderBy(x => x.ChoiceDate); ;
+                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
+                            }
+                        }
+                        if (restOfStudentsNo.Count() == 0) break;
+                    }
+
+                    //tylko jeden weź
+                    if (restOfStudentsNo.Count() > 0)
+                    {
+                        var oneSubject = subjects.Where(x => x.UpperLimit == null).FirstOrDefault();
+                        if (oneSubject != null)
+                        {
+                            foreach (var item in restOfStudentsNo)
+                            {
+                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
+                            }
+                        }
+                        else
+                        {
+                            string alertStudents = string.Empty;
+                            foreach (var item in restOfStudentsNo)
+                            {
+                                alertStudents += " " + item;
+                            }
+                            if (restOfStudentsNo.Count() == 1)
+                            {
+                                TempData["Alert"] = "Nie można przydzielić studenta o indeksie" + alertStudents;
+                            }
+                            else
+                            {
+                                TempData["Alert"] = "Nie można przydzielić studentów o indeksach:" + alertStudents;
+                            }
+                            TempData["Alert"] += " - brak wolnych miejsc w kategorii " + oneCategory.Name + " w grupie " + oneClassGroup.DegreeCourse.ToString() + "/" + oneClassGroup.Graduate.ToString() + "/";
+                            if (oneClassGroup.FullTimeStudies == true) { TempData["Alert"] += "STACJ"; }
+                            else { TempData["Alert"] += "NIESTACJ"; }
+                            TempData["Alert"] += "/" + oneClassGroup.Semester.ToString() + "/" + oneClassGroup.Speciality.ToString() + "!";
+                            return null;
+                        }
+                    }
+                }
+
+                //weź studentów którzy nie wybrali
+                var studentsWithoutChoicesNo = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == oneClassGroup.ClassGroupID && !db.StudentChoices.Any(y => y.StudentNo == x.StudentNo && y.CategoryID==oneCategory.CategoryID)).OrderByDescending(x => x.AverageGrade).Select(x => x.StudentNo).ToList();
+                if (studentsWithoutChoicesNo.Count() > 0)
+                {
+                    foreach (var oneSubject in subjects.Where(x => x.UpperLimit != null))
+                    {
+                        int freePlaces = oneSubject.UpperLimit.Value - algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Count;
+                        if (freePlaces > 0)
+                        {
+                            var selectedsortedStudentsNo = studentsWithoutChoicesNo.Take(freePlaces);
+                            foreach (var item in selectedsortedStudentsNo)
+                            {
+                                studentsWithoutChoicesNo = studentsWithoutChoicesNo.Where(x => x != item).ToList();
+                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
+                            }
+                        }
+                        if (studentsWithoutChoicesNo.Count() == 0) break;
+                    }
+
+                    //tylko jeden weź
+                    if (studentsWithoutChoicesNo.Count() > 0)
+                    {
+                        var oneSubject = subjects.Where(x => x.UpperLimit == null).FirstOrDefault();
+                        if (oneSubject != null)
+                        {
+                            foreach (var item in studentsWithoutChoicesNo)
+                            {
+                                algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Add(item);
+                            }
+                        }
+                        else
+                        {
+                            string alertStudents = string.Empty;
+                            foreach (var item in studentsWithoutChoicesNo)
+                            {
+                                alertStudents += " " + item;
+                            }
+                            if (studentsWithoutChoicesNo.Count() == 1)
+                            {
+                                TempData["Alert"] = "Nie można przydzielić studenta o indeksie" + alertStudents;
+                            }
+                            else
+                            {
+                                TempData["Alert"] = "Nie można przydzielić studentów o indeksach:" + alertStudents;
+                            }
+                            TempData["Alert"] += " - brak wolnych miejsc w kategorii " + oneCategory.Name + " w grupie " + oneClassGroup.DegreeCourse.ToString() + "/" + oneClassGroup.Graduate.ToString() + "/";
+                            if (oneClassGroup.FullTimeStudies == true) { TempData["Alert"] += "STACJ"; }
+                            else { TempData["Alert"] += "NIESTACJ"; }
+                            TempData["Alert"] += "/" + oneClassGroup.Semester.ToString() + "/" + oneClassGroup.Speciality.ToString() + "!";
+                            return null;
+                        }
+                    }
+                }
+
+                //sprawdź limity dolne
+                int excludedSubjectID = -1;
+                int biggestDifferenceNumberOfPlaces = 0;
+                foreach (var oneSubject in subjects.Where(x => x.LowerLimit != null))
+                {
+                    if(oneSubject.LowerLimit.Value - algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Count > biggestDifferenceNumberOfPlaces)
+                    {
+                        biggestDifferenceNumberOfPlaces = oneSubject.LowerLimit.Value - algorithmChoices[oneSubject.ElectiveSubjectAndSpecialityID].Count;
+                        excludedSubjectID = oneSubject.ElectiveSubjectAndSpecialityID;
+                    }
+                }
+                if(excludedSubjectID!=-1)
+                {
+                    return AssignStudentToSubjectInOneCategory(subjects.Where(x=>x.ElectiveSubjectAndSpecialityID != excludedSubjectID), oneCategory, oneClassGroup);
+                }
+            }
+
+
+            return algorithmChoices;
         }
 
         public ActionResult ShareResults()
