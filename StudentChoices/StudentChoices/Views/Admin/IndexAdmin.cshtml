@@ -1,0 +1,31 @@
+﻿@model IEnumerable<StudentChoices.Models.AddAdmin>
+@{
+    ViewBag.Title = "Administratorzy";
+}
+
+<h2>Lista administratorów</h2>
+
+<br />
+<br />
+<table class="table">
+    <tr>
+        <th>Login</th>
+        <th>Aktywny</th>
+        <th>SuperAdministrator</th>
+    </tr>
+
+    @foreach (var admin in Model)
+    {
+        <tr>
+            <td>@admin.Login</td>
+            <td>@admin.Active</td>
+            <td>@admin.SuperAdmin</td>
+
+            <td>
+                @Html.ActionLink("Edytuj", "EditAdmin", "Admin", new { id = @admin.AdminID }, new { @class = "btn btn-primary" })
+            </td>
+        </tr>
+    }
+
+</table>
+

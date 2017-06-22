@@ -11,13 +11,14 @@
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Zarządzaj!
                                 <span class="caret"></span></a>
                             <ul class="dropdown-menu dropdown-menu-main" style="width:inherit;text-align:left;">
-                                <li>@Html.ActionLink("Importuj dane", "Index", "Home")</li>
+                                <li>@Html.ActionLink("Importuj dane", "Import", "Admin")</li>
                                 <li>@Html.ActionLink("Dodaj dane", "AddData", "Admin")</li>
                                 <li>@Html.ActionLink("Edytuj dane", "EditData", "Admin")</li>
                                 <li>@Html.ActionLink("Zmień hasło", "ChangePass", "Admin")</li>
                                 @if (Session["User"] == "SuperAdmin")
                                 {
-                                    <li>@Html.ActionLink("Administatorzy", "Index", "Home")</li>
+                                    <li>@Html.ActionLink("Administatorzy", "IndexAdmin", "Admin")</li>
+                                    <li>@Html.ActionLink("Nowy administator", "AddAdmin", "Admin")</li>
                                 }
                             </ul>
                         </li> 

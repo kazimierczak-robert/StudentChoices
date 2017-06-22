@@ -1,0 +1,89 @@
+﻿@model StudentChoices.Models.AddGroups
+@{
+    ViewBag.Title = "EditGroups";
+}
+
+<h2>Edytuj grupe</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @if (ViewBag.Success != null)
+        {
+            <div class="alert alert-margin0px alert-success" style="text-align:center">
+                @ViewBag.Success
+            </div>
+        }
+        @if (ViewBag.Alert != null)
+        {
+            <div class="alert alert-margin0px alert-danger" style="text-align:center">
+                @ViewBag.Alert
+            </div>
+        }
+
+        @Html.HiddenFor(model => model.ClassGroupID)
+
+
+
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.DegreeCourse, "Kierunek", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DegreeCourse, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DegreeCourse, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.Graduate, "Stopień", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.EditorFor(model => model.Graduate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Graduate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.FullTimeStudies, "Tryb", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.EditorFor(model => model.FullTimeStudies, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FullTimeStudies, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.Semester, "Semestr", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.EditorFor(model => model.Semester, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Semester, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group-10px">
+            @Html.LabelFor(model => model.Speciality, "Specjalizacja", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Speciality, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Speciality, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+
+        <br />
+        <div class="form-group">
+            <div class="col-md-offset-3 col-md-7">
+                <input type="submit" value="Zapisz zmiany" class="btn btn-primary" />
+                @Html.ActionLink("Anuluj", "IndexGroup", "Admin", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+
+    </div>
+}
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

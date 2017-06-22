@@ -127,7 +127,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Models\AddAdmin.cs" />
     <Compile Include="Models\AddCategories.cs" />
+    <Compile Include="Models\AddGroups.cs" />
     <Compile Include="Models\AddStudents.cs" />
     <Compile Include="Models\Admins.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
@@ -260,6 +262,13 @@
     <Content Include="Views\Admin\IndexCat.cshtml" />
     <Content Include="Views\Admin\EditCategories.cshtml" />
     <Content Include="Views\Admin\AddSubSpec.cshtml" />
+    <Content Include="Views\Admin\AddGroups.cshtml" />
+    <Content Include="Views\Admin\EditGroups.cshtml" />
+    <Content Include="Views\Admin\IndexGroup.cshtml" />
+    <Content Include="Views\Admin\IndexAdmin.cshtml" />
+    <Content Include="Views\Admin\EditAdmin.cshtml" />
+    <Content Include="Views\Admin\AddAdmin.cshtml" />
+    <Content Include="Views\Admin\Import.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

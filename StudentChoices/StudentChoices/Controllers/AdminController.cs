@@ -366,5 +366,168 @@ namespace StudentChoices.Controllers
             ViewBag.ClassGroupID = new SelectList(classgroups, "ClassGroupID", "ClassGroup", selectedClassGroup);
         }
 
+
+    [HttpGet]
+    public ActionResult AddGroups()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public ActionResult AddGroups([Bind(Include ="DegreeCourse,Graduate,FullTimeStudies,Semester,Speciality")]AddGroups group)
+    {
+        if (Session["User"].ToString().Contains("Admin"))
+        {
+                var groupsToAdd = new ClassGroups();
+                groupsToAdd.DegreeCourse = group.DegreeCourse;
+                groupsToAdd.Graduate = group.Graduate;
+                groupsToAdd.FullTimeStudies = group.FullTimeStudies;
+                groupsToAdd.Semester = group.Semester;
+                groupsToAdd.Speciality = group.Speciality;
+
+                db.ClassGroups.Add(groupsToAdd);
+                db.SaveChanges();
+
+        }
+
+            return View();
+    }
+
+    public ActionResult IndexGroup()
+        {
+            var data = (from g in db.ClassGroups
+                        select new AddGroups
+                        {
+                            DegreeCourse = g.DegreeCourse,
+                            Graduate = g.Graduate,
+                            FullTimeStudies = g.FullTimeStudies,
+                            Semester = g.Semester,
+                            Speciality = g.Speciality
+                        }).ToList();
+            return View(data);
+        }
+
+    [HttpGet]
+    public ActionResult EditGroups (int id)
+    {
+            var data = (from g in db.ClassGroups
+                        where g.ClassGroupID == id
+                        select new AddGroups
+                        {
+                            DegreeCourse = g.DegreeCourse,
+                            Graduate = g.Graduate,
+                            FullTimeStudies = g.FullTimeStudies,
+                            Semester = g.Semester,
+                            Speciality = g.Speciality
+                        }).FirstOrDefault();
+            return View(data);
+        }
+
+        [HttpPost]
+        public ActionResult EditGroups([Bind(Include = "DegreeCourse,Graduate,FullTimeStudies,Semester,Speciality")] AddGroups groups)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {
+                var groupsToEdit = (from g in db.ClassGroups
+                                    where g.ClassGroupID == groups.ClassGroupID
+                                    select g
+                    ).FirstOrDefault();
+                groupsToEdit.DegreeCourse = groups.DegreeCourse;
+                groupsToEdit.Graduate = groups.Graduate;
+                groupsToEdit.FullTimeStudies = groups.FullTimeStudies;
+                groupsToEdit.Semester = groups.Semester;
+                groupsToEdit.Speciality = groups.Speciality;
+
+                db.Entry(groupsToEdit).State = EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("","Home");
+            }
+            return View();
+        }
+
+
+        //////////////////////////////////////////////// ADMIN
+
+        [HttpGet]
+        public ActionResult AddAdmin()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult AddAdmin([Bind(Include = "Login,Password,Active,SuperAdmin")]AddAdmin admin)
+        {
+            if (Session["User"].ToString().Contains("SuperAdmin"))
+            {
+                var AdminToAdd = new Admins();
+                AdminToAdd.Login = admin.Login;
+                AdminToAdd.Password = admin.Password;
+                AdminToAdd.Active = admin.Active;
+                AdminToAdd.SuperAdmin = admin.SuperAdmin;
+
+
+                db.Admins.Add(AdminToAdd);
+                db.SaveChanges();
+
+            }
+
+            return View();
+        }
+
+        public ActionResult IndexAdmin()
+        {
+            var data = (from a in db.Admins
+                        select new AddAdmin
+                        {
+                            Login = a.Login,
+                            Password = a.Password,
+                            Active = a.Active,
+                            SuperAdmin = a.SuperAdmin
+                        }).ToList();
+            return View(data);
+        }
+
+        [HttpGet]
+        public ActionResult EditAdmin(int id)
+        {
+            var data = (from a in db.Admins
+                        where a.AdminID == id
+                        select new AddAdmin
+                        {
+                            Login = a.Login,
+                            Password = a.Password,
+                            Active = a.Active,
+                            SuperAdmin = a.SuperAdmin
+                        }).FirstOrDefault();
+            return View(data);
+        }
+
+        [HttpPost]
+        public ActionResult EditAdmin([Bind(Include = "Login,Password,Active,SuperAdmin")] AddAdmin admin)
+        {
+            if (Session["User"].ToString().Contains("SuperAdmin"))
+            {
+                var adminToEdit = (from g in db.Admins
+                                    where g.AdminID == admin.AdminID
+                                    select g
+                    ).FirstOrDefault();
+                adminToEdit.Login = admin.Login;
+                adminToEdit.Password = admin.Password;
+                adminToEdit.Active = admin.Active;
+                adminToEdit.SuperAdmin = admin.SuperAdmin;
+
+
+                db.Entry(adminToEdit).State = EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("", "Home");
+            }
+            return View();
+        }
+
+        public ActionResult Import()
+        {
+            return View();
+        }
+
     }
 }
