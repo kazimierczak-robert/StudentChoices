@@ -113,8 +113,12 @@
             }
             else if ((bool)HttpContext.Current.Application["AfterRec"] == true)
             {
-                <h5>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</h5>
-                <h4>Rekrutacja na specjalności oraz przedmioty obieralne jest już zakończona, lecz wyniki nie zostały jeszcze opublikowane.</h4>
+                <div class="alert alert-danger">
+                    <b>Termin zakończenia rekrutacji: @HttpContext.Current.Application["RecStopString"]</b>
+                </div>
+                <div class="alert alert-danger">
+                    Rekrutacja na specjalności oraz przedmioty obieralne jest już zakończona, lecz wyniki nie zostały jeszcze opublikowane.
+                </div>
             }
             else
             {
@@ -214,15 +218,15 @@
                                     <h5><b>Kategoria:</b></h5>
                                 </div>
                             </div>
-                                <div class="row">
-                                    <div class="col-sm-8" style="padding-bottom:10px">
-                                        @Html.DropDownList("Categories", (SelectList)Session["Categories"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table; max-width: none" })
-                                    </div>
-                                    <div class="col-sm-2" style="text-align:center">
-                                        <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Home")' class="btn btn-default btn-default-main" />
-                                    </div>
-                                    <div class="col-sm-2"></div>
+                            <div class="row">
+                                <div class="col-sm-8" style="padding-bottom:10px">
+                                    @Html.DropDownList("Categories", (SelectList)Session["Categories"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table; max-width: none" })
                                 </div>
+                                <div class="col-sm-2" style="text-align:center">
+                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Home")' class="btn btn-default btn-default-main" />
+                                </div>
+                                <div class="col-sm-2"></div>
+                            </div>
                                 <hr />
                         }
                         <h5>Liczba wszystkich studentów: <b>@Session["NoOfStudents"]</b></h5>
