@@ -1,34 +1,61 @@
-﻿@model StudentChoices.Models.AddStudents
+﻿@model StudentChoices.Models.EditStudents  
 
 @{
     ViewBag.Title = "Edycja studenta";
 }
 
 <h2>@ViewBag.Title</h2>
-
+<hr />
+@if (TempData["Alert"] != null)
+{
+    <div class="alert alert-margin0px alert-danger" style="text-align:center;margin-bottom:10px">
+        @TempData["Alert"]
+    </div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-margin0px alert-success" style="text-align:center;margin-bottom:10px">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Info"] != null)
+{
+    <div class="alert alert-margin0px alert-info" style="text-align:center;margin-bottom:10px">
+        @TempData["Info"]
+    </div>
+}
 @using (Html.BeginForm())
 {
 @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-        <hr />
+        
         @if (ViewBag.Success != null)
         {
             <div class="alert alert-margin0px alert-success" style="text-align:center">
                 @ViewBag.Success
             </div>
+            <br />
         }
         @if (ViewBag.Alert != null)
         {
             <div class="alert alert-margin0px alert-danger" style="text-align:center">
                 @ViewBag.Alert
             </div>
+            <br />
         }
-
-        <div class="form-group-10px">
+        @if (ViewBag.Info != null)
+        {
+            <div class="alert alert-margin0px alert-info" style="text-align:center">
+                @ViewBag.Info
+            </div>
+            <br />
+        }
+        
+         <div class="form-group-10px">
             @Html.LabelFor(model => model.StudentNo, "Indeks studenta", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.StudentNo, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.StudentNo, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                 @Html.ValidationMessageFor(model => model.StudentNo, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -78,7 +105,7 @@
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Zapisz zmiany" class="btn btn-primary" />
-                @Html.ActionLink("Anuluj", "Index" , "Admin", null, new { @class = "btn btn-default" })
+                @Html.ActionLink("Anuluj", "IndexStudent" , "Admin", null, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>

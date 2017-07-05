@@ -131,6 +131,7 @@
     <Compile Include="Models\AddCategories.cs" />
     <Compile Include="Models\AddGroups.cs" />
     <Compile Include="Models\AddStudents.cs" />
+    <Compile Include="Models\AddSubSpec.cs" />
     <Compile Include="Models\Admins.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
@@ -145,6 +146,7 @@
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Models\EditStudents.cs" />
     <Compile Include="Models\ElectiveSubjectsAndSpecialities.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
@@ -255,7 +257,7 @@
     <Content Include="Views\Admin\ChangePass.cshtml" />
     <Content Include="Views\Admin\AddStudents.cshtml" />
     <Content Include="Views\Admin\EditStudents.cshtml" />
-    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\IndexStudent.cshtml" />
     <Content Include="Views\Admin\AddData.cshtml" />
     <Content Include="Views\Admin\AddCategories.cshtml" />
     <Content Include="Views\Admin\EditData.cshtml" />
@@ -269,6 +271,8 @@
     <Content Include="Views\Admin\EditAdmin.cshtml" />
     <Content Include="Views\Admin\AddAdmin.cshtml" />
     <Content Include="Views\Admin\Import.cshtml" />
+    <Content Include="Views\Admin\IndexSubSpec.cshtml" />
+    <Content Include="Views\Admin\EditSubSpec.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

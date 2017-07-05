@@ -15,12 +15,21 @@
             <div class="alert alert-margin0px alert-success" style="text-align:center">
                 @ViewBag.Success
             </div>
+            <br />
         }
         @if (ViewBag.Alert != null)
         {
             <div class="alert alert-margin0px alert-danger" style="text-align:center">
                 @ViewBag.Alert
             </div>
+            <br />
+        }
+        @if (ViewBag.Info != null)
+        {
+            <div class="alert alert-margin0px alert-info" style="text-align:center">
+                @ViewBag.Info
+            </div>
+            <br />
         }
         <div class="form-group-10px">
             @Html.LabelFor(model => model.Name, "Nazwa kategorii", htmlAttributes: new { @class = "control-label col-md-3" })
@@ -82,7 +91,7 @@
         <div class="form-group-10px">
             <div class="col-md-offset-3 col-md-7">
                 <input type="submit" value="Dodaj kategorię" class="btn btn-default btn-default-main" />
-                @Html.ActionLink("Anuluj", "Index", "Home", null, new { @class = "btn btn-default" })
+                @Html.ActionLink("Anuluj", "AddData", "Admin", null, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>

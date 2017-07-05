@@ -1,29 +1,30 @@
-﻿@model StudentChoices.Models.AddSubSpec    
+﻿@model StudentChoices.Models.AddSubSpec
 @{
-    ViewBag.Title = "AddSubSpec";
+    ViewBag.Title = "EditSubSpec";
 }
 
-<h2>Dodawanie przedmiotów i specjalności do kategorii</></h2>
+<h2>Edytuj przedmiot lub specjalność</h2>
 
- <hr />
-    @if (TempData["Alert"] != null)
-    {
-        <div class="alert alert-margin0px alert-danger" style="text-align:center;margin-bottom:10px">
-            @TempData["Alert"]
-        </div>
-    }
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-margin0px alert-success" style="text-align:center;margin-bottom:10px">
-            @TempData["Success"]
-        </div>
-    }
-    @using (Html.BeginForm())
-    {
+<hr />
+@if (TempData["Alert"] != null)
+{
+    <div class="alert alert-margin0px alert-danger" style="text-align:center;margin-bottom:10px">
+        @TempData["Alert"]
+    </div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-margin0px alert-success" style="text-align:center;margin-bottom:10px">
+        @TempData["Success"]
+    </div>
+}
+@using (Html.BeginForm())
+{
     @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.CategoryID, new { Value = ViewBag.CatID })
+    @Html.HiddenFor(model => model.ElectiveSubjectAndSpecialityID, new { Value = ViewBag.SubID })
     <div class="form-horizontal">
-        
+
         @if (ViewBag.Success != null)
         {
             <div class="alert alert-margin0px alert-success" style="text-align:center">
@@ -46,7 +47,10 @@
             <br />
         }
 
+
         
+
+
 
         <div class="form-group-10px">
             @Html.LabelFor(model => model.Name, "Nazwa przedmiotu/specjalności", htmlAttributes: new { @class = "control-label col-md-3" })
@@ -76,17 +80,17 @@
                 @Html.ValidationMessageFor(model => model.LowerLimit, "", new { @class = "text-danger" })
             </div>
         </div>
-        
-        
+
+
         <br />
         <div class="form-group-10px">
             <div class="col-md-offset-3 col-md-7">
-                <input type="submit" value="Dodaj przedmiot/specjalność" class="btn btn-default btn-default-main" />
+                <input type="submit" value="Zapisz zmiany" class="btn btn-default btn-default-main" />
                 @Html.ActionLink("Anuluj", "IndexCat", "Admin", null, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>
-    }
+}
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

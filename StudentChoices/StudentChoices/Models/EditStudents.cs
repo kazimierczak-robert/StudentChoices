@@ -9,21 +9,21 @@ using System.Xml.Serialization;
 
 namespace StudentChoices.Models
 {
-    public class AddStudents
+    public class EditStudents
     {
-        public AddStudents()
+        public EditStudents()
         {
 
         }
 
-        //[Editable(false)]
+        [Editable(false)]
         [Required(ErrorMessage = "To pole jest wymagane!")]
         public int StudentNo { get; set; }
 
         [Required(ErrorMessage = "To pole jest wymagane!")]
         public string Login { get; set; }
 
-        [Required(ErrorMessage = "To pole jest wymagane!")]
+        //[Required(ErrorMessage = "To pole jest wymagane!")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
@@ -38,6 +38,6 @@ namespace StudentChoices.Models
 
         [Required(ErrorMessage = "To pole jest wymagane!")]
         public int ClassGroupID { get; set; }
-        
+
     }
 }

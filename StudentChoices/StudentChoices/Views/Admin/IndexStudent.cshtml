@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<StudentChoices.Models.AddStudents>
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "IndexStudent";
 }
 
 <h2>Lista studentów</h2>
@@ -11,6 +11,7 @@
     <tr>
         <th>Indeks</th>
         <th>Imię i nazwisko</th>
+        <th>Login</th>
         <th>Grupa</th>
         <th>Operacje</th>
     </tr>
@@ -20,6 +21,7 @@
         <tr>
             <td>@student.StudentNo</td>
             <td>@student.Name @student.Surname</td>
+            <td>@student.Login</td>
             <td>@student.ClassGroupID</td>
             <td>
                 @Html.ActionLink("Edytuj", "EditStudents", "Admin", new { id = @student.StudentNo }, new { @class = "btn btn-primary" })

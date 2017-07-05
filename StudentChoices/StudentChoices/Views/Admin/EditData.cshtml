@@ -9,17 +9,18 @@
 <div class="row">
     <div class="col-md-4">
         <h3>Edytowanie studenta</h3>
-        <p>Edytuj studentów będących na liście i zmieniaj przypisane im dane.</p>
-        <p>@Html.ActionLink("Edytuj studenta »", "Index", "Admin", null, new { @class = "btn btn-default" })</p>
+        <p>Edytuj studentów będących na liście i zmieniaj przypisane im dane.</p><br /><br />
+        <p>@Html.ActionLink("Edytuj studenta »", "IndexStudent", "Admin", null, new { @class = "btn btn-default" })</p>
     </div>
     <div class="col-md-4">
         <h3>Edytowanie kategorii</h3>
-        <p>Edytuj kategorie i należące do nich specjalności lub przedmioty obieralne w poszczególnych grupach.</p>
+        <p>Edytuj kategorie i należące do nich specjalności lub przedmioty obieralne w poszczególnych grupach oraz dodawaj 
+           przedmioty i specjalności do odpowiednich kategorii.</p>
         <p>@Html.ActionLink("Edytuj kategorię »", "IndexCat", "Admin", null, new { @class = "btn btn-default" })</p>
     </div>
     <div class="col-md-4">
         <h3>Edytowanie grupy studentów</h3>
-        <p>Edytuj grupy studentów zawierające informacje o kierunku, semestrze i trybie studiów.</p>
+        <p>Edytuj grupy studentów zawierające informacje o kierunku, semestrze i trybie studiów.</p><br /><br />
         <p>@Html.ActionLink("Edytuj grupę »", "IndexGroup", "Admin", null, new { @class = "btn btn-default" })</p>
     </div>
 </div>

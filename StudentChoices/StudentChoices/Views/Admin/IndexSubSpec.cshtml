@@ -1,0 +1,33 @@
+﻿
+@model IEnumerable<StudentChoices.Models.AddSubSpec>
+@{
+    ViewBag.Title = "IndexSubSpec";
+}
+
+<h2>Lista przedmiotów i specjalności</h2>
+
+<br />
+<br />
+<table class="table">
+    <tr>
+        <th>Nazwa przedmiotu</th>
+        <th>Kategoria</th>
+        <th>Limit górny</th>
+        <th>Limit dolny</th>
+        <th>Operacje</th>
+    </tr>
+
+    @foreach (var category in Model)
+    {
+        <tr>
+            <td>@category.Name</td>
+            <td>@category.CategoryID</td>
+            <td>@category.UpperLimit</td>
+            <td>@category.LowerLimit</td>
+            <td>
+                @Html.ActionLink("Edytuj", "EditSubSpec", "Admin", new { id = @category.CategoryID }, new { @class = "btn btn-primary" })
+            </td>
+        </tr>
+    }
+
+</table>

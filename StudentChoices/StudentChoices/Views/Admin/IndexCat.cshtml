@@ -24,6 +24,7 @@
             <td>
                 @Html.ActionLink("Dodaj przedmiot", "AddSubSpec", "Admin", new { id = @category.CategoryID }, new { @class = "btn btn-primary" })
                 @Html.ActionLink("Edytuj", "EditCategories", "Admin", new { id = @category.CategoryID }, new { @class = "btn btn-primary" })
+                @Html.ActionLink("Zobacz przedmioty", "IndexSubSpec", "Admin", new { id = @category.CategoryID }, new { @class = "btn btn-primary" })
             </td>
         </tr>
     }

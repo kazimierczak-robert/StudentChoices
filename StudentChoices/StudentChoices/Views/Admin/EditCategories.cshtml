@@ -17,12 +17,21 @@
             <div class="alert alert-margin0px alert-success" style="text-align:center">
                 @ViewBag.Success
             </div>
+            <br />
         }
         @if (ViewBag.Alert != null)
         {
             <div class="alert alert-margin0px alert-danger" style="text-align:center">
                 @ViewBag.Alert
             </div>
+            <br />
+        }
+        @if (ViewBag.Info != null)
+        {
+            <div class="alert alert-margin0px alert-info" style="text-align:center">
+                @ViewBag.Info
+            </div>
+            <br />
         }
         @Html.HiddenFor(model => model.CategoryID)
         <div class="form-group-10px">

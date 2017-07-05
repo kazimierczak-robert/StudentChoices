@@ -77,7 +77,7 @@ namespace StudentChoices.Controllers
 
         private PPDBEntities db = new PPDBEntities();
 
-        public ActionResult Index()
+        public ActionResult IndexStudent()
         {
             var data = (from s in db.Students
                         join g in db.StudentsAndClassGroups on s.StudentNo equals g.StudentNo
@@ -106,7 +106,9 @@ namespace StudentChoices.Controllers
         {
             if (Session["User"].ToString().Contains("Admin"))
             {
-                student.Password = HashPassword(student.Password);    
+                student.Password = HashPassword(student.Password);
+                student.StudentNo = Math.Abs(student.StudentNo);
+                student.Login = student.Name.ToLower() + "." + student.Surname.ToLower();
                 var studentToAdd = new Students();
                 studentToAdd.StudentNo = student.StudentNo;
                 studentToAdd.Login = student.Name.ToLower() + "." + student.Surname.ToLower();
@@ -120,19 +122,35 @@ namespace StudentChoices.Controllers
                 stdToAdd.AverageGrade = student.AverageGrade;
                 stdToAdd.ClassGroupID = student.ClassGroupID;
                 stdToAdd.CreatedBy = (int)Session["AdminID"];
-                stdToAdd.CreationDate = DateTime.Now;
-                if (db.Students.Where(st => st.Login == student.Login).Count() == 0)
+                stdToAdd.CreationDate = DateTime.Now;                
+
+                if (db.Students.Where(st => st.StudentNo == student.StudentNo).Count() == 0 && db.StudentsAndClassGroups.Where(st => st.StudentNo == student.StudentNo).Count() == 0)
                 {
-                    db.Students.Add(studentToAdd);
-                    db.StudentsAndClassGroups.Add(stdToAdd);
-                    db.SaveChanges();
-                    return RedirectToAction("", "Home");
+                    if (db.Students.Where(st => st.Login == student.Login).Count() == 0)
+                    {
+                        if (student.AverageGrade >= 2.0 && student.AverageGrade <= 5.0)
+                        {
+                            db.Students.Add(studentToAdd);
+                            db.StudentsAndClassGroups.Add(stdToAdd);
+                            db.SaveChanges();
+                            TempData["Success"] = "Dodano studenta pomyślnie!";
+                            return RedirectToAction("", "Home");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("AverageGrade", "Średnia musi być z przedziału 2.0 do 5.0!");
+                        }
+                    }
+                    else
+                    {
+                        //ModelState.AddModelError("Surname", "Użytkownik o takim loginie już istnieje!");
+                        ViewBag.Alert = "Użytkownik o takim loginie już istnieje!";
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError("Login", "Użytkownik o takim loginie już istnieje.");
+                    ModelState.AddModelError("StudentNo", "Użytkownik o takim indeksie już istnieje!");
                 }
-                return View();
             }
             PopulateClassGroupsList();
             return View();
@@ -141,10 +159,11 @@ namespace StudentChoices.Controllers
         [HttpGet]
         public ActionResult EditStudents(int id)
         {
+            TempData["Info"] = "Puste pole hasła powoduje, że hasło pozostaje niezmienione!";
             var student = (from st in db.Students
                            join std in db.StudentsAndClassGroups on st.StudentNo equals std.StudentNo
                             where st.StudentNo == id
-                            select new AddStudents()
+                            select new EditStudents()    
                             {
                                 StudentNo = st.StudentNo,
                                 Login = st.Login,
@@ -158,10 +177,11 @@ namespace StudentChoices.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditStudents([Bind(Include = "StudentNo,Login,Password,Name,Surname,AverageGrade,ClassGroupID")] AddStudents student)
+        public ActionResult EditStudents([Bind(Include = "StudentNo,Login,Password,Name,Surname,AverageGrade,ClassGroupID")] EditStudents student)//AddStudents
         {
             if (Session["User"].ToString().Contains("Admin"))
             {
+                student.Login = student.Name.ToLower() + "." + student.Surname.ToLower();
                 var studentToEdit = (from s in db.Students
                                   where s.StudentNo == student.StudentNo
                                   select s).FirstOrDefault();
@@ -178,24 +198,25 @@ namespace StudentChoices.Controllers
                 stdToEdit.AverageGrade = student.AverageGrade;
                 stdToEdit.ClassGroupID = student.ClassGroupID;
                 stdToEdit.LastEdit = DateTime.Now;
-
-                if (db.Students.Where(st => st.Login == student.Login).Count() == 0)
+                
+                if (student.AverageGrade >= 2.0 && student.AverageGrade <= 5.0)
                 {
                     db.SaveChanges();
-                    return RedirectToAction("", "Admin");
+                    TempData["Success"] = "Edytowano studenta pomyślnie!";
+                    return RedirectToAction("", "Home");
                 }
                 else
                 {
-                    ModelState.AddModelError("Login", "Użytkownik o takim loginie już istnieje.");
+                    TempData["Info"] = "Puste pole hasła powoduje, że hasło pozostaje niezmienione!";
+                    ModelState.AddModelError("AverageGrade", "Średnia musi być z przedziału 2.0 do 5.0!");
                 }
-                return View();
             }
             PopulateClassGroupsList();
             return View();
         }
 
-       
 
+        ///////////////    DODAWANIE I EDYCJA DANYCH   ////////////////////
 
         public ActionResult AddData()
         {
@@ -221,6 +242,7 @@ namespace StudentChoices.Controllers
         {
             if (Session["User"].ToString().Contains("Admin"))
             {
+                category.MaxNoChoices = Math.Abs(category.MaxNoChoices);
                 var categoryToAdd = new Categories();
                 categoryToAdd.Name = category.Name;
                 categoryToAdd.ClassGroupID = category.ClassGroupID;
@@ -232,63 +254,15 @@ namespace StudentChoices.Controllers
                 {
                     db.Categories.Add(categoryToAdd);
                     db.SaveChanges();
+                    TempData["Success"] = "Dodano kategorię pomyślnie! Aby dodać przedmiot obieralny lub specjalność do kategorii należy wejść w opcję Edycja kategorii.";
                     return RedirectToAction("", "Home");
                 }
                 else
                 {
-                    ModelState.AddModelError("Name", "Kategoria o takiej nazwie już istnieje.");
+                    ModelState.AddModelError("Name", "Kategoria o takiej nazwie już istnieje!");
                 }
             }
             PopulateClassGroupsList();
-            return View();
-        }
-
-        [HttpGet]
-        public ActionResult AddSubSpec(int id)
-        {
-            if (Session["User"].ToString().Contains("Admin"))
-            {  
-                var sub = db.Categories.Find(id); 
-                if (db.Categories.Where(ct => ct.CategoryID == sub.CategoryID).Count() == 1)
-                {
-                    ViewBag.CatID = id;
-                    return View();
-                }
-                if (sub == null)
-                {
-                    ModelState.AddModelError("CategoryID", "Nie ma kategorii");
-                }
-            }
-            return RedirectToAction("", "EditData");
-        }
-
-        [HttpPost]
-        public ActionResult AddSubSpec([Bind(Include = "CategoryID,Name,Information,UpperLimit,LowerLimit")] ElectiveSubjectsAndSpecialities subject)
-        {
-            if (Session["User"].ToString().Contains("Admin"))
-            {
-                var subjectToAdd = new ElectiveSubjectsAndSpecialities();
-                subjectToAdd.CategoryID = subject.CategoryID;
-                subjectToAdd.Name = subject.Name;
-                subjectToAdd.Information = subject.Information;
-                subjectToAdd.UpperLimit = subject.UpperLimit;
-                subjectToAdd.LowerLimit = subject.LowerLimit;
-                subjectToAdd.CreatedBy = (int)Session["AdminID"];
-                subjectToAdd.CreationDate = DateTime.Now;
-
-                var ctg = db.ElectiveSubjectsAndSpecialities.Find(subject.CategoryID);
-                if (db.ElectiveSubjectsAndSpecialities.Where(ct => ct.Name == subject.Name).Count() == 0)
-                {
-                    db.ElectiveSubjectsAndSpecialities.Add(subjectToAdd);
-                    db.SaveChanges();
-                    return RedirectToAction("", "Home");
-                }
-                else
-                {
-                    ModelState.AddModelError("Name", "Przedmiot/specjalność o takiej nazwie już istnieje.");
-                }
-                return View();
-            }
             return View();
         }
 
@@ -310,7 +284,6 @@ namespace StudentChoices.Controllers
         public ActionResult EditCategories(int id)
         {
             var category = (from ct in db.Categories
-                            join ctg in db.ElectiveSubjectsAndSpecialities on ct.CategoryID equals ctg.CategoryID
                             where ct.CategoryID == id
                             select new AddCategories()
                             {
@@ -329,6 +302,7 @@ namespace StudentChoices.Controllers
         {
             if (Session["User"].ToString().Contains("Admin"))
             {
+                category.MaxNoChoices = Math.Abs(category.MaxNoChoices);//
                 var categoryToEdit = (from c in db.Categories
                                       where c.CategoryID == category.CategoryID
                                       select c).FirstOrDefault();
@@ -336,11 +310,152 @@ namespace StudentChoices.Controllers
                 categoryToEdit.ClassGroupID = category.ClassGroupID;
                 categoryToEdit.Information = category.Information;
                 categoryToEdit.MaxNoChoices = category.MaxNoChoices;
+
                 db.Entry(categoryToEdit).State = EntityState.Modified;
                 db.SaveChanges();
+                TempData["Success"] = "Edytowano kategorię pomyślnie!";
                 return RedirectToAction("", "Home");
             }
             PopulateClassGroupsList();
+            return View();
+        }
+
+        ////////////    DODAWANIE I EDYCJA PRZEDMIOTÓW / SPECJALNOŚCI   ////////////////////
+
+        [HttpGet]
+        public ActionResult AddSubSpec(int id)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {  
+                var sub = db.Categories.Find(id); 
+                if (db.Categories.Where(ct => ct.CategoryID == sub.CategoryID).Count() == 1)
+                {
+                    ViewBag.CatID = id;
+                    return View();
+                }
+                if (sub == null)
+                {
+                    ModelState.AddModelError("CategoryID", "Nie ma takiej kategorii!");
+                }
+            }
+            return RedirectToAction("", "EditData");
+        }
+
+        [HttpPost]
+        public ActionResult AddSubSpec([Bind(Include = "CategoryID,Name,Information,UpperLimit,LowerLimit")] ElectiveSubjectsAndSpecialities subject)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {
+                subject.LowerLimit = Math.Abs((sbyte)subject.LowerLimit);//
+                subject.UpperLimit = Math.Abs((sbyte)subject.UpperLimit);//
+                var subjectToAdd = new ElectiveSubjectsAndSpecialities();
+                subjectToAdd.CategoryID = subject.CategoryID;
+                subjectToAdd.Name = subject.Name;
+                subjectToAdd.Information = subject.Information;
+                subjectToAdd.UpperLimit = subject.UpperLimit;
+                subjectToAdd.LowerLimit = subject.LowerLimit;
+                subjectToAdd.CreatedBy = (int)Session["AdminID"];
+                subjectToAdd.CreationDate = DateTime.Now;
+                
+                if (db.ElectiveSubjectsAndSpecialities.Where(ct => ct.Name == subject.Name).Count() != 0)
+                {
+                    TempData["Alert"] = "Przedmiot/specjalność o takiej nazwie już isnieje!";
+                    return RedirectToAction("AddSubSpec", "Admin", new { @id = subject.CategoryID });
+                }
+                if (subject.UpperLimit < subject.LowerLimit)
+                {
+                    TempData["Alert"] = "Limit górny nie może być mniejszy od dolnego!";
+                    return RedirectToAction("AddSubSpec", "Admin", new { @id = subject.CategoryID });
+                }
+                else if(db.ElectiveSubjectsAndSpecialities.Where(ct => ct.Name == subject.Name).Count() == 0 && subject.UpperLimit >= subject.LowerLimit)
+                {
+                    db.ElectiveSubjectsAndSpecialities.Add(subjectToAdd);
+                    db.SaveChanges();
+                    TempData["Success"] = "Dodano przedmiot/specjalność pomyślnie!";
+                    return RedirectToAction("", "Home");
+                }
+            }
+            return View();
+        }
+
+        public ActionResult IndexSubSpec(int id)
+        {
+            var data = (from s in db.ElectiveSubjectsAndSpecialities
+                        join sub in db.Categories on s.CategoryID equals sub.CategoryID
+                        where s.CategoryID == id
+                        select new AddSubSpec()
+                        {
+                            CategoryID = s.CategoryID,
+                            ElectiveSubjectAndSpecialityID = s.ElectiveSubjectAndSpecialityID,
+                            Name = s.Name,
+                            Information = s.Information,
+                            UpperLimit = s.UpperLimit,
+                            LowerLimit = s.LowerLimit
+                        }).ToList();
+            return View(data);
+        }
+        
+        [HttpGet]
+        public ActionResult EditSubSpec(int id)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {
+                var sub = db.Categories.Find(id);
+                if (db.Categories.Where(ct => ct.CategoryID == sub.CategoryID).Count() == 1)
+                {
+                    ViewBag.CatID = id;
+                    
+                    var subject = (from s in db.ElectiveSubjectsAndSpecialities
+                                   join ctg in db.Categories on s.CategoryID equals ctg.CategoryID
+                                   where s.CategoryID == id 
+                                   select new AddSubSpec()
+                                   {
+                                       CategoryID = s.CategoryID,
+                                       ElectiveSubjectAndSpecialityID = s.ElectiveSubjectAndSpecialityID,
+                                       Name = s.Name,
+                                       Information = s.Information,
+                                       UpperLimit = s.UpperLimit,
+                                       LowerLimit = s.LowerLimit
+                                   }).FirstOrDefault();
+
+                    ViewBag.SubID = subject.ElectiveSubjectAndSpecialityID;
+                    return View(subject);
+                }
+                if (sub == null)
+                {
+                    ModelState.AddModelError("CategoryID", "Nie ma takiej kategorii!");
+                }
+            }
+            return RedirectToAction("", "EditData");
+        }
+
+        [HttpPost]
+        public ActionResult EditSubSpec([Bind(Include = "ElectiveSubjectAndSpecialityID,CategoryID,Name,Information,UpperLimit,LowerLimit")] ElectiveSubjectsAndSpecialities subject)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {
+                var subjectToEdit = (from s in db.ElectiveSubjectsAndSpecialities
+                                      where s.ElectiveSubjectAndSpecialityID == subject.ElectiveSubjectAndSpecialityID
+                                      && s.CategoryID == subject.CategoryID                                                                                
+                                     select s).FirstOrDefault();
+                subjectToEdit.Name = subject.Name;
+                subjectToEdit.Information = subject.Information;
+                subjectToEdit.UpperLimit = subject.UpperLimit;
+                subjectToEdit.LowerLimit = subject.LowerLimit;
+
+                if (subject.UpperLimit >= subject.LowerLimit)
+                {
+                    db.Entry(subjectToEdit).State = EntityState.Modified;
+                    db.SaveChanges();
+                    TempData["Success"] = "Edytowano przedmiot/specjalność pomyślnie!";
+                    return RedirectToAction("", "Home");
+                }
+                else
+                {
+                    TempData["Alert"] = "Limit górny nie może być mniejszy od dolnego!";
+                    return RedirectToAction("EditSubSpec", "Admin", new { @id = subject.CategoryID });
+                }
+            }
             return View();
         }
 
@@ -366,6 +481,8 @@ namespace StudentChoices.Controllers
             ViewBag.ClassGroupID = new SelectList(classgroups, "ClassGroupID", "ClassGroup", selectedClassGroup);
         }
 
+   
+        //////////////////////////////////////////////////////////
 
     [HttpGet]
     public ActionResult AddGroups()
