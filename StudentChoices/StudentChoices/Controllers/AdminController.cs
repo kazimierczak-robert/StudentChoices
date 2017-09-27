@@ -119,7 +119,7 @@ namespace StudentChoices.Controllers
                 studentToAdd.CreationDate = DateTime.Now;
                 var stdToAdd = new StudentsAndClassGroups();
                 stdToAdd.StudentNo = student.StudentNo;
-                stdToAdd.AverageGrade = student.AverageGrade;
+                stdToAdd.AverageGrade = Math.Round(student.AverageGrade, 2);
                 stdToAdd.ClassGroupID = student.ClassGroupID;
                 stdToAdd.CreatedBy = (int)Session["AdminID"];
                 stdToAdd.CreationDate = DateTime.Now;                
@@ -195,7 +195,7 @@ namespace StudentChoices.Controllers
                 var stdToEdit = (from ss in db.StudentsAndClassGroups
                                  where ss.StudentNo == student.StudentNo
                                  select ss).FirstOrDefault();
-                stdToEdit.AverageGrade = student.AverageGrade;
+                stdToEdit.AverageGrade = Math.Round(student.AverageGrade, 2);
                 stdToEdit.ClassGroupID = student.ClassGroupID;
                 stdToEdit.LastEdit = DateTime.Now;
                 
