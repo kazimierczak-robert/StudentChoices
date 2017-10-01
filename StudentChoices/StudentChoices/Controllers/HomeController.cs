@@ -717,6 +717,35 @@ namespace StudentChoices.Controllers
             }
         }
 
+        public void ExportAdminResults()
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                if ((bool)HttpContext.Application["RecActive"] == false && (bool)HttpContext.Application["AfterRec"] == true)
+                {
+                    using (PPDBEntities db = new PPDBEntities())
+                    {
+                        List<Models.Export.Admin> exportData = new List<Models.Export.Admin>();
+
+                        var admins = db.Admins.ToList();
+
+                        foreach(var v in admins)
+                        {
+                            exportData.Add(new Models.Export.Admin(v.Login, v.Password, v.Active, v.SuperAdmin));
+                        }
+
+
+                        Response.ClearContent();
+                        Response.Buffer = true;
+                        Response.AddHeader("content-disposition", "attachment; filename = AdminsResults.xml");
+                        Response.ContentType = "text/xml";
+                        var serializer = new System.Xml.Serialization.XmlSerializer(exportData.GetType());
+                        serializer.Serialize(Response.OutputStream, exportData);
+                    }
+                }
+            }
+        }
+
         public ActionResult Help()
         {
             return View();

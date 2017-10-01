@@ -151,6 +151,7 @@
       <DependentUpon>PPDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Export\Category.cs" />
+    <Compile Include="Models\Export\Admin.cs" />
     <Compile Include="Models\Export\ElectiveSubjectAndSpeciality.cs" />
     <Compile Include="Models\Files.cs">
       <DependentUpon>PPDB.tt</DependentUpon>
@@ -273,6 +274,7 @@
     <Content Include="Views\Admin\Import.cshtml" />
     <Content Include="Views\Admin\IndexSubSpec.cshtml" />
     <Content Include="Views\Admin\EditSubSpec.cshtml" />
+    <Content Include="Views\Admin\MakeChanges.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

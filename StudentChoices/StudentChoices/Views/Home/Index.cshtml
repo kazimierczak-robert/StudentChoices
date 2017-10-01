@@ -185,7 +185,19 @@
                     <div class="panel-body" style="text-align:center">
                         <div> @Html.ActionLink("Uruchom algorytm", "Run", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "RunButton" })</div>
                         <div style="padding-top:10px;padding-bottom:10px"> @Html.ActionLink("Udostępnij wyniki studentom", "ShareResults", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "ShareButton" })</div>
+                        <div> @Html.ActionLink("Dokonaj zmian", "MakeChanges","Admin", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "MakeChangesButton" })</div>
+                </div>
+
+            </div>
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="background-color:#09339a; padding-bottom:4px; padding-top:4px">
+                        <h4 style="color:#ffffff">Eksport danych</h4>
+                    </div>
+                    <div class="panel-body" style="text-align:center">
                         <div> @Html.ActionLink("Wyeksportuj", "ExportResults", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "ExportButton" })</div>
+                        <div style="padding-top:10px;padding-bottom:10px"> @Html.ActionLink("Wyeksportuj dane administratorów", "ExportAdminResults", null, htmlAttributes: new { @class = "btn btn-default btn-default-main", @id = "ExportAdminnButton" })</div>
                     </div>
                 </div>
 
@@ -295,6 +307,8 @@ else
                         </div>
                     </div>
                 </div>
+
+
             </div>
         </div>
     }
@@ -323,6 +337,7 @@ else
                 document.getElementById("RunButton").setAttribute('disabled', true);
                 document.getElementById("ShareButton").setAttribute('disabled', true);
                 document.getElementById("ExportButton").setAttribute('disabled', true);
+                document.getElementById("MakeChangesButton").setAttribute('disabled', true);
             }
         }
 
