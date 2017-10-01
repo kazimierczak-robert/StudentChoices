@@ -119,7 +119,7 @@ namespace StudentChoices.Controllers
                 studentToAdd.CreationDate = DateTime.Now;
                 var stdToAdd = new StudentsAndClassGroups();
                 stdToAdd.StudentNo = student.StudentNo;
-                stdToAdd.AverageGrade = Math.Round(student.AverageGrade,2);
+                stdToAdd.AverageGrade = Math.Round(student.AverageGrade, 2);
                 stdToAdd.ClassGroupID = student.ClassGroupID;
                 stdToAdd.CreatedBy = (int)Session["AdminID"];
                 stdToAdd.CreationDate = DateTime.Now;                
@@ -169,7 +169,7 @@ namespace StudentChoices.Controllers
                                 Login = st.Login,
                                 Name = st.Name,
                                 Surname = st.Surname,
-                                AverageGrade = Math.Round(std.AverageGrade,2),
+                                AverageGrade = std.AverageGrade,
                                 ClassGroupID = std.ClassGroupID
                             }).FirstOrDefault();
             PopulateClassGroupsList(student.ClassGroupID.ToString());
@@ -195,7 +195,7 @@ namespace StudentChoices.Controllers
                 var stdToEdit = (from ss in db.StudentsAndClassGroups
                                  where ss.StudentNo == student.StudentNo
                                  select ss).FirstOrDefault();
-                stdToEdit.AverageGrade = student.AverageGrade;
+                stdToEdit.AverageGrade = Math.Round(student.AverageGrade, 2);
                 stdToEdit.ClassGroupID = student.ClassGroupID;
                 stdToEdit.LastEdit = DateTime.Now;
                 
@@ -646,107 +646,5 @@ namespace StudentChoices.Controllers
             return View();
         }
 
-        public ActionResult MakeChanges()
-        {
-            return View();
-        }
-
-
-        void setSessionClassGroups(string selectedValue)
-        {
-            using (PPDBEntities db = new PPDBEntities())
-            {
-                List<string> ClassGroups = new List<string>();
-                string oneClassGroup = string.Empty;
-                foreach (var elem in db.ClassGroups)
-                {
-                    oneClassGroup = elem.DegreeCourse.ToString() + "/" + elem.Graduate.ToString() + "/";
-                    if (elem.FullTimeStudies == true) { oneClassGroup += "STACJ"; }
-                    else { oneClassGroup += "NIESTACJ"; }
-                    oneClassGroup += "/" + elem.Semester.ToString() + "/" + elem.Speciality.ToString();
-                    ClassGroups.Add(oneClassGroup);
-                }
-                if (ClassGroups.IndexOf(selectedValue) >= 0)
-                {
-                    ClassGroups.Remove(selectedValue);
-                    ClassGroups.Insert(0, selectedValue);
-                }
-                Session["ClassGroups"] = new SelectList(ClassGroups);
-                setSessionCategoriesAndStats("", ClassGroups.ElementAt(0));
-            }
-        }
-
-        void setSessionCategoriesAndStats(string selectedValue, string selectedClassGroup)
-        {
-            using (PPDBEntities db = new PPDBEntities())
-            {
-                var selectedClassGroupDetails = selectedClassGroup.Split('/');
-
-                string DegreeCourse = selectedClassGroupDetails[0];
-                Byte Graduate = Byte.Parse(selectedClassGroupDetails[1]);
-                bool FullTimeStudies = selectedClassGroupDetails[2] == "STACJ" ? true : false;
-                Byte Semester = Byte.Parse(selectedClassGroupDetails[3]);
-                string Speciality = selectedClassGroupDetails[4];
-
-                var selectedClassGroupID = db.ClassGroups.Where(x => x.DegreeCourse == DegreeCourse &&
-                    x.Graduate == Graduate && x.FullTimeStudies == FullTimeStudies &&
-                    x.Semester == Semester && x.Speciality == Speciality).FirstOrDefault().ClassGroupID;
-
-                Session["NoOfStudents"] = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == selectedClassGroupID).Count();
-
-                List<string> Categories = new List<string>();
-                foreach (var elem in db.Categories.Where(x => x.ClassGroupID == selectedClassGroupID).Select(x => x.Name))
-                {
-                    Categories.Add(elem);
-                }
-                if (Categories.IndexOf(selectedValue) >= 0)
-                {
-                    Categories.Remove(selectedValue);
-                    Categories.Insert(0, selectedValue);
-                }
-                Session["Categories"] = new SelectList(Categories);
-
-                int NoOfSavedStudents = 0;
-                int NoOfSavedStudentsOnOneSubject = 0;
-                Dictionary<string, int> stats = new Dictionary<string, int>();
-
-                var firstCategoryName = Categories.ElementAt(0);
-                var firstCategoryID = db.Categories.Where(x => x.Name == firstCategoryName).FirstOrDefault().CategoryID;
-                foreach (var item in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == firstCategoryID))
-                {
-                    NoOfSavedStudentsOnOneSubject = db.StudentChoices.Where(x => x.ChoiceID == item.ElectiveSubjectAndSpecialityID && x.PreferenceNo == 1).Count();
-                    stats.Add(item.Name, NoOfSavedStudentsOnOneSubject);
-                    NoOfSavedStudents += NoOfSavedStudentsOnOneSubject;
-                }
-                Session["NoOfSavedStudents"] = NoOfSavedStudents;
-                Session["Stats"] = stats;
-
-                List<Students> stud = new List<Students>();
-                
-
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult ChangeClassGroup(string ClassGroups)
-        {
-            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
-            {
-                setSessionClassGroups(ClassGroups);
-            }
-            return RedirectToAction("MakeChanges", "Admin");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult ChangeCategory(string Categories, string ClassGroups)
-        {
-            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
-            {
-                setSessionCategoriesAndStats(Categories, ClassGroups);
-            }
-            return RedirectToAction("MakeChanges", "Admin");
-        }
     }
 }
