@@ -81,16 +81,16 @@ namespace StudentChoices.Controllers
         {
             var data = (from s in db.Students
                         join g in db.StudentsAndClassGroups on s.StudentNo equals g.StudentNo
-                       select new AddStudents
-                       {
-                           StudentNo = s.StudentNo,
-                           Name = s.Name,
-                           Surname = s.Surname,
-                           ClassGroupID = g.ClassGroupID,
-                           AverageGrade = g.AverageGrade,
-                           Login = s.Login,
-                           Password = s.Password
-                       }).ToList();
+                        select new AddStudents
+                        {
+                            StudentNo = s.StudentNo,
+                            Name = s.Name,
+                            Surname = s.Surname,
+                            ClassGroupID = g.ClassGroupID,
+                            AverageGrade = g.AverageGrade,
+                            Login = s.Login,
+                            Password = s.Password
+                        }).ToList();
             return View(data);
         }
 
@@ -122,7 +122,7 @@ namespace StudentChoices.Controllers
                 stdToAdd.AverageGrade = Math.Round(student.AverageGrade, 2);
                 stdToAdd.ClassGroupID = student.ClassGroupID;
                 stdToAdd.CreatedBy = (int)Session["AdminID"];
-                stdToAdd.CreationDate = DateTime.Now;                
+                stdToAdd.CreationDate = DateTime.Now;
 
                 if (db.Students.Where(st => st.StudentNo == student.StudentNo).Count() == 0 && db.StudentsAndClassGroups.Where(st => st.StudentNo == student.StudentNo).Count() == 0)
                 {
@@ -162,16 +162,16 @@ namespace StudentChoices.Controllers
             TempData["Info"] = "Puste pole hasła powoduje, że hasło pozostaje niezmienione!";
             var student = (from st in db.Students
                            join std in db.StudentsAndClassGroups on st.StudentNo equals std.StudentNo
-                            where st.StudentNo == id
-                            select new EditStudents()    
-                            {
-                                StudentNo = st.StudentNo,
-                                Login = st.Login,
-                                Name = st.Name,
-                                Surname = st.Surname,
-                                AverageGrade = std.AverageGrade,
-                                ClassGroupID = std.ClassGroupID
-                            }).FirstOrDefault();
+                           where st.StudentNo == id
+                           select new EditStudents()
+                           {
+                               StudentNo = st.StudentNo,
+                               Login = st.Login,
+                               Name = st.Name,
+                               Surname = st.Surname,
+                               AverageGrade = std.AverageGrade,
+                               ClassGroupID = std.ClassGroupID
+                           }).FirstOrDefault();
             PopulateClassGroupsList(student.ClassGroupID.ToString());
             return View(student);
         }
@@ -183,8 +183,8 @@ namespace StudentChoices.Controllers
             {
                 student.Login = student.Name.ToLower() + "." + student.Surname.ToLower();
                 var studentToEdit = (from s in db.Students
-                                  where s.StudentNo == student.StudentNo
-                                  select s).FirstOrDefault();
+                                     where s.StudentNo == student.StudentNo
+                                     select s).FirstOrDefault();
                 studentToEdit.Login = student.Name.ToLower() + "." + student.Surname.ToLower();
                 if (student.Password != null)
                 {
@@ -198,7 +198,7 @@ namespace StudentChoices.Controllers
                 stdToEdit.AverageGrade = Math.Round(student.AverageGrade, 2);
                 stdToEdit.ClassGroupID = student.ClassGroupID;
                 stdToEdit.LastEdit = DateTime.Now;
-                
+
                 if (student.AverageGrade >= 2.0 && student.AverageGrade <= 5.0)
                 {
                     db.SaveChanges();
@@ -326,8 +326,8 @@ namespace StudentChoices.Controllers
         public ActionResult AddSubSpec(int id)
         {
             if (Session["User"].ToString().Contains("Admin"))
-            {  
-                var sub = db.Categories.Find(id); 
+            {
+                var sub = db.Categories.Find(id);
                 if (db.Categories.Where(ct => ct.CategoryID == sub.CategoryID).Count() == 1)
                 {
                     ViewBag.CatID = id;
@@ -356,7 +356,7 @@ namespace StudentChoices.Controllers
                 subjectToAdd.LowerLimit = subject.LowerLimit;
                 subjectToAdd.CreatedBy = (int)Session["AdminID"];
                 subjectToAdd.CreationDate = DateTime.Now;
-                
+
                 if (db.ElectiveSubjectsAndSpecialities.Where(ct => ct.Name == subject.Name).Count() != 0)
                 {
                     TempData["Alert"] = "Przedmiot/specjalność o takiej nazwie już isnieje!";
@@ -367,7 +367,7 @@ namespace StudentChoices.Controllers
                     TempData["Alert"] = "Limit górny nie może być mniejszy od dolnego!";
                     return RedirectToAction("AddSubSpec", "Admin", new { @id = subject.CategoryID });
                 }
-                else if(db.ElectiveSubjectsAndSpecialities.Where(ct => ct.Name == subject.Name).Count() == 0 && subject.UpperLimit >= subject.LowerLimit)
+                else if (db.ElectiveSubjectsAndSpecialities.Where(ct => ct.Name == subject.Name).Count() == 0 && subject.UpperLimit >= subject.LowerLimit)
                 {
                     db.ElectiveSubjectsAndSpecialities.Add(subjectToAdd);
                     db.SaveChanges();
@@ -394,7 +394,7 @@ namespace StudentChoices.Controllers
                         }).ToList();
             return View(data);
         }
-        
+
         [HttpGet]
         public ActionResult EditSubSpec(int id)
         {
@@ -404,10 +404,10 @@ namespace StudentChoices.Controllers
                 if (db.Categories.Where(ct => ct.CategoryID == sub.CategoryID).Count() == 1)
                 {
                     ViewBag.CatID = id;
-                    
+
                     var subject = (from s in db.ElectiveSubjectsAndSpecialities
                                    join ctg in db.Categories on s.CategoryID equals ctg.CategoryID
-                                   where s.CategoryID == id 
+                                   where s.CategoryID == id
                                    select new AddSubSpec()
                                    {
                                        CategoryID = s.CategoryID,
@@ -435,8 +435,8 @@ namespace StudentChoices.Controllers
             if (Session["User"].ToString().Contains("Admin"))
             {
                 var subjectToEdit = (from s in db.ElectiveSubjectsAndSpecialities
-                                      where s.ElectiveSubjectAndSpecialityID == subject.ElectiveSubjectAndSpecialityID
-                                      && s.CategoryID == subject.CategoryID                                                                                
+                                     where s.ElectiveSubjectAndSpecialityID == subject.ElectiveSubjectAndSpecialityID
+                                     && s.CategoryID == subject.CategoryID
                                      select s).FirstOrDefault();
                 subjectToEdit.Name = subject.Name;
                 subjectToEdit.Information = subject.Information;
@@ -481,20 +481,20 @@ namespace StudentChoices.Controllers
             ViewBag.ClassGroupID = new SelectList(classgroups, "ClassGroupID", "ClassGroup", selectedClassGroup);
         }
 
-   
+
         //////////////////////////////////////////////////////////
 
-    [HttpGet]
-    public ActionResult AddGroups()
-    {
-        return View();
-    }
-
-    [HttpGet]
-    public ActionResult AddGroups([Bind(Include ="DegreeCourse,Graduate,FullTimeStudies,Semester,Speciality")]AddGroups group)
-    {
-        if (Session["User"].ToString().Contains("Admin"))
+        [HttpGet]
+        public ActionResult AddGroups()
         {
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult AddGroups([Bind(Include = "DegreeCourse,Graduate,FullTimeStudies,Semester,Speciality")]AddGroups group)
+        {
+            if (Session["User"].ToString().Contains("Admin"))
+            {
                 var groupsToAdd = new ClassGroups();
                 groupsToAdd.DegreeCourse = group.DegreeCourse;
                 groupsToAdd.Graduate = group.Graduate;
@@ -505,12 +505,12 @@ namespace StudentChoices.Controllers
                 db.ClassGroups.Add(groupsToAdd);
                 db.SaveChanges();
 
-        }
+            }
 
             return View();
-    }
+        }
 
-    public ActionResult IndexGroup()
+        public ActionResult IndexGroup()
         {
             var data = (from g in db.ClassGroups
                         select new AddGroups
@@ -524,9 +524,9 @@ namespace StudentChoices.Controllers
             return View(data);
         }
 
-    [HttpGet]
-    public ActionResult EditGroups (int id)
-    {
+        [HttpGet]
+        public ActionResult EditGroups(int id)
+        {
             var data = (from g in db.ClassGroups
                         where g.ClassGroupID == id
                         select new AddGroups
@@ -557,7 +557,7 @@ namespace StudentChoices.Controllers
 
                 db.Entry(groupsToEdit).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("","Home");
+                return RedirectToAction("", "Home");
             }
             return View();
         }
@@ -625,8 +625,8 @@ namespace StudentChoices.Controllers
             if (Session["User"].ToString().Contains("SuperAdmin"))
             {
                 var adminToEdit = (from g in db.Admins
-                                    where g.AdminID == admin.AdminID
-                                    select g
+                                   where g.AdminID == admin.AdminID
+                                   select g
                     ).FirstOrDefault();
                 adminToEdit.Login = admin.Login;
                 adminToEdit.Password = admin.Password;
@@ -646,5 +646,107 @@ namespace StudentChoices.Controllers
             return View();
         }
 
+        public ActionResult MakeChanges()
+        {
+            return View();
+        }
+
+
+        void setSessionClassGroups(string selectedValue)
+        {
+            using (PPDBEntities db = new PPDBEntities())
+            {
+                List<string> ClassGroups = new List<string>();
+                string oneClassGroup = string.Empty;
+                foreach (var elem in db.ClassGroups)
+                {
+                    oneClassGroup = elem.DegreeCourse.ToString() + "/" + elem.Graduate.ToString() + "/";
+                    if (elem.FullTimeStudies == true) { oneClassGroup += "STACJ"; }
+                    else { oneClassGroup += "NIESTACJ"; }
+                    oneClassGroup += "/" + elem.Semester.ToString() + "/" + elem.Speciality.ToString();
+                    ClassGroups.Add(oneClassGroup);
+                }
+                if (ClassGroups.IndexOf(selectedValue) >= 0)
+                {
+                    ClassGroups.Remove(selectedValue);
+                    ClassGroups.Insert(0, selectedValue);
+                }
+                Session["ClassGroups"] = new SelectList(ClassGroups);
+                setSessionCategoriesAndStats("", ClassGroups.ElementAt(0));
+            }
+        }
+
+        void setSessionCategoriesAndStats(string selectedValue, string selectedClassGroup)
+        {
+            using (PPDBEntities db = new PPDBEntities())
+            {
+                var selectedClassGroupDetails = selectedClassGroup.Split('/');
+
+                string DegreeCourse = selectedClassGroupDetails[0];
+                Byte Graduate = Byte.Parse(selectedClassGroupDetails[1]);
+                bool FullTimeStudies = selectedClassGroupDetails[2] == "STACJ" ? true : false;
+                Byte Semester = Byte.Parse(selectedClassGroupDetails[3]);
+                string Speciality = selectedClassGroupDetails[4];
+
+                var selectedClassGroupID = db.ClassGroups.Where(x => x.DegreeCourse == DegreeCourse &&
+x.Graduate == Graduate && x.FullTimeStudies == FullTimeStudies &&
+x.Semester == Semester && x.Speciality == Speciality).FirstOrDefault().ClassGroupID;
+
+                Session["NoOfStudents"] = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == selectedClassGroupID).Count();
+
+                List<string> Categories = new List<string>();
+                foreach (var elem in db.Categories.Where(x => x.ClassGroupID == selectedClassGroupID).Select(x => x.Name))
+                {
+                    Categories.Add(elem);
+                }
+                if (Categories.IndexOf(selectedValue) >= 0)
+                {
+                    Categories.Remove(selectedValue);
+                    Categories.Insert(0, selectedValue);
+                }
+                Session["Categories"] = new SelectList(Categories);
+
+                int NoOfSavedStudents = 0;
+                int NoOfSavedStudentsOnOneSubject = 0;
+                Dictionary<string, int> stats = new Dictionary<string, int>();
+
+                var firstCategoryName = Categories.ElementAt(0);
+                var firstCategoryID = db.Categories.Where(x => x.Name == firstCategoryName).FirstOrDefault().CategoryID;
+                foreach (var item in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == firstCategoryID))
+                {
+                    NoOfSavedStudentsOnOneSubject = db.StudentChoices.Where(x => x.ChoiceID == item.ElectiveSubjectAndSpecialityID && x.PreferenceNo == 1).Count();
+                    stats.Add(item.Name, NoOfSavedStudentsOnOneSubject);
+                    NoOfSavedStudents += NoOfSavedStudentsOnOneSubject;
+                }
+                Session["NoOfSavedStudents"] = NoOfSavedStudents;
+                Session["Stats"] = stats;
+
+                List<Students> stud = new List<Students>();
+
+
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangeClassGroup(string ClassGroups)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                setSessionClassGroups(ClassGroups);
+            }
+            return RedirectToAction("MakeChanges", "Admin");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangeCategory(string Categories, string ClassGroups)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                setSessionCategoriesAndStats(Categories, ClassGroups);
+            }
+            return RedirectToAction("MakeChanges", "Admin");
+        }
     }
 }
