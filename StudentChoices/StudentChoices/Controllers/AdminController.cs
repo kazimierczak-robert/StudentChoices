@@ -493,7 +493,7 @@ namespace StudentChoices.Controllers
             return View();
         }
 
-        [HttpGet]
+        [HttpPost]
         public ActionResult AddGroups([Bind(Include = "DegreeCourse,Graduate,FullTimeStudies,Semester,Speciality")]AddGroups group)
         {
             if (Session["User"].ToString().Contains("Admin"))
@@ -504,7 +504,8 @@ namespace StudentChoices.Controllers
                 groupsToAdd.FullTimeStudies = group.FullTimeStudies;
                 groupsToAdd.Semester = group.Semester;
                 groupsToAdd.Speciality = group.Speciality;
-
+                groupsToAdd.CreatedBy = (int)Session["AdminID"];
+                groupsToAdd.CreationDate = DateTime.Now;
                 db.ClassGroups.Add(groupsToAdd);
                 db.SaveChanges();
 
@@ -557,7 +558,8 @@ namespace StudentChoices.Controllers
                 groupsToEdit.FullTimeStudies = groups.FullTimeStudies;
                 groupsToEdit.Semester = groups.Semester;
                 groupsToEdit.Speciality = groups.Speciality;
-
+                groupsToEdit.LastEditedBy = (int)Session["AdminID"];
+                groupsToEdit.LastEdit = DateTime.Now;
                 db.Entry(groupsToEdit).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("", "Home");
@@ -574,16 +576,16 @@ namespace StudentChoices.Controllers
             return View();
         }
 
-        [HttpGet]
+        [HttpPost]
         public ActionResult AddAdmin([Bind(Include = "Login,Password,Active,SuperAdmin")]AddAdmin admin)
         {
             if (Session["User"].ToString().Contains("SuperAdmin"))
             {
                 var AdminToAdd = new Admins();
                 AdminToAdd.Login = admin.Login;
-                AdminToAdd.Password = admin.Password;
+                AdminToAdd.Password = HashPassword(admin.Password);
                 AdminToAdd.Active = admin.Active;
-                AdminToAdd.SuperAdmin = admin.SuperAdmin;
+                AdminToAdd.SuperAdmin = false;
 
 
                 db.Admins.Add(AdminToAdd);
@@ -632,9 +634,9 @@ namespace StudentChoices.Controllers
                                    select g
                     ).FirstOrDefault();
                 adminToEdit.Login = admin.Login;
-                adminToEdit.Password = admin.Password;
+                adminToEdit.Password = HashPassword(admin.Password);
                 adminToEdit.Active = admin.Active;
-                adminToEdit.SuperAdmin = admin.SuperAdmin;
+                adminToEdit.SuperAdmin = false;
 
 
                 db.Entry(adminToEdit).State = EntityState.Modified;

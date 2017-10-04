@@ -3,7 +3,7 @@
     ViewBag.Title = "EditGroups";
 }
 
-<h2>Edytuj grupe</h2>
+<h2>Edytuj grupę</h2>
 
 
 @using (Html.BeginForm())
@@ -40,7 +40,7 @@
         <div class="form-group-10px">
             @Html.LabelFor(model => model.Graduate, "Stopień", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-7">
-                @Html.EditorFor(model => model.Graduate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Graduate, new { htmlAttributes = new { @class = "form-control", @min = 1, @max = 3 } })
                 @Html.ValidationMessageFor(model => model.Graduate, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -56,7 +56,7 @@
         <div class="form-group-10px">
             @Html.LabelFor(model => model.Semester, "Semestr", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-7">
-                @Html.EditorFor(model => model.Semester, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Semester, new { htmlAttributes = new { @class = "form-control", @min = 1, @max = 10 } })
                 @Html.ValidationMessageFor(model => model.Semester, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -75,7 +75,7 @@
         <div class="form-group">
             <div class="col-md-offset-3 col-md-7">
                 <input type="submit" value="Zapisz zmiany" class="btn btn-primary" />
-                @Html.ActionLink("Anuluj", "IndexGroup", "Admin", null, new { @class = "btn btn-default" })
+                @Html.ActionLink("Anuluj", "AddData", "Admin", null, new { @class = "btn btn-default" })
             </div>
         </div>
 

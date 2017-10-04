@@ -21,6 +21,7 @@ namespace StudentChoices.Models
         [Required(ErrorMessage = "To pole jest wymagane!")]
         public string Login { get; set; }
         [Required(ErrorMessage = "To pole jest wymagane!")]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
         [Required(ErrorMessage = "To pole jest wymagane!")]
         public bool Active { get; set; }
