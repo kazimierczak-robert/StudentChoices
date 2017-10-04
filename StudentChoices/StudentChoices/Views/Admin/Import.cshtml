@@ -2,8 +2,339 @@
     ViewBag.Title = "Import";
 }
 
-<h2>Import</h2>
+<h3><b>Import</b></h3>
+<div class="alert alert-info">
+    Wybierz plik z dysku, aby zaimportować dane o 
+    @if (Session["User"].ToString() == "SuperAdmin")
+    {
+        @:administratorach, 
+    } 
+    studentach lub przedmiotach obieralnych/specjalnościach.
+</div>
 
-@Html.ActionLink("Wybierz plik", "Import", "Admin")
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-margin0px alert-success" style="text-align:center; margin-bottom:10px">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Alert"] != null)
+{
+    <div class="alert alert-margin0px alert-danger" style="text-align:center;margin-bottom:10px">
+        @TempData["Alert"]
+    </div>
+}
 
+@using (Html.BeginForm("Import", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div>
+        <input type="file" name="file" style="display: inline-block; height: 29.5px; margin-top: 5px">
+        <input type="submit" value="Importuj" style="margin-bottom: 10px; margin-top: 5px; margin-left:1px;" class="btn btn-default btn-default-main"  />
+    </div>
+}
 
+@if (ViewBag.nameOfImportedData != null && ViewBag.importedData != null)
+{
+    <b style="font-size: 20px; padding-bottom: 5px; padding-top: 5px;"><br>Rodzaj importowanych danych: @ViewBag.nameOfImportedData</b><br><br>
+    <div class="panel panel-primary">   
+        @using (Html.BeginForm("SaveToDB", "Admin"))
+        {
+            int id = -1;
+            @Html.Hidden("nameOfImportedData", (string)ViewBag.nameOfImportedData);
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="table">
+                    @if (ViewBag.nameOfImportedData == "Administratorzy")
+                    {
+                        <thead>
+                            <tr>
+                                <th name="Login">Login</th>
+                                <th name="Password">Hasło</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var admin in (List<StudentChoices.Models.Import.Admin>)ViewBag.importedData)
+                            {
+                                id += 1;
+                                <tr name="@id">  
+                                    <td><input type="text" class="form-control form-control-import" value="@admin.Login" onchange="changeValue(this)" required /></td>
+                                    <td><input type="text" class="form-control form-control-import" value="@admin.Password" onchange="changeValue(this)" pattern="^[0-9A-F]{64,64}" required /></td>
+                                    <td><input type="button" value="Usuń" class="btn btn-danger btn-import" onclick="Delete(this, 1)"></td>
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                    else if (ViewBag.nameOfImportedData == "Studenci")
+                    {
+                        <thead>
+                            <tr>
+                                <th name="StudentNo">Indeks</th>
+                                <th name="Login">Login</th>
+                                <th name="Password">Hasło</th>
+                                <th name="Name">Imię</th>
+                                <th name="Surname">Nazwisko</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                         </thead>
+                        <tbody>
+                        @foreach (var student in (List<StudentChoices.Models.Import.Student.Student>)ViewBag.importedData)
+                        {
+                            id += 1;
+                            <tr name="@id">
+                                <td><input type="text" class="form-control form-control-import" value="@student.StudentNo" style="max-width: 80px" onchange="changeValue(this)" pattern="^[0-9]{1,}" required /></td>
+                                <td><input type="text" class="form-control form-control-import" value="@student.Login" onchange="changeValue(this)" required /></td>
+                                <td><input type="text" class="form-control form-control-import" value="@student.Password" onchange="changeValue(this)" pattern="^[0-9A-F]{64,64}" required /></td>
+                                <td><input type="text" class="form-control form-control-import" value="@student.Name" onchange="changeValue(this)" required /></td>
+                                <td><input type="text" class="form-control form-control-import" value="@student.Surname" onchange="changeValue(this)" required /></td>
+                                <td><button type="button" data-toggle="collapse" data-target="#@id.ToString()" class="btn btn-default btn-import" style="color:azure; background-color:#757cfb">Grupy</button></td>
+                                <td><input type="button" value="Usuń" class="btn btn-danger btn-import" onclick="Delete(this, 2)"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7">
+                                   <div id="@id.ToString()" class="collapse">
+                                       <div class="form-group" style="margin:0px;">
+                                           <div class="panel panel-primary" style="border-color: #264b6c">
+                                               <table class="table table-hover" id="table1">
+                                                   <thead>
+                                                       <tr>
+                                                           <th name="DegreeCourse">Kierunek</th>
+                                                           <th name="Graduate">Stopień</th>
+                                                           <th name="FullTimeStudies">St. stacjonarne</th>
+                                                           <th name="Semester">Semestr</th>
+                                                           <th name="Speciality">Specjalność</th>
+                                                           <th name="AverageGrade">Średnia</th>
+                                                           <th></th>
+                                                       </tr>
+                                                   </thead>
+                                                   <tbody>
+                                                       @foreach (var classGroup in (List<StudentChoices.Models.Import.Student.ClassGroup>)student.ClassGroup)
+                                                       {
+                                                           id += 1;
+                                                           <tr name="@id">
+                                                               <td><input type="text" class="form-control form-control-import" value="@classGroup.DegreeCourse" onchange="changeValue(this)" required /></td>
+                                                               <td><input type="text" class="form-control form-control-import" value="@classGroup.Graduate.ToString()" style="max-width: 60px" onchange="changeValue(this)" pattern="^[1-3]$" required /></td>
+                                                               @if (classGroup.FullTimeStudies == true)
+                                                               {
+                                                                   <td><input type="checkbox" onchange="changeValue(this)" checked></td>
+                                                               }
+                                                               else
+                                                               {
+                                                                   <td><input type="checkbox" onchange="changeValue(this)"></td>
+                                                               }
+                                                               <td><input type="text" class="form-control form-control-import" value="@classGroup.Semester.ToString()" style="max-width: 65px" onchange="changeValue(this)" pattern="^([0-9]|10)$" required /></td>
+                                                               <td><input type="text" class="form-control form-control-import" value="@classGroup.Speciality" onchange="changeValue(this)" /></td>
+                                                               <td><input type="text" class="form-control form-control-import" value="@classGroup.AverageGrade.ToString()" style="max-width: 60px" onchange="changeValue(this)" pattern="^(([2-4],[0-9][0-9])|5,00)$" required /></td>
+                                                               <td><input type="button" value="Usuń" class="btn btn-danger btn-import" onclick="Delete(this, 1)"></td>
+                                                           </tr>
+                                                       }
+                                                   </tbody>
+                                               </table>
+                                           </div>
+                                       </div>
+                                   </div>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    }
+                    else
+                    {
+                        <thead>
+                            <tr>
+                                <th name="DegreeCourse">Kierunek</th>
+                                <th name="Graduate">Stopień</th>
+                                <th name="FullTimeStudies">St. stacjonarne</th>
+                                <th name="Semester">Semestr</th>
+                                <th name="Speciality">Specjalność</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var classGroup in (List<StudentChoices.Models.Import.Subject.ClassGroup>)ViewBag.importedData)
+                            {
+                                id += 1;
+                                <tr name="@id">
+                                    <td><input type="text" class="form-control form-control-import" value="@classGroup.DegreeCourse" onchange="changeValue(this)" required /></td>
+                                    <td><input type="text" class="form-control form-control-import" value="@classGroup.Graduate.ToString()" style="max-width: 60px" onchange="changeValue(this)" pattern="^[1-3]$" required /></td>
+                                    @if (classGroup.FullTimeStudies == true)
+                                    {
+                                        <td><input type="checkbox" onchange="changeValue(this)" checked></td>
+                                    }
+                                    else
+                                    {
+                                        <td><input type="checkbox" onchange="changeValue(this)"></td>
+                                    }
+                                    <td><input type="text" class="form-control form-control-import" value="@classGroup.Semester.ToString()" style="max-width: 65px" onchange="changeValue(this)" pattern="^([0-9]|10)$" required /></td>
+                                    <td><input type="text" class="form-control form-control-import" value="@classGroup.Speciality" onchange="changeValue(this)" /></td>
+                                    <td><button type="button" data-toggle="collapse" data-target="#@id.ToString()" class="btn btn-default btn-import" style="color:azure; background-color:#757cfb">Kategorie</button></td>
+                                    <td><input type="button" value="Usuń" class="btn btn-danger btn-import" onclick="Delete(this, 2)"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="7">
+                                        <div id="@id.ToString()" class="collapse">
+                                            <div class="form-group" style="margin:0px;">
+                                                <div class="panel panel-primary" style="border-color: #264b6c">
+                                                    <table class="table table-hover" id="table1">
+                                                        <thead>
+                                                            <tr>
+                                                                <th name="Name">Nazwa</th>
+                                                                <th name="Information">Informacje</th>
+                                                                <th name="MaxNoChoices">Maks. liczba wyborów</th>
+                                                                <th name="Login"></th>
+                                                                <th name="Login"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var category in (List<StudentChoices.Models.Import.Subject.Category>)classGroup.Category)
+                                                            {
+                                                                id += 1;
+                                                                <tr name="@id">
+                                                                    <td><input type="text" class="form-control form-control-import" value="@category.Name" onchange="changeValue(this)" required /></td>
+                                                                    <td><input type="text" class="form-control form-control-import" value="@category.Information" onchange="changeValue(this)" /></td>
+                                                                    <td><input type="text" class="form-control form-control-import" value="@category.MaxNoChoices" style="max-width: 150px" onchange="changeValue(this)" pattern="^[0-9]{1,}" required /></td>
+                                                                    <td><button type="button" data-toggle="collapse" data-target="#@id.ToString()" class="btn btn-default btn-import" style="color:azure; background-color:#757cfb">Przedmioty</button></td>
+                                                                    <td><input type="button" value="Usuń" class="btn btn-danger btn-import" onclick="Delete(this, 2)"></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="5">
+                                                                        <div id="@id.ToString()" class="collapse">
+                                                                            <div class="form-group" style="margin:0px;">
+                                                                                <div class="panel panel-primary" style="border-color: #4d7ca7">
+                                                                                    <table class="table table-hover" id="table2">
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th name="Name">Nazwa</th>
+                                                                                                <th name="Information">Informacje</th>
+                                                                                                <th name="UpperLimit">Górny limit</th>
+                                                                                                <th name="LowerLimit">Dolny limit</th>
+                                                                                                <th></th>
+                                                                                                <th></th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            @foreach (var subject in (List<StudentChoices.Models.Import.Subject.ElectiveSubjectAndSpeciality>)category.ElectiveSubjectAndSpeciality)
+                                                                                            {
+                                                                                                id += 1;
+                                                                                                <tr name="@id">
+                                                                                                    <td><input type="text" class="form-control form-control-import" value="@subject.Name" onchange="changeValue(this)" required /></td>
+                                                                                                    <td><input type="text" class="form-control form-control-import" value="@subject.Information" onchange="changeValue(this)" /></td>
+                                                                                                    <td><input type="text" class="form-control form-control-import" value="@subject.UpperLimit" style="max-width: 80px" onchange="changeValue(this)" pattern="^[0-9]{0,}" /></td>
+                                                                                                    <td><input type="text" class="form-control form-control-import" value="@subject.LowerLimit" style="max-width: 80px" onchange="changeValue(this)" pattern="^[0-9]{0,}" /></td>
+                                                                                                    <td><button type="button" data-toggle="collapse" data-target="#@id.ToString()" class="btn btn-default btn-import" style="color:azure; background-color:#757cfb">Odnośniki</button></td>
+                                                                                                    <td><input type="button" value="Usuń" class="btn btn-danger btn-import" onclick="Delete(this, 2)"></td>
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                    <td colspan="6">
+                                                                                                        <div id="@id.ToString()" class="collapse">
+                                                                                                            <div class="form-group" style="margin:0px;">
+                                                                                                                <div class="panel panel-primary" style="border-color: #94b5d4">
+                                                                                                                    <table class="table table-hover" id="table3">
+                                                                                                                        <thead>
+                                                                                                                            <tr>
+                                                                                                                                <th name="Filename">Nazwa</th>
+                                                                                                                                <th name="Path">Ścieżka</th>
+                                                                                                                                <th></th>
+                                                                                                                            </tr>
+                                                                                                                        </thead>
+                                                                                                                        <tbody>
+                                                                                                                            @foreach (var file in (List<StudentChoices.Models.Import.Subject.Files>)subject.Files)
+                                                                                                                            {
+                                                                                                                                id += 1;
+                                                                                                                                <tr name="@id">
+                                                                                                                                    <td><input type="text" class="form-control form-control-import" value="@file.Filename" onchange="changeValue(this)" required /></td>
+                                                                                                                                    <td><input type="text" class="form-control form-control-import" value="@file.Path" onchange="changeValue(this)" required /></td>
+                                                                                                                                    <td><input type="button" value="Usuń" class="btn btn-danger btn-import" onclick="Delete(this, 1)"></td>
+                                                                                                                                </tr>
+                                                                                                                            }
+                                                                                                                        </tbody>
+                                                                                                                    </table>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            }
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                    </table> 
+                </div>
+            </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-sm-11">
+                            <div class="alert alert-danger" align="justify" style="margin-bottom:10px">
+                                @if (ViewBag.nameOfImportedData == "Administratorzy")
+                                {
+                                    @:<strong>Uwaga!</strong> Powyższe dane nie są zapisane w bazie danych! W przypadku wykrycia duplikatu <strong>(ten sam login administratora)</strong>, nastąpi <strong>nadpisanie danych!</strong> Niedozwolone jest importowanie administratora o loginie <strong>admin</strong>. Zaimportowany administrator jest domyślnie <strong>nieaktywny!</strong>
+                                }
+                                else if (ViewBag.nameOfImportedData == "Studenci")
+                                {
+                                    @:<strong>Uwaga!</strong> Powyższe dane nie są zapisane w bazie danych! W przypadku wykrycia duplikatu <strong>(ten sam numer indeksu studenta)</strong>, nastąpi <strong>nadpisanie danych!</strong> Niewystępujące w bazie danych grupy studenckie zostaną dodane.
+                                }
+                                else
+                                {
+                                    @:<strong>Uwaga!</strong> Powyższe dane nie są zapisane w bazie danych! W przypadku wykrycia duplikatu <strong>(ta sama nazwa kategorii wewnątrz jednej grupy studentów, przedmiotu obieralnego/specjalności wewnątrz jednej kategorii, odnośnika wewnątrz jednego przedmiotu obieralnego/specjalności)</strong>, nastąpi <strong>nadpisanie danych!</strong> Niewystępujące w bazie danych grupy studenckie zostaną dodane. Górnym limitem wyborów jest liczba przedmiotów obieralnych/specjalności, w przypadku przekroczenia - podana wartość zostanie zmniejszona. Dolny limit musi być niewiększy niż górny limit - w przeciwnym razie przyjmie wartość górnego limitu.
+                                }
+                            </div>
+                        </div>
+                        <div class="col-sm-1" style="text-align:center; padding-top: 10px; padding-left: 0px; padding-right: 0px;">
+                            <input type="submit" value="Zapisz" class="btn btn-default btn-default-main" style="margin-right:10px" />
+                        </div>
+                    </div>
+                </div>
+        }
+    </div>
+}
+
+<script type="text/javascript">
+    function Delete(t, numberOfRows) {
+        var row = t.parentNode.parentNode;
+        var tableID = row.parentNode.parentNode.id
+
+        $.post('@Url.Action("deleteFromImportedData", "Admin")', {
+            nameOfImportedData: '@ViewBag.nameOfImportedData',
+            row: row.getAttribute("name")
+        }, function () { });
+
+        for (i = numberOfRows-1 ; i >= 0; i--) {
+            document.getElementById(tableID).deleteRow(row.rowIndex + i);
+        } 
+    }
+    function changeValue(t) {
+        var colName = t.parentNode.parentNode.parentNode.parentNode.children[0].children[0].children[t.parentNode.cellIndex].getAttribute("name");
+
+        var value = "";
+        if (t.getAttribute("type") == "checkbox") {
+           value = t.checked;
+        }
+        else {
+            value = t.value;
+        }
+
+        $.post('@Url.Action("changeImportedData", "Admin")', {
+            nameOfImportedData: '@ViewBag.nameOfImportedData',
+            row: t.parentNode.parentNode.getAttribute("name"),
+            columnName: colName,
+            newValue: value
+        }, function () { });
+    }
+</script>

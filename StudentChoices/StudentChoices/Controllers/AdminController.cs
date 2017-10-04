@@ -2,11 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Xml.Serialization;
 
 namespace StudentChoices.Controllers
 {
@@ -641,13 +644,12 @@ namespace StudentChoices.Controllers
             return View();
         }
 
-        public ActionResult Import()
-        {
-            return View();
-        }
-
         public ActionResult MakeChanges()
         {
+            if (Session["ClassGroupsEditFinalChoices"] == null)
+            {
+                setSessionClassGroups("");
+            }
             return View();
         }
 
@@ -671,7 +673,7 @@ namespace StudentChoices.Controllers
                     ClassGroups.Remove(selectedValue);
                     ClassGroups.Insert(0, selectedValue);
                 }
-                Session["ClassGroups"] = new SelectList(ClassGroups);
+                Session["ClassGroupsEditFinalChoices"] = new SelectList(ClassGroups);
                 setSessionCategoriesAndStats("", ClassGroups.ElementAt(0));
             }
         }
@@ -692,8 +694,6 @@ namespace StudentChoices.Controllers
 x.Graduate == Graduate && x.FullTimeStudies == FullTimeStudies &&
 x.Semester == Semester && x.Speciality == Speciality).FirstOrDefault().ClassGroupID;
 
-                Session["NoOfStudents"] = db.StudentsAndClassGroups.Where(x => x.ClassGroupID == selectedClassGroupID).Count();
-
                 List<string> Categories = new List<string>();
                 foreach (var elem in db.Categories.Where(x => x.ClassGroupID == selectedClassGroupID).Select(x => x.Name))
                 {
@@ -704,26 +704,67 @@ x.Semester == Semester && x.Speciality == Speciality).FirstOrDefault().ClassGrou
                     Categories.Remove(selectedValue);
                     Categories.Insert(0, selectedValue);
                 }
-                Session["Categories"] = new SelectList(Categories);
+                Session["CategoriesEditFinalChoices"] = new SelectList(Categories);
 
-                int NoOfSavedStudents = 0;
-                int NoOfSavedStudentsOnOneSubject = 0;
-                Dictionary<string, int> stats = new Dictionary<string, int>();
+                Dictionary<int, string[]> subjectsStats = new Dictionary<int, string[]>();
 
+                
                 var firstCategoryName = Categories.ElementAt(0);
                 var firstCategoryID = db.Categories.Where(x => x.Name == firstCategoryName).FirstOrDefault().CategoryID;
-                foreach (var item in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == firstCategoryID))
+
+                Session["SubjectCombobox"] = new SelectList(subjectsStats, "Key", "Value[0]");
+
+
+                string upperLimit = "";
+                string lowerLimit = "";
+                string noOfStudents = "";
+
+                foreach (var subject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == firstCategoryID))
                 {
-                    NoOfSavedStudentsOnOneSubject = db.StudentChoices.Where(x => x.ChoiceID == item.ElectiveSubjectAndSpecialityID && x.PreferenceNo == 1).Count();
-                    stats.Add(item.Name, NoOfSavedStudentsOnOneSubject);
-                    NoOfSavedStudents += NoOfSavedStudentsOnOneSubject;
+                    if(subject.UpperLimit.HasValue)
+                    {
+                        upperLimit = subject.UpperLimit.ToString();
+                    }
+                    else
+                    {
+                        upperLimit = "brak";
+                    }
+                    if (subject.LowerLimit.HasValue)
+                    {
+                        lowerLimit = subject.LowerLimit.ToString();
+                    }
+                    else
+                    {
+                        lowerLimit = "brak";
+                    }
+                    noOfStudents = db.FinalChoices.Where(x => x.ChoiceID == subject.ElectiveSubjectAndSpecialityID).Count().ToString();
+                    subjectsStats.Add(subject.ElectiveSubjectAndSpecialityID, new string[] { subject.Name, lowerLimit, upperLimit, noOfStudents });
                 }
-                Session["NoOfSavedStudents"] = NoOfSavedStudents;
-                Session["Stats"] = stats;
 
-                List<Students> stud = new List<Students>();
+                Session["SubjectsStats"] = subjectsStats;
 
+                Dictionary<int, Dictionary<int, string[]>> students = new Dictionary<int,  Dictionary<int, string[]>>();
+                string studentName = "";
+                string studentGrade = "";
+                foreach (var subject in db.ElectiveSubjectsAndSpecialities.Where(x => x.CategoryID == firstCategoryID))
+                {
+                    Dictionary<int, string[]> studentsOneSubject = new Dictionary<int, string[]>();
 
+                    foreach (var finalChoice in db.FinalChoices.Where(x => x.ChoiceID == subject.ElectiveSubjectAndSpecialityID))
+                    {
+                        string[] studentDetails = new string[2];
+
+                        studentName = db.Students.Where(x=>x.StudentNo == finalChoice.StudentNo).Select(x=>x.Name).FirstOrDefault() + " " + db.Students.Where(x => x.StudentNo == finalChoice.StudentNo).Select(x => x.Surname).FirstOrDefault();
+                        studentGrade = db.StudentsAndClassGroups.Where(x => x.StudentNo == finalChoice.StudentNo && x.ClassGroupID == selectedClassGroupID).Select(x => x.AverageGrade).FirstOrDefault().ToString();
+
+                        studentDetails[0] = studentName;
+                        studentDetails[1] = studentGrade;
+
+                        studentsOneSubject.Add(finalChoice.StudentNo, studentDetails);
+                    }
+                    students.Add(subject.ElectiveSubjectAndSpecialityID, studentsOneSubject);
+                }
+                Session["SubjectsStudents"] = students;
             }
         }
 
@@ -748,5 +789,664 @@ x.Semester == Semester && x.Speciality == Speciality).FirstOrDefault().ClassGrou
             }
             return RedirectToAction("MakeChanges", "Admin");
         }
+
+        [HttpPost]
+        public ActionResult MoveStudent(string StudentId, int OldSubID, int NewSubID)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                var subjectsStats = (Dictionary<int, string[]>)Session["SubjectsStats"];
+                if(subjectsStats[NewSubID].ElementAt(2) != "brak")
+                {
+                    if (Int32.Parse(subjectsStats[NewSubID][2]) == Int32.Parse(subjectsStats[NewSubID][3]))
+                    {
+                        TempData["Alert"] = "Nie można przenieść studenta - liczba studentów w docelowej grupie będzie większa niż jej limit górny!";
+                        return RedirectToAction("MakeChanges", "Admin");
+                    }
+                }
+                if (subjectsStats[OldSubID].ElementAt(1) != "brak")
+                {
+                    if (Int32.Parse(subjectsStats[OldSubID][1]) == Int32.Parse(subjectsStats[OldSubID][3]))
+                    {
+                        TempData["Alert"] = "Nie można przenieść studenta - liczba studentów w grupie będzie mniejsza niż jej limit dolny!";
+                        return RedirectToAction("MakeChanges", "Admin");
+                    }
+                }
+
+                subjectsStats[OldSubID][3] = (Int32.Parse(subjectsStats[OldSubID][3]) - 1).ToString();
+                subjectsStats[NewSubID][3] = (Int32.Parse(subjectsStats[NewSubID][3]) + 1).ToString();
+
+                var students = (Dictionary<int, Dictionary<int, string[]>>)Session["SubjectsStudents"];
+
+                string[] student = new string[2];
+                int stdNo = Int32.Parse(StudentId);
+
+                student = students[OldSubID][stdNo];
+                students[OldSubID].Remove(stdNo);
+                students[NewSubID].Add(stdNo, student);
+
+                var finalChoiceToEdit = db.FinalChoices.Where(x => x.StudentNo == stdNo && x.ChoiceID==OldSubID).FirstOrDefault();
+                finalChoiceToEdit.ChoiceID = NewSubID;
+                finalChoiceToEdit.LastEditedBy = (int)Session["AdminID"];
+                finalChoiceToEdit.LastEdit = DateTime.Now;
+                db.Entry(finalChoiceToEdit).State = EntityState.Modified;
+                db.SaveChanges();
+
+                Session["SubjectsStats"] = subjectsStats;
+                Session["SubjectsStudents"] = students;
+
+                TempData["Success"] = "Przeniesiono studenta pomyślnie!";
+            }
+            return RedirectToAction("MakeChanges", "Admin");
+        }
+
+        public string GetStudentSelectList(int subID)
+        {
+            var students = ((Dictionary<int, Dictionary<int, string[]>>)Session["SubjectsStudents"])[subID];
+            string result = "";
+            foreach(KeyValuePair <int, string[]> pair in students)
+            {
+                result += pair.Key + ",";
+                result += pair.Value[0] +",";
+            }
+            result.Remove(result.Length - 2, 1);
+            return result;
+        }
+
+        [HttpPost]
+        public ActionResult SwapStudent(int StudentIdSwap, int OldSubIDSwap, int SwapStudentID, int SwapSubjectID)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                var students = (Dictionary<int, Dictionary<int, string[]>>)Session["SubjectsStudents"];
+
+                string[] student = new string[2];
+
+                student = students[OldSubIDSwap][StudentIdSwap];
+                students[OldSubIDSwap].Remove(StudentIdSwap);
+                students[SwapSubjectID].Add(StudentIdSwap, student);
+
+                student = students[SwapSubjectID][SwapStudentID];
+                students[SwapSubjectID].Remove(SwapStudentID);
+                students[OldSubIDSwap].Add(SwapStudentID, student);
+
+                var finalChoiceToEdit = db.FinalChoices.Where(x => x.StudentNo == StudentIdSwap && x.ChoiceID == OldSubIDSwap).FirstOrDefault();
+                finalChoiceToEdit.ChoiceID = SwapSubjectID;
+                finalChoiceToEdit.LastEditedBy = (int)Session["AdminID"];
+                finalChoiceToEdit.LastEdit = DateTime.Now;
+                db.Entry(finalChoiceToEdit).State = EntityState.Modified;
+
+                finalChoiceToEdit = db.FinalChoices.Where(x => x.StudentNo == SwapStudentID && x.ChoiceID == SwapSubjectID).FirstOrDefault();
+                finalChoiceToEdit.ChoiceID = OldSubIDSwap;
+                finalChoiceToEdit.LastEditedBy = (int)Session["AdminID"];
+                finalChoiceToEdit.LastEdit = DateTime.Now;
+                db.Entry(finalChoiceToEdit).State = EntityState.Modified;
+
+                db.SaveChanges();
+
+                Session["SubjectsStudents"] = students;
+
+                TempData["Success"] = "Zamieniono studentów pomyślnie!";
+            }
+            return RedirectToAction("MakeChanges", "Admin");
+        }
+
+        public ActionResult Import()
+        {
+            Session["Data"] = null;
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("", "Home");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Import(HttpPostedFileBase file)
+        {
+            if (file != null && (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin"))
+            {
+                byte[] bytes = new byte[17];
+                file.InputStream.Seek(24, SeekOrigin.Begin);
+                file.InputStream.Read(bytes, 0, 17);
+                file.InputStream.Seek(0, SeekOrigin.Begin);
+
+                string result = System.Text.Encoding.UTF8.GetString(bytes).Split(' ')[0];
+
+                if (result == "ArrayOfAdmin" && Session["User"].ToString() == "SuperAdmin")
+                {
+                    /*var filename = Path.GetFileName(file.FileName);
+                    var path = Path.Combine(Server.MapPath("~/App_Data"), filename);
+                    file.SaveAs(path);*/
+                    List<StudentChoices.Models.Import.Admin> admins = null;
+
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<StudentChoices.Models.Import.Admin>));
+                    try
+                    {
+                        admins = (List<StudentChoices.Models.Import.Admin>)serializer.Deserialize(file.InputStream);
+                        foreach (var admin in admins)
+                        {
+                            if (admin.Login == "admin")
+                            {
+                                admins.Remove(admin);
+                                break;
+                            }
+                        }
+                        TempData["Success"] = "Wczytano dane pomyślnie!";
+                        ViewBag.nameOfImportedData = "Administratorzy";
+                        ViewBag.importedData = admins;
+                    }
+                    catch (Exception)
+                    {
+                        TempData["Alert"] = "Wystąpił błąd podczas odczytu pliku! Sprawdź zawartość pliku i spróbuj ponownie.";
+                    }
+
+                }
+                else if (result == "ArrayOfStudent")
+                {
+                    List<StudentChoices.Models.Import.Student.Student> students = null;
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<StudentChoices.Models.Import.Student.Student>));
+                    try
+                    {
+                        students = (List<StudentChoices.Models.Import.Student.Student>)serializer.Deserialize(file.InputStream);
+                        TempData["Success"] = "Wczytano dane pomyślnie!";
+                        ViewBag.nameOfImportedData = "Studenci";
+                        ViewBag.importedData = students;
+                    }
+                    catch (Exception)
+                    {
+                        TempData["Alert"] = "Wystąpił błąd podczas odczytu pliku! Sprawdź zawartość pliku i spróbuj ponownie.";
+                    }
+                }
+                else if (result == "ArrayOfClassGroup")
+                {
+                    List<StudentChoices.Models.Import.Subject.ClassGroup> subjects = null;
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<StudentChoices.Models.Import.Subject.ClassGroup>));
+                    try
+                    {
+                        subjects = (List<StudentChoices.Models.Import.Subject.ClassGroup>)serializer.Deserialize(file.InputStream);
+                        TempData["Success"] = "Wczytano dane pomyślnie!";
+                        ViewBag.nameOfImportedData = "Przedmioty obieralne i specjelności";
+                        ViewBag.importedData = subjects;
+                    }
+                    catch (Exception)
+                    {
+                        TempData["Alert"] = "Wystąpił błąd podczas odczytu pliku! Sprawdź zawartość pliku i spróbuj ponownie.";
+                    }
+                }
+                else
+                {
+                    TempData["Alert"] = "Nie rozpoznano rodzaju danych! Sprawdź zawartość pliku i spróbuj ponownie.";
+                }
+                Session["Data"] = ViewBag.importedData;
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public void changeImportedData(string nameOfImportedData, int row, string columnName, string newValue)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                if (nameOfImportedData == "Administratorzy" && Session["User"].ToString() == "SuperAdmin")
+                {
+                    List<StudentChoices.Models.Import.Admin> admins = (List<StudentChoices.Models.Import.Admin>)Session["Data"];
+                    PropertyInfo propertyInfo = admins[row].GetType().GetProperty(columnName);
+                    propertyInfo.SetValue(admins[row], Convert.ChangeType(newValue, propertyInfo.PropertyType), null);
+                    Session["Data"] = admins;
+                }
+                else if (nameOfImportedData == "Studenci")
+                {
+                    List<StudentChoices.Models.Import.Student.Student> students = (List<StudentChoices.Models.Import.Student.Student>)Session["Data"];
+                    int tempCounter = 0;
+                    foreach (var student in students)
+                    {
+                        if (tempCounter == row)
+                        {
+                            PropertyInfo propertyInfo = student.GetType().GetProperty(columnName);
+                            propertyInfo.SetValue(student, Convert.ChangeType(newValue, propertyInfo.PropertyType), null);
+                            Session["Data"] = students;
+                            return;
+                        }
+                        else
+                        {
+                            tempCounter += 1;
+                        }
+                        foreach (var classgroup in student.ClassGroup)
+                        {
+                            if (tempCounter == row)
+                            {
+                                PropertyInfo propertyInfo = classgroup.GetType().GetProperty(columnName);
+                                propertyInfo.SetValue(classgroup, Convert.ChangeType(newValue, propertyInfo.PropertyType), null);
+                                Session["Data"] = students;
+                                return;
+                            }
+                            else
+                            {
+                                tempCounter += 1;
+                            }
+                        }
+                    }
+                }
+                else if (nameOfImportedData == "Przedmioty obieralne i specjelności")
+                {
+                    List<StudentChoices.Models.Import.Subject.ClassGroup> subjects = (List<StudentChoices.Models.Import.Subject.ClassGroup>)Session["Data"];
+
+                    int tempCounter = 0;
+                    foreach (var classgroup in subjects)
+                    {
+                        if (tempCounter == row)
+                        {
+                            PropertyInfo propertyInfo = classgroup.GetType().GetProperty(columnName);
+                            propertyInfo.SetValue(classgroup, Convert.ChangeType(newValue, propertyInfo.PropertyType), null);
+                            Session["Data"] = subjects;
+                            return;
+                        }
+                        else
+                        {
+                            tempCounter += 1;
+                        }
+                        foreach (var category in classgroup.Category)
+                        {
+                            if (tempCounter == row)
+                            {
+                                PropertyInfo propertyInfo = category.GetType().GetProperty(columnName);
+                                propertyInfo.SetValue(category, Convert.ChangeType(newValue, propertyInfo.PropertyType), null);
+                                Session["Data"] = subjects;
+                                return;
+                            }
+                            else
+                            {
+                                tempCounter += 1;
+                            }
+                            foreach (var subject in category.ElectiveSubjectAndSpeciality)
+                            {
+                                if (tempCounter == row)
+                                {
+                                    PropertyInfo propertyInfo = subject.GetType().GetProperty(columnName);
+                                    propertyInfo.SetValue(subject, Convert.ChangeType(newValue, propertyInfo.PropertyType), null);
+                                    Session["Data"] = subjects;
+                                    return;
+                                }
+                                else
+                                {
+                                    tempCounter += 1;
+                                }
+                                foreach (var file in subject.Files)
+                                {
+                                    if (tempCounter == row)
+                                    {
+                                        PropertyInfo propertyInfo = file.GetType().GetProperty(columnName);
+                                        propertyInfo.SetValue(file, Convert.ChangeType(newValue, propertyInfo.PropertyType), null);
+                                        Session["Data"] = subjects;
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        tempCounter += 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [HttpPost]
+        public void deleteFromImportedData(string nameOfImportedData, int row)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                if (nameOfImportedData == "Administratorzy" && Session["User"].ToString() == "SuperAdmin")
+                {
+                    List<StudentChoices.Models.Import.Admin> admins = (List<StudentChoices.Models.Import.Admin>)Session["Data"];
+                    admins[row].ToRemove = true;
+                    Session["Data"] = admins;
+                }
+                else if (nameOfImportedData == "Studenci")
+                {
+                    List<StudentChoices.Models.Import.Student.Student> students = (List<StudentChoices.Models.Import.Student.Student>)Session["Data"];
+                    int tempCounter = 0;
+                    foreach (var student in students)
+                    {
+                        if (tempCounter == row)
+                        {
+                            student.ToRemove = true;
+                            Session["Data"] = students;
+                            return;
+                        }
+                        else
+                        {
+                            tempCounter += 1;
+                        }
+                        foreach (var classgroup in student.ClassGroup)
+                        {
+                            if (tempCounter == row)
+                            {
+                                classgroup.ToRemove = true;
+                                Session["Data"] = students;
+                                return;
+                            }
+                            else
+                            {
+                                tempCounter += 1;
+                            }
+                        }
+                    }
+                }
+                else if (nameOfImportedData == "Przedmioty obieralne i specjelności")
+                {
+                    List<StudentChoices.Models.Import.Subject.ClassGroup> subjects = (List<StudentChoices.Models.Import.Subject.ClassGroup>)Session["Data"];
+
+                    int tempCounter = 0;
+                    foreach (var classgroup in subjects)
+                    {
+                        if (tempCounter == row)
+                        {
+                            classgroup.ToRemove = true;
+                            Session["Data"] = subjects;
+                            return;
+                        }
+                        else
+                        {
+                            tempCounter += 1;
+                        }
+                        foreach (var category in classgroup.Category)
+                        {
+                            if (tempCounter == row)
+                            {
+                                category.ToRemove = true;
+                                Session["Data"] = subjects;
+                                return;
+                            }
+                            else
+                            {
+                                tempCounter += 1;
+                            }
+                            foreach (var subject in category.ElectiveSubjectAndSpeciality)
+                            {
+                                if (tempCounter == row)
+                                {
+                                    subject.ToRemove = true;
+                                    Session["Data"] = subjects;
+                                    return;
+                                }
+                                else
+                                {
+                                    tempCounter += 1;
+                                }
+                                foreach (var file in subject.Files)
+                                {
+                                    if (tempCounter == row)
+                                    {
+                                        file.ToRemove = true;
+                                        Session["Data"] = subjects;
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        tempCounter += 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [HttpPost]
+        public ActionResult SaveToDB(string nameOfImportedData)
+        {
+            if (Session["User"].ToString() == "Admin" || Session["User"].ToString() == "SuperAdmin")
+            {
+                if (nameOfImportedData == "Administratorzy" && Session["User"].ToString() == "SuperAdmin")
+                {
+                    List<StudentChoices.Models.Import.Admin> admins = (List<StudentChoices.Models.Import.Admin>)Session["Data"];
+                    foreach (var admin in admins.Where(x => x.ToRemove == false))
+                    {
+                        if (db.Admins.Where(x => x.Login == admin.Login).Count() > 0)
+                        {
+                            var adminToEdit = db.Admins.Where(x => x.Login == admin.Login).FirstOrDefault();
+                            adminToEdit.Password = admin.Password;
+                            adminToEdit.Active = false;
+                            db.Entry(adminToEdit).State = EntityState.Modified;
+                        }
+                        else
+                        {
+                            var newAdmin = new Admins();
+                            newAdmin.Login = admin.Login;
+                            newAdmin.Password = admin.Password;
+                            newAdmin.Active = false;
+                            newAdmin.SuperAdmin = false;
+                            db.Admins.Add(newAdmin);
+                        }
+                        db.SaveChanges();
+                    }
+                }
+                else if (nameOfImportedData == "Studenci")
+                {
+                    List<StudentChoices.Models.Import.Student.Student> students = (List<StudentChoices.Models.Import.Student.Student>)Session["Data"];
+                    foreach (var student in students.Where(x => x.ToRemove == false))
+                    {
+                        if (db.Students.Where(x => x.StudentNo == student.StudentNo).Count() > 0)
+                        {
+                            var studentToEdit = db.Students.Where(x => x.StudentNo == student.StudentNo).FirstOrDefault();
+                            studentToEdit.Login = student.Login;
+                            studentToEdit.Password = student.Password;
+                            studentToEdit.Name = student.Name;
+                            studentToEdit.Surname = student.Surname;
+                            studentToEdit.LastEditedBy = (int)Session["AdminID"];
+                            studentToEdit.LastEdit = DateTime.Now;
+                            db.Entry(studentToEdit).State = EntityState.Modified;
+                        }
+                        else
+                        {
+                            var newStudent = new Students();
+                            newStudent.StudentNo = student.StudentNo;
+                            newStudent.Login = student.Login;
+                            newStudent.Password = student.Password;
+                            newStudent.Name = student.Name;
+                            newStudent.Surname = student.Surname;
+                            newStudent.CreatedBy = (int)Session["AdminID"];
+                            newStudent.CreationDate = DateTime.Now;
+                            db.Students.Add(newStudent);
+                        }
+                        db.SaveChanges();
+                        foreach (var classgroup in student.ClassGroup.Where(x => x.ToRemove == false))
+                        {
+                            if (classgroup.Speciality == "")
+                            {
+                                classgroup.Speciality = "-";
+                            }
+                            if (db.ClassGroups.Where(x => x.DegreeCourse == classgroup.DegreeCourse && x.Graduate == classgroup.Graduate && x.FullTimeStudies == classgroup.FullTimeStudies && x.Semester == classgroup.Semester && x.Speciality == classgroup.Speciality).Select(x => x.ClassGroupID).Count() == 0)
+                            {
+                                var newClassGroup = new ClassGroups();
+                                newClassGroup.DegreeCourse = classgroup.DegreeCourse;
+                                newClassGroup.Graduate = classgroup.Graduate;
+                                newClassGroup.FullTimeStudies = classgroup.FullTimeStudies;
+                                newClassGroup.Semester = classgroup.Semester;
+                                newClassGroup.Speciality = classgroup.Speciality;
+                                newClassGroup.CreatedBy = (int)Session["AdminID"];
+                                newClassGroup.CreationDate = DateTime.Now;
+                                db.ClassGroups.Add(newClassGroup);
+                                db.SaveChanges();
+                            }
+                            int classGroupID = db.ClassGroups.Where(x => x.DegreeCourse == classgroup.DegreeCourse && x.Graduate == classgroup.Graduate && x.FullTimeStudies == classgroup.FullTimeStudies && x.Semester == classgroup.Semester && x.Speciality == classgroup.Speciality).Select(x => x.ClassGroupID).FirstOrDefault();
+                            if (db.StudentsAndClassGroups.Where(x => x.StudentNo == student.StudentNo && classGroupID == x.ClassGroupID).Count() > 0)
+                            {
+                                var studentClassGroupToEdit = db.StudentsAndClassGroups.Where(x => x.StudentNo == student.StudentNo && classGroupID == x.ClassGroupID).FirstOrDefault();
+                                studentClassGroupToEdit.AverageGrade = classgroup.AverageGrade;
+                                studentClassGroupToEdit.LastEditedBy = (int)Session["AdminID"];
+                                studentClassGroupToEdit.LastEdit = DateTime.Now;
+                                db.Entry(studentClassGroupToEdit).State = EntityState.Modified;
+                            }
+                            else
+                            {
+                                var newStudentClassGroup = new StudentsAndClassGroups();
+                                newStudentClassGroup.StudentNo = student.StudentNo;
+                                newStudentClassGroup.AverageGrade = classgroup.AverageGrade;
+                                newStudentClassGroup.CreatedBy = (int)Session["AdminID"];
+                                newStudentClassGroup.CreationDate = DateTime.Now;
+                                newStudentClassGroup.ClassGroupID = classGroupID;
+                                db.StudentsAndClassGroups.Add(newStudentClassGroup);
+                            }
+                            db.SaveChanges();
+                        }
+                    }
+                }
+                else if (nameOfImportedData == "Przedmioty obieralne i specjelności")
+                {
+                    List<StudentChoices.Models.Import.Subject.ClassGroup> subjects = (List<StudentChoices.Models.Import.Subject.ClassGroup>)Session["Data"];
+                    foreach (var classgroup in subjects.Where(x => x.ToRemove == false))
+                    {
+                        if (classgroup.Speciality == "")
+                        {
+                            classgroup.Speciality = "-";
+                        }
+                        int classGroupID = -1;
+                        if (db.ClassGroups.Where(x => x.DegreeCourse == classgroup.DegreeCourse && x.Graduate == classgroup.Graduate && x.FullTimeStudies == classgroup.FullTimeStudies && x.Semester == classgroup.Semester && x.Speciality == classgroup.Speciality).Select(x => x.ClassGroupID).Count() > 0)
+                        {
+                            classGroupID = db.ClassGroups.Where(x => x.DegreeCourse == classgroup.DegreeCourse && x.Graduate == classgroup.Graduate && x.FullTimeStudies == classgroup.FullTimeStudies && x.Semester == classgroup.Semester && x.Speciality == classgroup.Speciality).Select(x => x.ClassGroupID).FirstOrDefault();
+                        }
+                        else
+                        {
+                            var newClassGroup = new ClassGroups();
+                            newClassGroup.DegreeCourse = classgroup.DegreeCourse;
+                            newClassGroup.Graduate = classgroup.Graduate;
+                            newClassGroup.FullTimeStudies = classgroup.FullTimeStudies;
+                            newClassGroup.Semester = classgroup.Semester;
+                            newClassGroup.Speciality = classgroup.Speciality;
+                            newClassGroup.CreatedBy = (int)Session["AdminID"];
+                            newClassGroup.CreationDate = DateTime.Now;
+                            db.ClassGroups.Add(newClassGroup);
+                            db.SaveChanges();
+                            classGroupID = newClassGroup.ClassGroupID;
+                        }
+
+                        foreach (var category in classgroup.Category.Where(x => x.ToRemove == false))
+                        {
+                            int categoryID = -1;
+                            if (category.MaxNoChoices > category.ElectiveSubjectAndSpeciality.Count)
+                            {
+                                category.MaxNoChoices = category.ElectiveSubjectAndSpeciality.Count;
+                            }
+                            if (db.Categories.Where(x => x.Name == category.Name && classGroupID == x.ClassGroupID).Count() > 0)
+                            {
+                                var categoryToEdit = db.Categories.Where(x => x.Name == category.Name && classGroupID == x.ClassGroupID).FirstOrDefault();
+                                categoryToEdit.Information = category.Information;
+                                categoryToEdit.MaxNoChoices = category.MaxNoChoices;
+                                categoryToEdit.LastEditedBy = (int)Session["AdminID"];
+                                categoryToEdit.LastEdit = DateTime.Now;
+                                db.Entry(categoryToEdit).State = EntityState.Modified;
+                                db.SaveChanges();
+                                categoryID = categoryToEdit.CategoryID;
+                            }
+                            else
+                            {
+                                var newCategory = new Categories();
+                                newCategory.ClassGroupID = classGroupID;
+                                newCategory.Name = category.Name;
+                                newCategory.Information = category.Information;
+                                newCategory.MaxNoChoices = category.MaxNoChoices;
+                                newCategory.CreatedBy = (int)Session["AdminID"];
+                                newCategory.CreationDate = DateTime.Now;
+                                db.Categories.Add(newCategory);
+                                db.SaveChanges();
+                                categoryID = newCategory.CategoryID;
+                            }
+
+                            foreach (var subject in category.ElectiveSubjectAndSpeciality.Where(x => x.ToRemove == false))
+                            {
+                                int subjectID = -1;
+                                if (subject.UpperLimit != "" && subject.LowerLimit != "")
+                                {
+                                    if (Int16.Parse(subject.LowerLimit) > Int16.Parse(subject.UpperLimit))
+                                    {
+                                        subject.LowerLimit = subject.UpperLimit;
+                                    }
+                                }
+                                if (db.ElectiveSubjectsAndSpecialities.Where(x => x.Name == subject.Name && categoryID == x.CategoryID).Count() > 0)
+                                {
+                                    var subjectToEdit = db.ElectiveSubjectsAndSpecialities.Where(x => x.Name == subject.Name && categoryID == x.CategoryID).FirstOrDefault();
+                                    subjectToEdit.Name = subject.Name;
+                                    subjectToEdit.Information = subject.Information;
+                                    if (subject.UpperLimit != "")
+                                    {
+                                        subjectToEdit.UpperLimit = Int16.Parse(subject.UpperLimit);
+                                    }
+                                    if (subject.LowerLimit != "")
+                                    {
+                                        subjectToEdit.LowerLimit = Int16.Parse(subject.LowerLimit);
+                                    }
+                                    subjectToEdit.LastEditedBy = (int)Session["AdminID"];
+                                    subjectToEdit.LastEdit = DateTime.Now;
+                                    db.Entry(subjectToEdit).State = EntityState.Modified;
+                                    db.SaveChanges();
+                                    subjectID = subjectToEdit.ElectiveSubjectAndSpecialityID;
+                                }
+                                else
+                                {
+                                    var newSubject = new ElectiveSubjectsAndSpecialities();
+                                    newSubject.Name = subject.Name;
+                                    newSubject.CategoryID = categoryID;
+                                    newSubject.Information = subject.Information;
+                                    if (subject.UpperLimit != "")
+                                    {
+                                        newSubject.UpperLimit = Int16.Parse(subject.UpperLimit);
+                                    }
+                                    if (subject.LowerLimit != "")
+                                    {
+                                        newSubject.LowerLimit = Int16.Parse(subject.LowerLimit);
+                                    }
+                                    newSubject.CreatedBy = (int)Session["AdminID"];
+                                    newSubject.CreationDate = DateTime.Now;
+                                    db.ElectiveSubjectsAndSpecialities.Add(newSubject);
+                                    db.SaveChanges();
+                                    subjectID = newSubject.ElectiveSubjectAndSpecialityID;
+                                }
+
+                                foreach (var file in subject.Files.Where(x => x.ToRemove == false))
+                                {
+                                    if (db.Files.Where(x => x.Filename == file.Filename && subjectID == x.ElectiveSubjectAndSpecialityID).Count() > 0)
+                                    {
+                                        var fileToEdit = db.Files.Where(x => x.Filename == file.Filename && subjectID == x.ElectiveSubjectAndSpecialityID).FirstOrDefault();
+                                        fileToEdit.Path = file.Path;
+                                        fileToEdit.LastEditedBy = (int)Session["AdminID"];
+                                        fileToEdit.LastEdit = DateTime.Now;
+                                        db.Entry(fileToEdit).State = EntityState.Modified;
+                                        db.SaveChanges();
+                                    }
+                                    else
+                                    {
+                                        var newFile = new Files();
+                                        newFile.Filename = file.Filename;
+                                        newFile.ElectiveSubjectAndSpecialityID = subjectID;
+                                        newFile.Path = file.Path;
+                                        newFile.CreatedBy = (int)Session["AdminID"];
+                                        newFile.CreationDate = DateTime.Now;
+                                        db.Files.Add(newFile);
+                                        db.SaveChanges();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return RedirectToAction("", "Home");
+            }
+            Session["Data"] = null;
+            TempData["Success"] = "Zaimportowane dane (" + nameOfImportedData + ") zapisano w bazie danych pomyślnie!";
+            return RedirectToAction("", "Home");
+        }
+
+
     }
 }

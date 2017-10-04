@@ -81,3 +81,13 @@ fieldset[disabled] .btn-default-main.active {
         line-height: 2;
     }
     }
+
+.btn-import {
+    height: 28px;
+    padding-top: 3px;
+}
+
+.form-control-import {
+    height: 28px;
+    font-size: 12px;
+}

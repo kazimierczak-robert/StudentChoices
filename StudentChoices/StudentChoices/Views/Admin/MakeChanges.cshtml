@@ -6,6 +6,20 @@
 <h2>Zmiany w wynikach rekrutacji</h2>
 
 <br />
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-margin0px alert-success" style="text-align:center; margin-bottom:10px">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Alert"] != null)
+{
+    <div class="alert alert-margin0px alert-danger" style="text-align:center;margin-bottom:10px">
+        @TempData["Alert"]
+    </div>
+}
+
 <div class="panel-body">
     @using (Html.BeginForm())
     {
@@ -15,164 +29,166 @@
                 <h5><b>Grupa studencka:</b></h5>
             </div>
         </div>
-                            <div class="row">
-                                <div class="col-sm-8" style="padding-bottom:10px">
-                                    @Html.DropDownList("ClassGroups", (SelectList)Session["ClassGroups"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table;max-width: none" })
-                                </div>
-                                <div class="col-sm-2" style="text-align:center">
-                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeClassGroup", "Admin")' class="btn btn-default btn-default-main" />
-                                </div>
-                                <div class="col-sm-2"></div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <h5><b>Kategoria:</b></h5>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-8" style="padding-bottom:10px">
-                                    @Html.DropDownList("Categories", (SelectList)Session["Categories"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table; max-width: none" })
-                                </div>
-                                <div class="col-sm-2" style="text-align:center">
-                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Admin")' class="btn btn-default btn-default-main" />
-                                </div>
-                                <div class="col-sm-2"></div>
-                            </div>
-                            <!-- test
-                            <div>
-                                @foreach (var item in (Dictionary<string, int>)Session["Stats"])
-                                {
-                                    <b>@item.Key</b>
-                                    <table>
-                                        <tr>
-                                            <td>nr indeksu</td>
-                                            <td>imię i nazwisko</td>
-                                            <td>średnia</td>
-                                            <td>przenieś do:</td>
-                                        </tr>
-                                        <tr>
-                                            <td>123457</td>
-                                        </tr>
+        <div class="row">
+            <div class="col-sm-8" style="padding-bottom:10px">
+                @Html.DropDownList("ClassGroups", (SelectList)Session["ClassGroupsEditFinalChoices"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table;max-width: none" })
+            </div>
+            <div class="col-sm-2" style="text-align:center">
+                <input type="submit" value="Zmień" formaction='@Url.Action("ChangeClassGroup", "Admin")' class="btn btn-default btn-default-main" style="height:34px" />
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h5><b>Kategoria:</b></h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8" style="padding-bottom:10px">
+                @Html.DropDownList("Categories", (SelectList)Session["CategoriesEditFinalChoices"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table; max-width: none" })
+            </div>
+            <div class="col-sm-2" style="text-align:center">
+                <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Admin")' class="btn btn-default btn-default-main" style="height:34px"/>
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
 
-                                    </table>
-                                }
-                            </div>
-                                -->
-
-        <b>Programowanie współbieżne</b>
-        <table class="table">
-            <tr>
-                <td>nr indeksu</td>
-                <td>imię i nazwisko</td>
-                <td>średnia</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>123457</td>
-                <td>Adam Mak</td>
-                <td>4,01</td>
-                <td>
-                    <div class="col-sm-2" style="text-align:center">
-                        <input type="submit" value="Przenieś" formaction='@Url.Action("MakeChanges2", "Admin")' class="btn btn-default btn-default-main" />
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>123466</td>
-                <td>Michał Winiarski</td>
-                <td>4,9</td>
-                <td>
-                    <div class="col-sm-2" style="text-align:center">
-                        <input type="submit" value="Przenieś" formaction='@Url.Action("MakeChanges2", "Admin")' class="btn btn-default btn-default-main" />
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>123480</td>
-                <td>Adam Kobiałka</td>
-                <td>4,83</td>
-                <td>
-                    <div class="col-sm-2" style="text-align:center">
-                        <input type="submit" value="Przenieś" formaction='@Url.Action("MakeChanges2", "Admin")' class="btn btn-default btn-default-main" />
-                    </div>
-                </td>
-            </tr>
-
-        </table>
-        <hr />
-        <b>Protokoły komunikacyjne</b>
-        <table class="table">
-            <tr>
-                <td>nr indeksu</td>
-                <td>imię i nazwisko</td>
-                <td>średnia</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>123459</td>
-                <td>Anna Wilk</td>
-                <td>4,4</td>
-                <td>
-                    <div class="col-sm-2" style="text-align:center">
-                        <input type="submit" value="Przenieś" formaction='@Url.Action("MakeChanges2", "Admin")' class="btn btn-default btn-default-main" />
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>123471</td>
-                <td>Marcelina Las</td>
-                <td>4,8</td>
-                <td>
-                    <div class="col-sm-2" style="text-align:center">
-                        <input type="submit" value="Przenieś" formaction='@Url.Action("MakeChanges2", "Admin")' class="btn btn-default btn-default-main" />
-                    </div>
-                </td>
-            </tr>
-            
-        </table>
-        <hr />
-        <b>Programowanie robotów</b>
-        <table class="table">
-            <tr>
-                <td>nr indeksu</td>
-                <td>imię i nazwisko</td>
-                <td>średnia</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>123458</td>
-                <td>Jan Kot</td>
-                <td>4</td>
-                <td>
-                    <div class="col-sm-2" style="text-align:center">
-                        <input type="submit" value="Przenieś" formaction='@Url.Action("MakeChanges2", "Admin")' class="btn btn-default btn-default-main" />
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>123456</td>
-                <td>Jan Nowak</td>
-                <td>4,02</td>
-                <td>
-                    <div class="col-sm-2" style="text-align:center">
-                        <input type="submit" value="Przenieś" formaction='@Url.Action("MakeChanges2", "Admin")' class="btn btn-default btn-default-main" />
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>123455</td>
-                <td>Marek Lis</td>
-                <td>4,34</td>
-                <td>
-                    <div class="col-sm-2" style="text-align:center">
-                        <input type="submit" value="Przenieś" formaction='@Url.Action("MakeChanges2", "Admin")' class="btn btn-default btn-default-main" />
-                    </div>
-                </td>
-            </tr>
-
-        </table>
+        foreach (var subjectStats in (Dictionary<int, string[]>)Session["SubjectsStats"])
+        {
+            <div class="panel-footer">
+                <h4>@subjectStats.Value[0] (dolny limit: @subjectStats.Value[1], górny limit: @subjectStats.Value[2], liczba przyjętych: @subjectStats.Value[3]) </h4>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="table1">
+                        <thead>
+                            <tr>
+                                <th>Indeks</th>
+                                <th>Imię i nazwisko</th>
+                                <th>Średnia</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (KeyValuePair<int, string[]> pair in ((Dictionary<int, Dictionary<int, string[]>>)Session["SubjectsStudents"])[subjectStats.Key])
+                            {
+                                <tr>
+                                    <td>@pair.Key</td>
+                                    <td>@pair.Value[0]</td>
+                                    <td style="width:70px">@pair.Value[1]</td>
+                                    
+                                    <td style="width:55px"><a href="#move" role="button" class="btn btn-default btn-default-main" data-toggle="modal" data-backdrop="static" onclick="Set(@pair.Key, @subjectStats.Key)">Przenieś do...</a></td>
+                                    <td style="width:55px"><a href="#swap" role="button" class="btn btn-default btn-default-main" data-toggle="modal" data-backdrop="static" onclick="Set(@pair.Key, @subjectStats.Key)">Zamień z...</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+             </div>
+        }
     }
+    </div>
 
+<div id="move" class="modal fade">
+    <div class="modal-dialog" style="width:350px">
+        <div class="modal-content">
+            @using (Html.BeginForm("MoveStudent", "Admin", FormMethod.Post))
+            {
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Przenieś do...</h4>
+            </div>
+            <div class="modal-body">
+                @Html.Hidden("StudentId", -1)
+                @Html.Hidden("OldSubID", -1)
+                <p>Przenieś studenta o indeksie <label id="stdDetails"> </label> do:</p>
+                @Html.DropDownList("NewSubID", (SelectList)Session["SubjectCombobox"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table;max-width: none" })
+            </div>
+            <div class="modal-footer">
+                <input type="submit" value="Zmień" class="btn btn-default btn-main" style="width:80px" />
+            </div>
+            }
+        </div>
+    </div>
 </div>
 
+<div id="swap" class="modal fade">
+    <div class="modal-dialog" style="width:350px">
+        <div class="modal-content">
+            @using (Html.BeginForm("SwapStudent", "Admin", FormMethod.Post))
+            {
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Zamień z...</h4>
+                </div>
+                <div class="modal-body">
+                    @Html.Hidden("StudentIdSwap", -1)
+                    @Html.Hidden("OldSubIDSwap", -1)
+                    <p>Zamień studenta o indeksie <label id="stdDetailsSwap"> std </label> z:</p>
+                    @Html.DropDownList("SwapSubjectID", (SelectList)Session["SubjectCombobox"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table;max-width: none", @onchange = "ComboboxChange()" })
+                    
+                    @Html.DropDownList("SwapStudentID", Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control", @style = "display:inline-table;max-width: none;" })
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" value="Zmień" class="btn btn-default btn-main" style="width:80px" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
+<script type="text/javascript">
+
+    var combobox;
+
+    window.onload = function () {
+        combobox = document.getElementById("NewSubID").innerHTML;
+    };
+
+    function Set(stdNo, subID) {
+        document.getElementById("StudentId").value = stdNo;
+        document.getElementById("stdDetails").innerText = stdNo;
+        document.getElementById("OldSubID").value = subID;
+
+        document.getElementById("StudentIdSwap").value = stdNo;
+        document.getElementById("stdDetailsSwap").innerText = stdNo;
+        document.getElementById("OldSubIDSwap").value = subID;
+
+        var control = document.getElementById("NewSubID");
+
+        control.innerHTML = combobox;
+        document.getElementById("SwapSubjectID").innerHTML = combobox;
+
+        for (var i = 0; i < control.length; i++) {
+            if (control[i].value == subID) {
+                control.remove(i);
+                document.getElementById("SwapSubjectID").remove(i);
+                break;
+            }
+        }
+        ComboboxChange();
+    }
+
+    function ComboboxChange() {
+
+        var studentsList = document.getElementById("SwapStudentID");
+        for (var i = studentsList.length - 1; i >= 0; i--) {
+            studentsList.remove(i);
+        }
+
+        $.post('@Url.Action("GetStudentSelectList", "Admin")', {
+            subID: document.getElementById("SwapSubjectID").value
+        }, function (data) {
+            var splitedData = data.split(",");
+            for (var i = 0; i < splitedData.length - 1; i += 2) {
+                var option = document.createElement('option');
+                option.value = splitedData[i];
+                option.text = splitedData[i + 1];
+                studentsList.add(option);
+            }
+        });
+
+    }
+
+</script>

@@ -221,7 +221,7 @@
                                     @Html.DropDownList("ClassGroups", (SelectList)Session["ClassGroups"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table;max-width: none" })
                                 </div>
                                 <div class="col-sm-2" style="text-align:center">
-                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeClassGroup", "Home")' class="btn btn-default btn-default-main" />
+                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeClassGroup", "Home")' class="btn btn-default btn-default-main" style="height:34px" />
                                 </div>
                                 <div class="col-sm-2"></div>
                             </div>
@@ -235,7 +235,7 @@
                                     @Html.DropDownList("Categories", (SelectList)Session["Categories"], htmlAttributes: new { @class = "form-control", @style = "display:inline-table; max-width: none" })
                                 </div>
                                 <div class="col-sm-2" style="text-align:center">
-                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Home")' class="btn btn-default btn-default-main" />
+                                    <input type="submit" value="Zmień" formaction='@Url.Action("ChangeCategory", "Home")' class="btn btn-default btn-default-main" style="height:34px" />
                                 </div>
                                 <div class="col-sm-2"></div>
                             </div>

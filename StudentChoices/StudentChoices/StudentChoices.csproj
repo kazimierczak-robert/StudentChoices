@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -162,6 +163,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Import\Admin.cs" />
+    <Compile Include="Models\Import\Student\ClassGroup.cs" />
+    <Compile Include="Models\Import\Student\Student.cs" />
+    <Compile Include="Models\Import\Subject\Category.cs" />
+    <Compile Include="Models\Import\Subject\ClassGroup.cs" />
+    <Compile Include="Models\Import\Subject\ElectiveSubjectAndSpeciality.cs" />
+    <Compile Include="Models\Import\Subject\Files.cs" />
     <Compile Include="Models\Users.cs" />
     <Compile Include="Models\PPDB.Context.cs">
       <AutoGen>True</AutoGen>

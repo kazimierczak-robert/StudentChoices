@@ -412,7 +412,12 @@ namespace StudentChoices.Controllers
             Session["Options"] = null;
             Session["ChosenOptions"] = null;
             Session["AdminID"] = null;
-
+            Session["ClassGroupsEditFinalChoices"] = null;
+            Session["CategoriesEditFinalChoices"] = null;
+            Session["SubjectCombobox"] = null;
+            Session["SubjectsStats"] = null;
+            Session["SubjectsStudents"] = null;
+            Session["Data"] = null;
             return RedirectToAction("", "Home");
         }
 
