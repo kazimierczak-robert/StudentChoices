@@ -8,6 +8,13 @@ Main goal is create system for university, which improves the process of recruit
 Students can choose from the avaiable options and check results of recruitation via Web Browser.
 Administrators can manage the whole process, import/export data, launch algorithm which assigns students based on on their preference, share results and much more.
 
+<p align="center"><img src="https://github.com/kazimierczak-robert/StudentChoices/blob/master/Screenshots/1.png"></p>
+<p align="center"><img src="https://github.com/kazimierczak-robert/StudentChoices/blob/master/Screenshots/2.png"></p>
+<p align="center"><img src="https://github.com/kazimierczak-robert/StudentChoices/blob/master/Screenshots/3.png"></p>
+<p align="center"><img src="https://github.com/kazimierczak-robert/StudentChoices/blob/master/Screenshots/4.png"></p>
+<p align="center"><img src="https://github.com/kazimierczak-robert/StudentChoices/blob/master/Screenshots/5.png"></p>
+
+
 ## Tools
 Microsoft Visual Studio 2017
 
